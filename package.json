@@ -1,7 +1,7 @@
 {
   "name": "commangular",
-  "description": "Command pattern for AngularJS apps",
-  "version": "0.5.0",
+  "description": "Command pattern implementation for AngularJS",
+  "version": "0.1.0",
   "filename": "commangular.min.js",
   "main": "./dist/commangular.min.js",
   "homepage": "https://github.com/yukatan/commangular",
