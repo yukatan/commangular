@@ -5,7 +5,7 @@
   "filename": "commangular.min.js",
   "main": "./dist/commangular.min.js",
   "homepage": "https://github.com/yukatan/commangular",
-  "author": "Jesús Barquín Cheda <yukatan@gmail.com.ar>",
+  "author": "Jesús Barquín Cheda <yukatan@gmail.com>",
   "repository": {
     "type": "git",
     "url": "git://github.com/yukatan/commangular.git"
