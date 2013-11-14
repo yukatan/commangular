@@ -5,7 +5,7 @@
 	commangular.create = function (commandName,commandFunction) {
 
 		if(!commangular.functions) {
-			commangular.functions = [];
+			commangular.functions = {};
 		}
 		commangular.functions[commandName] = commandFunction;
 	}
@@ -16,7 +16,7 @@
 
 		this.commandType = commandType;
 		this.descriptors = [];
-		this.command = {};
+		this.command = null;
 	}
 	CommandDescriptor.prototype.add = function(command) {
 
@@ -251,7 +251,7 @@
 	angular.module('commangular',[])
   		.provider('$commangular', function () {
        
-		    var descriptors = [];    
+		    var descriptors = {};    
 		    var currentCommandDescriptor;
 		    var pendingDescriptors = [];
 		    
