@@ -29,9 +29,17 @@ module.exports = function(grunt) {
     zip: {
       '<%= dirs.dest %>/commangular.zip': ['<%= dirs.dest %>/<%= pkg.name %>.js', '<%= dirs.dest %>/<%= pkg.name %>.min.js']
     },
-    bowerInstall: {
+    bower: {
         install: {
-        }
+          	options: {
+          		targetDir: './bower_components',
+          		install: true,
+          		verbose: false,
+          		cleanTargetDir: false,
+          		cleanBowerDir: false,
+          		bowerOptions: {}
+             }
+           }
     },
     uglify: {
       options: {
@@ -84,8 +92,6 @@ module.exports = function(grunt) {
 
   grunt.loadNpmTasks('grunt-bower-task');
 
-  grunt.renameTask("bower", "bowerInstall");
-
   grunt.loadNpmTasks('grunt-karma');
 
   grunt.loadNpmTasks('grunt-conventional-changelog');
@@ -97,7 +103,7 @@ module.exports = function(grunt) {
   grunt.registerTask('default', ['build']);
 
   // Build task.
-  grunt.registerTask('build', ['bowerInstall', 'concat', 'uglify', 'zip']);
+  grunt.registerTask('build', ['bower', 'concat', 'uglify', 'zip']);
   
   // Provides the "bump" task.
   grunt.registerTask('bump', 'Increment version number', function() {
