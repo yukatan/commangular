@@ -37,10 +37,31 @@
 
 		this.execute =  function() {
 			
-			var command = this.context.$injector.instantiate(this.command,this.context.getContextData());
-			var result = this.context.$injector.invoke(command.execute,this.command,this.context.getContextData());
+			var self = this;
+			var isError = false;
 			this.deferred = this.context.$q.defer();
-			this.context.processResults(result,this.deferred);
+			var command = this.context.$injector.instantiate(this.command,this.context.getContextData());
+			try {
+				var result = this.context.$injector.invoke(command.execute,this.command,this.context.getContextData());
+				var resultPromise = this.context.processResults(result,this.deferred);
+			}
+			catch(error) {
+				isError = true;
+				if(command.hasOwnProperty('onError')) {
+
+					var contextData = this.context.getContextData();
+					contextData.lastError = error;
+					this.context.$injector.invoke(command.onError,this.command,this.context.getContextData());
+				}
+				this.deferred.reject(error); 
+			}
+			if(command.hasOwnProperty('onComplete') && !isError) {
+				
+				resultPromise.then(function(){
+
+					self.context.$injector.invoke(command.onComplete,self.command,self.context.getContextData());
+				});
+			}
 			return this.deferred.promise;
 		}
 	}
@@ -75,19 +96,26 @@
 			var commandDescriptor = this.descriptors[this.currentIndex];
 			var command = this.context.instanciate(commandDescriptor);
 			if(command instanceof CommandSequence || command instanceof CommandParallel)
-				command.start().then(function(){
+				command.start().then(
+				function() {
 					self.nextCommand();
+				},
+				function(error) {
+					self.deferred.reject(error);
 				});
 			if(command instanceof Command)
-				command.execute().then(function(){
+				command.execute().then(
+				function(){
 					self.nextCommand();
+				},
+				function(error) {
+					self.deferred.reject(error);
 				});
 
 		};
 		this.nextCommand = function () {
-
-			this.currentIndex++;
-			if(this.currentIndex == this.descriptors.length)	{
+			
+			if(++this.currentIndex == this.descriptors.length)	{
 				
 				this.deferred.resolve();
 				return;
@@ -111,13 +139,21 @@
 				var commandDescriptor = this.descriptors[x];
 				var command = this.context.instanciate(commandDescriptor);
 				if(command instanceof CommandSequence || command instanceof CommandParallel)
-					command.start().then(function(){
+					command.start().then(
+					function(){
 						self.checkComplete();
-				});
+					},
+					function(error) {
+						self.deferred.reject(error);
+					});
 				if(command instanceof Command)
-					command.execute().then(function(){
+					command.execute().then(
+					function(){
 						self.checkComplete();
-				});
+					},
+					function(error) {
+						self.deferred.reject(error);
+					});					
 			}
 		};
 		this.checkComplete = function() {
@@ -166,7 +202,7 @@
 			promises.push(value);
 			keys.push(prop);
 		}
-		this.$q.all(promises).then(function(data){
+		var promise = this.$q.all(promises).then(function(data){
 			
 			for(var x = 0 ; x< data.length;x++) {
 
@@ -174,6 +210,7 @@
 			}
 			deferred.resolve();
 		});
+		return promise;
 		
 	};
 	
@@ -309,6 +346,9 @@
 	            command.start().then(function(data) {
 
 	            	console.log("Command Complete");
+	            },function(error){
+
+	            	console.log("Command context end with error :" + error);
 	            });
 	        },
 	        
