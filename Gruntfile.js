@@ -83,8 +83,8 @@ module.exports = function(grunt) {
       },
       travis: {
         singleRun: true,
-        browsers: ['Firefox']
-        autoWatch: false,
+        browsers: ['Firefox'],
+        autoWatch: false
       },
       dev: {
         autoWatch: true
