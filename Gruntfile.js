@@ -73,6 +73,23 @@ module.exports = function(grunt) {
         }
       }
     },
+    karma: {
+      options: {
+        configFile: 'karma.conf.js'
+      },
+      build: {
+        singleRun: true,
+        autoWatch: false
+      },
+      travis: {
+        singleRun: true,
+        autoWatch: false,
+        browsers: ['Firefox']
+      },
+      dev: {
+        autoWatch: true
+      }
+    },
     
     changelog: {
       options: {
@@ -103,7 +120,11 @@ module.exports = function(grunt) {
   grunt.registerTask('default', ['build']);
 
   // Build task.
-  grunt.registerTask('build', ['bower', 'concat', 'uglify', 'zip']);
+  grunt.registerTask('build', ['bower', 'karma:build','concat', 'uglify', 'zip']);
+
+  grunt.registerTask('test', ['karma:build']);
+  
+  grunt.registerTask('travis', ['karma:travis']);
   
   // Provides the "bump" task.
   grunt.registerTask('bump', 'Increment version number', function() {
