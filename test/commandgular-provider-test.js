@@ -1,30 +1,32 @@
 describe("Provider Testing", function() {
-  
-	var provider;
-	
-	function command1(){};
-	function command2(){};
 
-	commangular.create('Command1',command1);
-	commangular.create('Command2',command2);
-	
+	var provider;
+	function command1() {};
+	function command2() {};
 
 	beforeEach(function() {
 
-			module('commangular',function($commangularProvider){
-	
-				provider = $commangularProvider;
-			});
-			inject(function(){});
+		commangular.functions = {};
+		commangular.create('Command1', command1);
+		commangular.create('Command2', command2);
 	});
-	
+
+	beforeEach(function() {
+
+		module('commangular', function($commangularProvider) {
+
+			provider = $commangularProvider;
+		});
+		inject(function() {});
+	});
+
 	it("provider should be defined", function() {
-		
+
 		expect(provider).toBeDefined();
 	});
 
 	it("should find the commands", function() {
-		
+
 		var command = provider.get('Command1');
 		expect(command).toBeDefined();
 		expect(command).toEqual(command1);
@@ -35,7 +37,7 @@ describe("Provider Testing", function() {
 	});
 
 	it("should create the correct commandType", function() {
-		
+
 		expect(provider).toBeDefined();
 
 		var sequence = provider.asSequence().add('Command1').create();
@@ -53,7 +55,7 @@ describe("Provider Testing", function() {
 	});
 
 	it("descriptor should have the correct command function", function() {
-		
+
 		expect(provider).toBeDefined();
 
 		var sequence = provider.asSequence().add('Command1').create();
@@ -74,5 +76,57 @@ describe("Provider Testing", function() {
 
 	});
 
+	it("should map to the correct event string", function() {
 
+		expect(provider).toBeDefined();
+		var eventName = 'TestEvent';
+		provider.asSequence().add('Command1').mapTo(eventName);
+		var commandDescriptor = provider.findCommand(eventName);
+		expect(commandDescriptor).toBeDefined();
+		expect(commandDescriptor.command).toBeDefined();
+		expect(commandDescriptor.descriptors[0].command).toEqual(command1);
+
+
+	});
+
+	it("should map correct sequences", function() {
+
+		expect(provider).toBeDefined();
+		var eventName = 'TestEvent';
+		provider.asSequence().add('Command1').add('Command2').mapTo(eventName);
+		var commandDescriptor = provider.findCommand(eventName);
+		expect(commandDescriptor.commandType).toBe('S');
+		expect(commandDescriptor).toBeDefined();
+		expect(commandDescriptor.descriptors[0].command).toEqual(command1);
+		expect(commandDescriptor.descriptors[1].command).toEqual(command2);
+	});
+
+
+	it("should map correct parallels", function() {
+
+		expect(provider).toBeDefined();
+		var eventName = 'TestEvent';
+		provider.asParallel().add('Command1').add('Command2').mapTo(eventName);
+		var commandDescriptor = provider.findCommand(eventName);
+		expect(commandDescriptor.commandType).toBe('P');
+		expect(commandDescriptor).toBeDefined();
+		expect(commandDescriptor.descriptors[0].command).toEqual(command1);
+		expect(commandDescriptor.descriptors[1].command).toEqual(command2);
+	});
+
+	it("should allow nested commands", function() {
+
+		expect(provider).toBeDefined();
+		var eventName = 'TestEvent';
+		var sequence = provider.asSequence().add('Command1').add('Command2').create();
+		provider.asParallel().add('Command1').add('Command2').add(sequence).mapTo(eventName);
+		var commandDescriptor = provider.findCommand(eventName);
+		expect(commandDescriptor.commandType).toBe('P');
+		expect(commandDescriptor).toBeDefined();
+		expect(commandDescriptor.descriptors[0].command).toEqual(command1);
+		expect(commandDescriptor.descriptors[1].command).toEqual(command2);
+		expect(commandDescriptor.descriptors[2]).toEqual(sequence);
+		expect(commandDescriptor.descriptors[2].descriptors[0].command).toEqual(command1);
+		expect(commandDescriptor.descriptors[2].descriptors[1].command).toEqual(command2);
+	});
 });

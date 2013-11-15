@@ -1,10 +1,10 @@
-(function(window,angular,undefined) {
+(function(window, angular, undefined) {
 
 	var commangular = window.commangular || (window.commangular = {});
 
-	commangular.create = function (commandName,commandFunction) {
+	commangular.create = function(commandName, commandFunction) {
 
-		if(!commangular.functions) {
+		if (!commangular.functions) {
 			commangular.functions = {};
 		}
 		commangular.functions[commandName] = commandFunction;
@@ -27,39 +27,37 @@
 
 		this.context = context;
 		this.deferred = null;
-	}	
+	}
 	//----------------------------------------------------------------------------------------------------------------------
 
-	function Command(command,context) {
-	
-		CommandBase.apply(this,[context]);
+	function Command(command, context) {
+
+		CommandBase.apply(this, [context]);
 		this.command = command;
 
-		this.execute =  function() {
-			
+		this.execute = function() {
 			var self = this;
 			var isError = false;
 			this.deferred = this.context.$q.defer();
-			var command = this.context.$injector.instantiate(this.command,this.context.getContextData());
+			var command = this.context.$injector.instantiate(this.command, this.context.getContextData());
 			try {
-				var result = this.context.$injector.invoke(command.execute,this.command,this.context.getContextData());
-				var resultPromise = this.context.processResults(result,this.deferred);
-			}
-			catch(error) {
+				var result = this.context.$injector.invoke(command.execute, this.command, this.context.getContextData());
+				var resultPromise = this.context.processResults(result, this.deferred);
+			} catch (error) {
 				isError = true;
-				if(command.hasOwnProperty('onError')) {
+				if (command.hasOwnProperty('onError')) {
 
 					var contextData = this.context.getContextData();
 					contextData.lastError = error;
-					this.context.$injector.invoke(command.onError,this.command,this.context.getContextData());
+					this.context.$injector.invoke(command.onError, this.command, this.context.getContextData());
 				}
-				this.deferred.reject(error); 
+				this.deferred.reject(error);
 			}
-			if(command.hasOwnProperty('onComplete') && !isError) {
-				
-				resultPromise.then(function(){
+			if (command.hasOwnProperty('onComplete') && !isError) {
 
-					self.context.$injector.invoke(command.onComplete,self.command,self.context.getContextData());
+				resultPromise.then(function() {
+
+					self.context.$injector.invoke(command.onComplete, self.command, self.context.getContextData());
 				});
 			}
 			return this.deferred.promise;
@@ -67,14 +65,14 @@
 	}
 	Command.prototype = CommandBase;
 	Command.prototype.constructor = Command;
-	
-	//----------------------------------------------------------------------------------------------------------------------
-	function CommandGroup(context,descriptors) {
 
-		CommandBase.apply(this,[context]);
+	//----------------------------------------------------------------------------------------------------------------------
+	function CommandGroup(context, descriptors) {
+
+		CommandBase.apply(this, [context]);
 		this.descriptors = descriptors;
-		
-		this.start = function () {
+
+		this.start = function() {
 
 			this.deferred = this.context.$q.defer();
 			this.execute();
@@ -84,39 +82,38 @@
 	CommandGroup.prototype = CommandBase;
 	CommandGroup.prototype.constructor = CommandGroup;
 	//----------------------------------------------------------------------------------------------------------------------
-	
-	function CommandSequence(context,descriptors) {
-				
-		CommandGroup.apply(this,[context,descriptors]);
+
+	function CommandSequence(context, descriptors) {
+
+		CommandGroup.apply(this, [context, descriptors]);
 		this.currentIndex = 0;
-		
-		this.execute = function () {
-		
+
+		this.execute = function() {
 			var self = this;
 			var commandDescriptor = this.descriptors[this.currentIndex];
 			var command = this.context.instanciate(commandDescriptor);
-			if(command instanceof CommandSequence || command instanceof CommandParallel)
+			if (command instanceof CommandSequence || command instanceof CommandParallel)
 				command.start().then(
-				function() {
-					self.nextCommand();
-				},
-				function(error) {
-					self.deferred.reject(error);
-				});
-			if(command instanceof Command)
+					function() {
+						self.nextCommand();
+					},
+					function(error) {
+						self.deferred.reject(error);
+					});
+			if (command instanceof Command)
 				command.execute().then(
-				function(){
-					self.nextCommand();
-				},
-				function(error) {
-					self.deferred.reject(error);
-				});
+					function() {
+						self.nextCommand();
+					},
+					function(error) {
+						self.deferred.reject(error);
+					});
 
 		};
-		this.nextCommand = function () {
-			
-			if(++this.currentIndex == this.descriptors.length)	{
-				
+		this.nextCommand = function() {
+
+			if (++this.currentIndex == this.descriptors.length) {
+
 				this.deferred.resolve();
 				return;
 			}
@@ -126,70 +123,70 @@
 	CommandSequence.prototype = CommandGroup;
 	CommandSequence.prototype.constructor = CommandSequence;
 	//----------------------------------------------------------------------------------------------------------------------
-	function CommandParallel(context,descriptors) {
+	function CommandParallel(context, descriptors) {
 
-		CommandGroup.apply(this,[context,descriptors]);
+		CommandGroup.apply(this, [context, descriptors]);
 		this.totalComplete = 0;
-		
-		this.execute = function () {
-		
+
+		this.execute = function() {
+
 			var self = this;
-			for(var x=0; x<this.descriptors.length;x++) {
+			for (var x = 0; x < this.descriptors.length; x++) {
 
 				var commandDescriptor = this.descriptors[x];
 				var command = this.context.instanciate(commandDescriptor);
-				if(command instanceof CommandSequence || command instanceof CommandParallel)
+				if (command instanceof CommandSequence || command instanceof CommandParallel)
 					command.start().then(
-					function(){
-						self.checkComplete();
-					},
-					function(error) {
-						self.deferred.reject(error);
-					});
-				if(command instanceof Command)
+						function() {
+							self.checkComplete();
+						},
+						function(error) {
+							self.deferred.reject(error);
+						});
+				if (command instanceof Command)
 					command.execute().then(
-					function(){
-						self.checkComplete();
-					},
-					function(error) {
-						self.deferred.reject(error);
-					});					
+						function() {
+							self.checkComplete();
+						},
+						function(error) {
+							self.deferred.reject(error);
+						});
 			}
 		};
 		this.checkComplete = function() {
 
-			if(++this.totalComplete == this.descriptors.length) {
+			if (++this.totalComplete == this.descriptors.length) {
 
 				this.deferred.resolve();
 			}
 
-			
+
 		};
-	} 
-	
+	}
+
 	CommandParallel.prototype = CommandGroup
 	CommandParallel.prototype.constructor = CommandParallel;
 	//----------------------------------------------------------------------------------------------------------------------
 
-	function CommandContext($injector,$q,instanciator,data) {
-	
+	function CommandContext($injector, $q, instanciator, data) {
+
 		this.contextData = data || {};
 		this.instanciator = instanciator;
 		this.$injector = $injector;
-		this.$q = $q; 
+		this.$q = $q;
 
-	} 
-			
-	CommandContext.prototype.instanciate = function (descriptor) {
+	}
 
-		var command = this.instanciator.instanciate(descriptor,this);
+	CommandContext.prototype.instanciate = function(descriptor) {
+
+		var command = this.instanciator.instanciate(descriptor, this);
 		return command;
 	};
 
-	CommandContext.prototype.processResults = function (resultValues,deferred) {
+	CommandContext.prototype.processResults = function(resultValues, deferred) {
 
 		var self = this;
-		if(!resultValues){
+		if (!resultValues) {
 
 			deferred.resolve();
 			return;
@@ -202,19 +199,19 @@
 			promises.push(value);
 			keys.push(prop);
 		}
-		var promise = this.$q.all(promises).then(function(data){
-			
-			for(var x = 0 ; x< data.length;x++) {
+		var promise = this.$q.all(promises).then(function(data) {
+
+			for (var x = 0; x < data.length; x++) {
 
 				self.contextData[keys[x]] = data[x];
 			}
 			deferred.resolve();
 		});
 		return promise;
-		
+
 	};
-	
-	CommandContext.prototype.getContextData = function (resultKey) {
+
+	CommandContext.prototype.getContextData = function(resultKey) {
 
 		return this.contextData;
 	};
@@ -222,140 +219,146 @@
 	//----------------------------------------------------------------------------------------------------------------------
 
 	function CommandInstanciator() {
-	
-	return {
 
-			instanciate : function (descriptor,context) {
+		return {
 
-				var command  = {};
-				if(descriptor.commandType == 'S') {
+			instanciate: function(descriptor, context) {
 
-					command = new CommandSequence(context,descriptor.descriptors)
+				var command = {};
+				if (descriptor.commandType == 'S') {
+
+					command = new CommandSequence(context, descriptor.descriptors)
 				}
-				if(descriptor.commandType == 'P') {
+				if (descriptor.commandType == 'P') {
 
-					command = new CommandParallel(context,descriptor.descriptors)
+					command = new CommandParallel(context, descriptor.descriptors)
 				}
-				if(descriptor.commandType == 'E') {
+				if (descriptor.commandType == 'E') {
 
-					command = new Command(descriptor.command,context);
+					command = new Command(descriptor.command, context);
 				}
 				return command;
 			}
 		}
-	
+
 	}
 	//----------------------------------------------------------------------------------------------------------------------
-	
+
 	//----------------------------------------------------------------------------------------------------------------------
-	angular.module('commangular',[])
-  		.provider('$commangular', function () {
-       
-		    var descriptors = {};    
-		    var currentCommandDescriptor;
-		    var pendingDescriptors = [];
-		    
-		    return {
-		        $get: ['commandExecutor',function(commandExecutor) {
-		                
-		            commandExecutor.descriptors = descriptors;
-		            return {
-		                dispatch: function(eventName,data) {
-		                    
-		                    commandExecutor.execute(eventName,data);
-		                }
-		            }
-		        }],
-		        asSequence: function() {
-		            
-		            if(currentCommandDescriptor) {
+	angular.module('commangular', [])
+		.provider('$commangular', function() {
 
-		            	pendingDescriptors.push(currentCommandDescriptor);
-		            }
-		            currentCommandDescriptor = new CommandDescriptor('S');
-		            return this;
-		        },
+			var descriptors = {};
+			var currentCommandDescriptor;
+			var pendingDescriptors = [];
 
-		        asParallel: function() {
-		            
-		            if(currentCommandDescriptor) {
+			return {
+				$get: ['commandExecutor',
+					function(commandExecutor) {
 
-		            	pendingDescriptors.push(currentCommandDescriptor);
-		            }
-		            currentCommandDescriptor = new CommandDescriptor('P');
-		            return this;
-		        },
+						commandExecutor.descriptors = descriptors;
+						return {
+							dispatch: function(eventName, data) {
 
-		        add: function(command) {
+								commandExecutor.execute(eventName, data);
+							}
+						}
+					}
+				],
+				asSequence: function() {
 
-		            if(angular.isString(command)) {
-		                
-		                command = this.get(command);                
-		            }
+					if (currentCommandDescriptor) {
 
-		            if(command instanceof CommandDescriptor) {
+						pendingDescriptors.push(currentCommandDescriptor);
+					}
+					currentCommandDescriptor = new CommandDescriptor('S');
+					return this;
+				},
 
-		                currentCommandDescriptor.add(command);
-		                return this;
-		            }
-		            var commandDescriptor = new CommandDescriptor('E');
-		            commandDescriptor.command = command;
-		            currentCommandDescriptor.add(commandDescriptor);
-		            return this;
-		        },
+				asParallel: function() {
 
-		        mapTo: function(eventName) {
+					if (currentCommandDescriptor) {
 
-		            if(pendingDescriptors.length > 0) {
+						pendingDescriptors.push(currentCommandDescriptor);
+					}
+					currentCommandDescriptor = new CommandDescriptor('P');
+					return this;
+				},
 
-		            	throw "Incorrect command structure on " + eventName;
-		            }
-		            descriptors[eventName] = currentCommandDescriptor;
-		            currentCommandDescriptor = null;
-		        },
+				add: function(command) {
 
-		        create : function () {
+					if (angular.isString(command)) {
 
-		            var descriptor = currentCommandDescriptor;
-		            currentCommandDescriptor = (pendingDescriptors.length > 0) ? pendingDescriptors.pop() : null;
-		            return descriptor;
-		        },
+						command = this.get(command);
+					}
 
-		        get:function(commandName) {
+					if (command instanceof CommandDescriptor) {
 
-		            return commangular.functions[commandName];
-		        }
-		    };
-		   
-		  });
+						currentCommandDescriptor.add(command);
+						return this;
+					}
+					var commandDescriptor = new CommandDescriptor('E');
+					commandDescriptor.command = command;
+					currentCommandDescriptor.add(commandDescriptor);
+					return this;
+				},
+
+				mapTo: function(eventName) {
+
+					if (pendingDescriptors.length > 0) {
+
+						throw "Incorrect command structure on " + eventName;
+					}
+					descriptors[eventName] = currentCommandDescriptor;
+					currentCommandDescriptor = null;
+				},
+
+				create: function() {
+
+					var descriptor = currentCommandDescriptor;
+					currentCommandDescriptor = (pendingDescriptors.length > 0) ? pendingDescriptors.pop() : null;
+					return descriptor;
+				},
+
+				get: function(commandName) {
+
+					return commangular.functions[commandName];
+				},
+				findCommand: function(eventName) {
+
+					return descriptors[eventName];
+				}
+
+			};
+
+		});
 
 	//-----------------------------------------------------------------------------------------------------------------
 
 	angular.module('commangular')
-	  .service('commandExecutor', ['$injector' ,'$q',function ($injector,$q) {
-	    
-	    return {
+		.service('commandExecutor', ['$injector', '$q',
+			function($injector, $q) {
 
-	        descriptors: {},
-	        
-	        execute: function (eventName,data) {
+				return {
 
-	            var context = new CommandContext($injector,$q,new CommandInstanciator(),data);
-	            var commandDescriptor = this.descriptors[eventName];
-	            var command = context.instanciate(commandDescriptor);
-	            command.start().then(function(data) {
+					descriptors: {},
 
-	            	console.log("Command Complete");
-	            },function(error){
+					execute: function(eventName, data) {
+						var context = new CommandContext($injector, $q, new CommandInstanciator(), data);
+						var commandDescriptor = this.descriptors[eventName];
+						var command = context.instanciate(commandDescriptor);
+						command.start().then(function(data) {
 
-	            	console.log("Command context end with error :" + error);
-	            });
-	        },
-	        
-	    };
-	   
-	  }]);
+							console.log("Command Complete");
+						}, function(error) {
+
+							console.log("Command context end with error :" + error);
+						});
+					},
+
+				};
+
+			}
+		]);
 	//------------------------------------------------------------------------------------------------------------------  
-})(window,angular);
-
-
+})(window, angular);
