@@ -6,7 +6,7 @@ A command pattern implementation for AngularJS.
 
 #Overview
 
-Commandgular is an abstraction that aims at simplifying the creation of operations in a clean self-contained unit and easily chain them together with a fluent API. It will allow you to maintain separate code units called commands with a single responsability.
+Commangular is an abstraction that aims at simplifying the creation of operations in a clean self-contained unit and easily chain them together with a fluent API. It will allow you to maintain separate code units called commands with a single responsability.
 
 Main features :
 
