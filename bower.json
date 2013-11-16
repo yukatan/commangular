@@ -12,9 +12,6 @@
     "angular-mocks" : "*"
   },
   "ignore": [
-	"node_modules",
-	"test",
-	"src",	
-  "*.js"
-  ]
+	"node_modules"
+	]
 }
