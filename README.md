@@ -10,7 +10,7 @@ Commangular is an abstraction that aims at simplifying the creation of operation
 
 Main features :
 
-* Chaining of command in command groups.
+* Chaining of commands in command groups.
 * Execution of commands in sequence or in parallel.
 * Any level of nesting in groups.
 * Injection of an object from the angular context with the same syntax.
