@@ -4,11 +4,11 @@
 
 A command pattern implementation for AngularJS.
 
-#Overview
+##Overview
 
 Commangular is an abstraction that aims at simplifying the creation of operations in a clean self-contained unit and easily chain them together with a fluent API. It will allow you to maintain separate code units called commands with a single responsability.
 
-Main features :
+###Main features :
 
 * Chaining of command in command groups.
 * Execution of commands in sequence or in parallel.
@@ -21,14 +21,14 @@ Main features :
 * Custom result resolvers(on the way).
 * Flows of commands with decision points to select the next commands based on result values(on the way).
 
-#Instalation
+##Instalation
 
 * Using bower : ``` bower install commangular ```
 * Download it and add commangular.js or commangular.min.js to your index.html.
 
 Remember to add commangular.js after angular.js. Commangular only depends on angularJs, it is not using other libraries.
 
-#Quick Guide
+##Quick Guide
 *Add commangular to your app.*
 ```javascript 
 //Add as a module dependency
@@ -79,6 +79,86 @@ angular.module('YourApp')
 ```
 You will see the message "Hello from my first command" in the logs so the command has been executed.
 
+##Table of Contents (Extended guide)
+* Using the provider
+    * Building command sequences.
+    * Building parallel commands.
+    * Nesting commands.
+    * Mapping commands to events
+* Command execution
+    * Dispatching an Event
+    * Passing data to commands at dispatching time
+    * Injection from angular context
+    * Injection of preceding results
+    
+##Using The Provider.
+
+All the commands configuration of your application is done in a angular config block and with the $commangularProvider. The provider is responsible to build the command strutures and map it to the desired event names. You can create multiple configs blocks in angular, so you can have multiple commands config blocks to separate functional parts of your application.
+
+###Building command sequences.
+A command sequence is a group of commands where the execution of the next command doesn't happen until the preceding command completes it execution and the result value has been resolved.
+
+Example :
+
+```javascript
+commangular.create('Command1',['$log',function($log) {
+  
+  return {
+        
+        execute: function() {
+        
+          $log.log('Command1 executed');
+        }]
+      }
+  }
+}]);
+commangular.create('Command2',['$log',function($log) {
+  
+  return {
+        
+        execute: function() {
+        
+          $log.log('Command2 executed');
+        }]
+      }
+  }
+}]);
+commangular.create('Command3',['$log',function($log) {
+  
+  return {
+        
+        execute: function() {
+        
+          $log.log('Command3 executed');
+        }]
+      }
+  }
+}]);
+
+//We create the sequence in a config block as follows
+
+$commangularProvider.asSequence()
+  .add('Command1')
+  .add('Command2')
+  .add('Command3')
+  .mapTo('MyEvent');
+```
+
+
+
+  
+
+##License
+
+The MIT License
+
+Copyright (c) 2013 Jesús Barquín Cheda
+
+Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 
 
