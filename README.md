@@ -1,4 +1,4 @@
-#Commangular             
+#Commangular  (work in progress)           
 
 [![Build Status](https://travis-ci.org/yukatan/commangular.png)](https://travis-ci.org/yukatan/commangular)
 
@@ -77,11 +77,16 @@ angular.module('YourApp')
 
    });
 ```
-You will see the message "Hello from my first command" in the logs so the command has been executed.
+You will see the message "Hello from my first command" in the logs when the onButtonClick function is executed, so the command has been executed.
 
 ##Table of Contents (Extended guide)
-* Using the provider
-    * Building command sequences.
+* Creating commands
+    * Commandgular namespace
+    * The angular syntax
+    * Returning results from commands
+
+* [Using the provider](#using-the-provider)
+    * [Building command sequences.](#building-command-sequences)
     * Building parallel commands.
     * Nesting commands.
     * Mapping commands to events
@@ -90,13 +95,14 @@ You will see the message "Hello from my first command" in the logs so the comman
     * Passing data to commands at dispatching time
     * Injection from angular context
     * Injection of preceding results
+    * Returning promises from commands
     
 ##Using The Provider.
 
 All the commands configuration of your application is done in a angular config block and with the $commangularProvider. The provider is responsible to build the command strutures and map it to the desired event names. You can create multiple configs blocks in angular, so you can have multiple commands config blocks to separate functional parts of your application.
 
 ###Building command sequences.
-A command sequence is a group of commands where the execution of the next command doesn't happen until the preceding command completes it execution and the result value has been resolved.
+A command sequence is a group of commands where the execution of the next command doesn't happen until the preceding command completes it's execution and the result value has been resolved.
 
 Example :
 
@@ -142,7 +148,50 @@ $commangularProvider.asSequence()
   .add('Command2')
   .add('Command3')
   .mapTo('MyEvent');
+  
 ```
+When you dispatch 'MyEvent' from the commangular service the Command1 is going to be executed. After completion then the Command2 will be executed and then the Command3.
+
+This is happening in a synchronous execution but what happen if some command has a asynchronous execution???  The result resolution will be explained below in the documentation but if Command1 is using $http and getting a promise, you can return that promise from the Command1 execute function and Command2 will not be executed until that promise has been resolved.
+
+###Building parallel commands.
+
+The main diference with sequeces is that the commands running in a parallel group dont wait for the execution of the others commands in the group.
+
+Suppose this :
+
+```javascript
+commangular.create('Command1',['$http',function($http) {
+  
+  return {
+        
+        execute: function() {
+          
+          var promise = http.get('/user/list.json');
+          return {result1:promise};
+        }]
+      }
+  }
+}]);
+commangular.create('Command2',['$log',function($log) {
+  
+  return {
+        
+        execute: function() {
+        
+          $log.log('Command2 executed');
+        }]
+      }
+  }
+}]);
+
+$commangularProvider.asParallel()
+  .add('Command1')
+  .add('Command2')
+  .mapTo('ParallelExampleEvent');
+  
+```
+The execution of Command1 is getting and returning a promise. Command2 wont wait for this promise resolution. So in this example Command2 will complete the execution before Command1.
 
 
 
