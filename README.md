@@ -10,7 +10,7 @@ Commangular is an abstraction that aims at simplifying the creation of operation
 
 ###Main features :
 
-* Chaining of command in command groups.
+* Chaining of commands in command groups.
 * Execution of commands in sequence or in parallel.
 * Any level of nesting in groups.
 * Injection of an object from the angular context with the same syntax.
@@ -36,11 +36,9 @@ Remember to add commangular.js after angular.js. Commangular only depends on ang
     * [How to create commands](#how-to-create-commands)
     * [The command config object](#the-command-config-object)
     * [Returning results from commands](#returning-result-from-commands)
-    
-
 * [Using the provider](#using-the-provider)
     * [Building command sequences.](#building-command-sequences)
-    * Building parallel commands.
+    * [Building parallel commands.](#building-parallel-commands)
     * Nesting commands.
     * Mapping commands to events
 * Command execution
@@ -311,6 +309,9 @@ This is happening in a synchronous execution but what happen if some command has
 
 The main diference with sequeces is that the commands running in a parallel group dont wait for the execution of the others commands in the group.
 
+It has not sense to use parallel commands if these commands are not returning a promise. Javascript has just one thread of execution so it is not posible to run synchronous commands at the same time.
+It's a perfect fit for http calls. While the http call is waiting the response other commands can be executed.
+
 Suppose this :
 
 ```javascript
@@ -320,8 +321,8 @@ commangular.create('Command1',['$http',function($http) {
         
         execute: function() {
           
-          var promise = http.get('/user/list.json');
-          return {result1:promise};
+          var promise = $http.get('/user/list.json');
+          return promise;
         }]
       }
   }
@@ -345,6 +346,7 @@ $commangularProvider.asParallel()
   
 ```
 The execution of Command1 is getting and returning a promise. Command2 wont wait for this promise resolution. So in this example Command2 will complete the execution before Command1.
+
 
 
 
