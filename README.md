@@ -28,6 +28,29 @@ Commangular is an abstraction that aims at simplifying the creation of operation
 
 Remember to add commangular.js after angular.js. Commangular only depends on angularJs, it is not using other libraries.
 
+
+##Table of Contents (Extended guide)
+* [Quick guide](#quick-guide)
+* [Creating commands](#creating-commands)
+    * [Commangular namespace](#commangular-namespace)
+    * [How to create commands](#how-to-create-commands)
+    * [The command config object](#the-command-config-object)
+    * [Returning results from commands](#returning-result-from-commands)
+    
+
+* [Using the provider](#using-the-provider)
+    * [Building command sequences.](#building-command-sequences)
+    * Building parallel commands.
+    * Nesting commands.
+    * Mapping commands to events
+* Command execution
+    * Dispatching an Event
+    * Passing data to commands at dispatching time
+    * Injection from angular context
+    * Injection of preceding results
+    * Returning promises from commands
+
+
 ##Quick Guide
 *Add commangular to your app.*
 ```javascript 
@@ -79,25 +102,7 @@ angular.module('YourApp')
 ```
 You will see the message "Hello from my first command" in the logs when the onButtonClick function is executed, so the command has been executed.
 
-##Table of Contents (Extended guide)
-* [Creating commands](#creating-commands)
-    * [Commangular namespace](#commangular-namespace)
-    * [How to create commands](#how-to-create-commands)
-    * [The command config object](#the-command-config-object)
-    * [Returning results from commands](#returning-result-from-commands)
-    
 
-* [Using the provider](#using-the-provider)
-    * [Building command sequences.](#building-command-sequences)
-    * Building parallel commands.
-    * Nesting commands.
-    * Mapping commands to events
-* Command execution
-    * Dispatching an Event
-    * Passing data to commands at dispatching time
-    * Injection from angular context
-    * Injection of preceding results
-    * Returning promises from commands
 
 ##Creating commands
 ###Commangular namespace
