@@ -84,7 +84,7 @@ You will see the message "Hello from my first command" in the logs when the onBu
     * [Commangular namespace](#commangular-namespace)
     * [How to create commands](#how-to-create-commands)
     * [The command config object](#the-command-config-object)
-    * Returning results from commands
+    * [Returning results from commands](#returning-result-from-commands)
     
 
 * [Using the provider](#using-the-provider)
@@ -167,8 +167,83 @@ To allow some command execution configuration, you can pass to the create functi
 
 Available properties :
 
-* resultKey : This property instruct commangular to keep the value returned by the command in the value key passed in 'resultKey'. It has to be a string. It means that after the execution of this commands you will be able to inject on the next command using that key and the result of the command will be injected.
+* 'resultKey' : This property instruct commangular to keep the value returned by the command in the value key passed in 'resultKey'. It has to be a string. It means that after the execution of this commands you will be able to inject on the next command using that key and the result of the command will be injected.
 
+###Returning result from commands
+
+There are two main concepts you have to think when you return a value from a command.
+* You always can inject that result on the next command using the property key lastResult like this :
+
+```javascript
+//Suppose this command are executed on sequence
+//Command that return the result
+commangular.create('Command1',function() {
+  
+  return {
+        
+        execute: function() {
+            return "This will be injected on the next command"        
+        }]
+      }
+  }
+}]);
+//Command that get the lastResult injected
+commangular.create('Command2',['$log','lastResult',function($log,lastResult) {
+  
+  return {
+        
+        execute: function() {
+            //this will print "This will be injected on the next command"
+            $log.log(lastResult); 
+        }]
+      }
+  }
+}]);
+```
+
+* If you want the result of that command to be available for injection for all the execution context you have to use the command config like that :
+
+```javascript
+//Suppose this command are executed on sequence
+//Command that return the result
+commangular.create('Command1',function() {
+  
+  return {
+        
+        execute: function() {
+            return "This will be injected on the next command"        
+        }]
+      }
+  }
+}],{resultKey:'theResult'}); //instructing commangular to keep that result.
+//Command that get the result injected
+commangular.create('Command2',['$log','theResult',function($log,theResult) {
+  
+  return {
+        
+        execute: function() {
+            //this will print "This will be injected on the next command"
+            $log.log(theResult); 
+        }]
+      }
+  }
+}]);
+//This command will get the result from the Command1 as well.
+commangular.create('Command3',['$log','theResult',function($log,theResult) {
+  
+  return {
+        
+        execute: function() {
+            //this will print "This will be injected on the next command"
+            $log.log(theResult); 
+        }]
+      }
+  }
+}]);
+``` 
+If the command is asynchronous it should return a promise. At the moment all the promises are managed by commangular, so if you make an http call and you get a promises as a result you can return that promise. Commangular will wait until the promise is resolved or rejected. If the promise is resolved, the result will be available to the next command. if the promise is rejected all the command context execution is cancelled.
+
+In the future you will be able to instruct commangular to use the promise as a result value and dont wait to promise resolution. 
     
 ##Using The Provider.
 
