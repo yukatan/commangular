@@ -80,10 +80,12 @@ angular.module('YourApp')
 You will see the message "Hello from my first command" in the logs when the onButtonClick function is executed, so the command has been executed.
 
 ##Table of Contents (Extended guide)
-* Creating commands
-    * Commandgular namespace
-    * The angular syntax
+* [Creating commands](#creating-commands)
+    * [Commangular namespace](#commangular-namespace)
+    * [How to create commands](#how-to-create-commands)
+    * The command config object
     * Returning results from commands
+    
 
 * [Using the provider](#using-the-provider)
     * [Building command sequences.](#building-command-sequences)
@@ -96,6 +98,68 @@ You will see the message "Hello from my first command" in the logs when the onBu
     * Injection from angular context
     * Injection of preceding results
     * Returning promises from commands
+
+##Creating commands
+###Commangular namespace
+
+All the commands created by commangular are saved in the "commangular" namespace and attached to the window object.
+There is a function attached to this namespace called commangular.create(). With this function you will be able to add new commands to the namespace.
+
+###How to create commands
+
+The create() function has this parameters :
+
+
+_commangular.create([TheCommandName],[TheCommandFunction],[TheCommandConfig])_
+
+* _TheCommandName_ : It's the name of the command you are creating. It's useful to reference that command from the command provider.
+* _TheCommandFunction_ : It's the function that will be executed when commangular runs this command. It can be a normal function or an array with parameters with the same syntax than angular services or controllers.
+* _TheCommandConfig_ : It's and object with paramaters to configure the command execution.
+
+
+You can invoke the create function like this :
+
+```javascript
+//Command with the $log injected from angular
+commangular.create('Command1',['$log',function($log) {
+  
+  return {
+        
+        execute: function() {
+        
+          $log.log('Command1 executed');
+        }
+      }
+  }
+}]);
+
+//Command with the $log injected in the execute method
+commangular.create('Command1',function() {
+  
+  return {
+        
+        execute:['$log',function() {
+        
+          $log.log('Command1 executed');
+        }]
+      }
+  }
+});
+
+//Command telling commangular to keep the result in the result1 key in the execution context where Command1 is running using a command config object
+commangular.create('Command1',['$log',function($log) {
+  
+  return {
+        
+        execute: function() {
+        
+          $log.log('Command1 executed');
+          return "This is going to be available on result1 key";
+        }
+      }
+  }
+}],{resultKey:'result1'});
+```
     
 ##Using The Provider.
 
