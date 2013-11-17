@@ -39,7 +39,7 @@ Remember to add commangular.js after angular.js. Commangular only depends on ang
 * [Using the provider](#using-the-provider)
     * [Building command sequences.](#building-command-sequences)
     * [Building parallel commands.](#building-parallel-commands)
-    * Nesting commands.
+    * [Nesting commands.](#nesting-commands)
     * Mapping commands to events
 * Command execution
     * Dispatching an Event
@@ -47,6 +47,7 @@ Remember to add commangular.js after angular.js. Commangular only depends on ang
     * Injection from angular context
     * Injection of preceding results
     * Returning promises from commands
+* Unit testing commands
 
 
 ##Quick Guide
@@ -347,7 +348,46 @@ $commangularProvider.asParallel()
 ```
 The execution of Command1 is getting and returning a promise. Command2 wont wait for this promise resolution. So in this example Command2 will complete the execution before Command1.
 
+##Nesting commands
 
+Yuo can create any kind of nesting with commangular. You can create a sequence of parallel commands or sequences in parallel. It's better to show it in code :
+
+```javascript
+
+//You can user vars
+var parallel1 = $commangularProvider.asParallel().add('Command3').add('Command4').create();
+
+$commangularProvider.asSequence()
+  .add('Command1')
+  .add('Command2')
+  .add(parrallel)
+  .mapTo('ParallelExampleEvent');
+ 
+//You can use inline
+
+$commangularProvider.asSequence()
+  .add('Command1')
+  .add('Command2')
+  .add($commangularProvider.asParallel()
+         .add('Command3')
+         .add('Command4')
+         .create())
+  .mapTo('ParallelExampleEvent');
+//Any level of nesting is allowed and all command are executed in the same comand context
+//You can reuse commands in the same or others command groups
+$commangularProvider.asSequence()
+  .add('Command1')
+  .add('Command2')
+  .add($commangularProvider.asParallel()
+         .add($commandgularProvider.asParrallel()
+               .add('Command7')
+               .add('Command1')
+               .create())
+         .add('Command4')
+         .create())
+  .mapTo('ParallelExampleEvent');
+  
+```
 
 
   
