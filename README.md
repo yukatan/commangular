@@ -1,4 +1,4 @@
-#Commangular  (work in progress)           
+#Commangular  (docs in progress)           
 
 [![Build Status](https://travis-ci.org/yukatan/commangular.png)](https://travis-ci.org/yukatan/commangular)
 
