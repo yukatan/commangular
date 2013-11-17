@@ -83,7 +83,7 @@ You will see the message "Hello from my first command" in the logs when the onBu
 * [Creating commands](#creating-commands)
     * [Commangular namespace](#commangular-namespace)
     * [How to create commands](#how-to-create-commands)
-    * The command config object
+    * [The command config object](#the-command-config-object)
     * Returning results from commands
     
 
@@ -160,10 +160,19 @@ commangular.create('Command1',['$log',function($log) {
   }
 }],{resultKey:'result1'});
 ```
+
+###The command config object
+
+To allow some command execution configuration, you can pass to the create function an object with some properties inside. At this moment there is just one property you can set in the config object but there will be more properties in the future.
+
+Available properties :
+
+* resultKey : This property instruct commangular to keep the value returned by the command in the value key passed in 'resultKey'. It has to be a string. It means that after the execution of this commands you will be able to inject on the next command using that key and the result of the command will be injected.
+
     
 ##Using The Provider.
 
-All the commands configuration of your application is done in a angular config block and with the $commangularProvider. The provider is responsible to build the command strutures and map it to the desired event names. You can create multiple configs blocks in angular, so you can have multiple commands config blocks to separate functional parts of your application.
+All the command configuration of your application is done in a angular config block and with the $commangularProvider. The provider is responsible to build the command strutures and map it to the desired event names. You can create multiple configs blocks in angular, so you can have multiple commands config blocks to separate functional parts of your application.
 
 ###Building command sequences.
 A command sequence is a group of commands where the execution of the next command doesn't happen until the preceding command completes it's execution and the result value has been resolved.
