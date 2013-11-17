@@ -1,4 +1,4 @@
-#Commangular  (work in progress)           
+#Commangular  (docs in progress)           
 
 [![Build Status](https://travis-ci.org/yukatan/commangular.png)](https://travis-ci.org/yukatan/commangular)
 
@@ -10,7 +10,7 @@ Commangular is an abstraction that aims at simplifying the creation of operation
 
 ###Main features :
 
-* Chaining of command in command groups.
+* Chaining of commands in command groups.
 * Execution of commands in sequence or in parallel.
 * Any level of nesting in groups.
 * Injection of an object from the angular context with the same syntax.
@@ -27,6 +27,28 @@ Commangular is an abstraction that aims at simplifying the creation of operation
 * Download it and add commangular.js or commangular.min.js to your index.html.
 
 Remember to add commangular.js after angular.js. Commangular only depends on angularJs, it is not using other libraries.
+
+
+##Table of Contents (Extended guide)
+* [Quick guide](#quick-guide)
+* [Creating commands](#creating-commands)
+    * [Commangular namespace](#commangular-namespace)
+    * [How to create commands](#how-to-create-commands)
+    * [The command config object](#the-command-config-object)
+    * [Returning results from commands](#returning-result-from-commands)
+* [Using the provider](#using-the-provider)
+    * [Building command sequences.](#building-command-sequences)
+    * [Building parallel commands.](#building-parallel-commands)
+    * [Nesting commands.](#nesting-commands)
+    * Mapping commands to events
+* Command execution
+    * Dispatching an Event
+    * Passing data to commands at dispatching time
+    * Injection from angular context
+    * Injection of preceding results
+    * Returning promises from commands
+* Unit testing commands
+
 
 ##Quick Guide
 *Add commangular to your app.*
@@ -79,27 +101,157 @@ angular.module('YourApp')
 ```
 You will see the message "Hello from my first command" in the logs when the onButtonClick function is executed, so the command has been executed.
 
-##Table of Contents (Extended guide)
-* Creating commands
-    * Commandgular namespace
-    * The angular syntax
-    * Returning results from commands
 
-* [Using the provider](#using-the-provider)
-    * [Building command sequences.](#building-command-sequences)
-    * Building parallel commands.
-    * Nesting commands.
-    * Mapping commands to events
-* Command execution
-    * Dispatching an Event
-    * Passing data to commands at dispatching time
-    * Injection from angular context
-    * Injection of preceding results
-    * Returning promises from commands
+
+##Creating commands
+###Commangular namespace
+
+All the commands created by commangular are saved in the "commangular" namespace and attached to the window object.
+There is a function attached to this namespace called commangular.create(). With this function you will be able to add new commands to the namespace.
+
+###How to create commands
+
+The create() function has this parameters :
+
+
+_commangular.create([TheCommandName],[TheCommandFunction],[TheCommandConfig])_
+
+* _TheCommandName_ : It's the name of the command you are creating. It's useful to reference that command from the command provider.
+* _TheCommandFunction_ : It's the function that will be executed when commangular runs this command. It can be a normal function or an array with parameters with the same syntax than angular services or controllers.
+* _TheCommandConfig_ : It's and object with paramaters to configure the command execution.
+
+
+You can invoke the create function like this :
+
+```javascript
+//Command with the $log injected from angular
+commangular.create('Command1',['$log',function($log) {
+  
+  return {
+        
+        execute: function() {
+        
+          $log.log('Command1 executed');
+        }
+      }
+  }
+}]);
+
+//Command with the $log injected in the execute method
+commangular.create('Command1',function() {
+  
+  return {
+        
+        execute:['$log',function() {
+        
+          $log.log('Command1 executed');
+        }]
+      }
+  }
+});
+
+//Command telling commangular to keep the result in the result1 key in the execution context where Command1 is running using a command config object
+commangular.create('Command1',['$log',function($log) {
+  
+  return {
+        
+        execute: function() {
+        
+          $log.log('Command1 executed');
+          return "This is going to be available on result1 key";
+        }
+      }
+  }
+}],{resultKey:'result1'});
+```
+
+###The command config object
+
+To allow some command execution configuration, you can pass to the create function an object with some properties inside. At this moment there is just one property you can set in the config object but there will be more properties in the future.
+
+Available properties :
+
+* 'resultKey' : This property instruct commangular to keep the value returned by the command in the value key passed in 'resultKey'. It has to be a string. It means that after the execution of this commands you will be able to inject on the next command using that key and the result of the command will be injected.
+
+###Returning result from commands
+
+There are two main concepts you have to think when you return a value from a command.
+* You always can inject that result on the next command using the property key lastResult like this :
+
+```javascript
+//Suppose this command are executed on sequence
+//Command that return the result
+commangular.create('Command1',function() {
+  
+  return {
+        
+        execute: function() {
+            return "This will be injected on the next command"        
+        }]
+      }
+  }
+}]);
+//Command that get the lastResult injected
+commangular.create('Command2',['$log','lastResult',function($log,lastResult) {
+  
+  return {
+        
+        execute: function() {
+            //this will print "This will be injected on the next command"
+            $log.log(lastResult); 
+        }]
+      }
+  }
+}]);
+```
+
+* If you want the result of that command to be available for injection for all the execution context you have to use the command config like that :
+
+```javascript
+//Suppose this command are executed on sequence
+//Command that return the result
+commangular.create('Command1',function() {
+  
+  return {
+        
+        execute: function() {
+            return "This will be injected on the next command"        
+        }]
+      }
+  }
+}],{resultKey:'theResult'}); //instructing commangular to keep that result.
+//Command that get the result injected
+commangular.create('Command2',['$log','theResult',function($log,theResult) {
+  
+  return {
+        
+        execute: function() {
+            //this will print "This will be injected on the next command"
+            $log.log(theResult); 
+        }]
+      }
+  }
+}]);
+//This command will get the result from the Command1 as well.
+commangular.create('Command3',['$log','theResult',function($log,theResult) {
+  
+  return {
+        
+        execute: function() {
+            //this will print "This will be injected on the next command"
+            $log.log(theResult); 
+        }]
+      }
+  }
+}]);
+``` 
+If the command is asynchronous it should return a promise. At the moment all the promises are managed by commangular, so if you make an http call and you get a promises as a result you can return that promise. Commangular will wait until the promise is resolved or rejected. If the promise is resolved, the result will be available to the next command. if the promise is rejected all the command context execution is cancelled.
+
+In the future you will be able to instruct commangular to use the promise as a result value and dont wait to promise resolution. 
     
 ##Using The Provider.
 
-All the commands configuration of your application is done in a angular config block and with the $commangularProvider. The provider is responsible to build the command strutures and map it to the desired event names. You can create multiple configs blocks in angular, so you can have multiple commands config blocks to separate functional parts of your application.
+All the command configuration of your application is done in a angular config block and with the $commangularProvider. The provider is responsible to build the command strutures and map it to the desired event names. You can create multiple configs blocks in angular, so you can have multiple commands config blocks to separate functional parts of your application.
 
 ###Building command sequences.
 A command sequence is a group of commands where the execution of the next command doesn't happen until the preceding command completes it's execution and the result value has been resolved.
@@ -158,6 +310,9 @@ This is happening in a synchronous execution but what happen if some command has
 
 The main diference with sequeces is that the commands running in a parallel group dont wait for the execution of the others commands in the group.
 
+It has not sense to use parallel commands if these commands are not returning a promise. Javascript has just one thread of execution so it is not posible to run synchronous commands at the same time.
+It's a perfect fit for http calls. While the http call is waiting the response other commands can be executed.
+
 Suppose this :
 
 ```javascript
@@ -167,8 +322,8 @@ commangular.create('Command1',['$http',function($http) {
         
         execute: function() {
           
-          var promise = http.get('/user/list.json');
-          return {result1:promise};
+          var promise = $http.get('/user/list.json');
+          return promise;
         }]
       }
   }
@@ -193,6 +348,46 @@ $commangularProvider.asParallel()
 ```
 The execution of Command1 is getting and returning a promise. Command2 wont wait for this promise resolution. So in this example Command2 will complete the execution before Command1.
 
+##Nesting commands
+
+Yuo can create any kind of nesting with commangular. You can create a sequence of parallel commands or sequences in parallel. It's better to show it in code :
+
+```javascript
+
+//You can user vars
+var parallel1 = $commangularProvider.asParallel().add('Command3').add('Command4').create();
+
+$commangularProvider.asSequence()
+  .add('Command1')
+  .add('Command2')
+  .add(parrallel)
+  .mapTo('ParallelExampleEvent');
+ 
+//You can use inline
+
+$commangularProvider.asSequence()
+  .add('Command1')
+  .add('Command2')
+  .add($commangularProvider.asParallel()
+         .add('Command3')
+         .add('Command4')
+         .create())
+  .mapTo('ParallelExampleEvent');
+//Any level of nesting is allowed and all command are executed in the same comand context
+//You can reuse commands in the same or others command groups
+$commangularProvider.asSequence()
+  .add('Command1')
+  .add('Command2')
+  .add($commangularProvider.asParallel()
+         .add($commandgularProvider.asParrallel()
+               .add('Command7')
+               .add('Command1')
+               .create())
+         .add('Command4')
+         .create())
+  .mapTo('ParallelExampleEvent');
+  
+```
 
 
   
