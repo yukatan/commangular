@@ -1,4 +1,4 @@
-describe("Injection from preceding command whit promise result test", function() {
+describe("Injection using lastResult test", function() {
 
 	var provider;
 	var dispatcher;
@@ -19,6 +19,33 @@ describe("Injection from preceding command whit promise result test", function()
 
 			return {
 
+				execute: function($log) {
+
+					$log.log('logging');
+					executed = true;
+					return 25;
+
+				}
+			};
+		});
+		
+		commangular.create('Command2', function() {
+
+			return {
+
+				execute: function(lastResult,$log) {
+
+					$log.log(lastResult);
+					resultInjected = lastResult;
+					executed2 = true;
+
+				}
+			};
+		});
+		commangular.create('Command3', function() {
+
+			return {
+
 				execute: function($log, $timeout, $q) {
 
 					var deferred = $q.defer()
@@ -28,21 +55,6 @@ describe("Injection from preceding command whit promise result test", function()
 					}, 500);
 					$log.log('logging');
 					return deferred.promise;
-					
-
-				}
-			};
-		},{resultKey:'result1'});
-		commangular.create('Command2', function() {
-
-			return {
-
-				execute: function(result1, $log) {
-
-					$log.log(result1);
-					resultInjected = result1;
-					executed2 = true;
-
 				}
 			};
 		});
@@ -55,12 +67,12 @@ describe("Injection from preceding command whit promise result test", function()
 			provider = $commangularProvider;
 
 		});
-		inject(function($commangular, $rootScope, $injector, $timeout) {
+		inject(function($commangular, $rootScope, $injector,$timeout) {
 
 			dispatcher = $commangular;
 			scope = $rootScope;
 			injector = $injector;
-			timeout = $timeout
+			timeout = $timeout;
 		});
 	});
 
@@ -79,7 +91,7 @@ describe("Injection from preceding command whit promise result test", function()
 		expect(injector).toBeDefined();
 	});
 
-	it('command should be executed and resultInjected has to be 25', function() {
+	it('command should be executed and result injected has to be 25', function() {
 
 		provider.asSequence().add('Command1').add('Command2').mapTo(eventName);
 		spyOn(injector, 'instantiate').andCallThrough();
@@ -94,7 +106,39 @@ describe("Injection from preceding command whit promise result test", function()
 		});
 
 		waitsFor(function() {
+
 			
+			return executed && executed2;
+
+		}, 'The command should be executed', 1000)
+
+
+		runs(function() {
+
+			expect(executed).toBe(true);
+			expect(executed2).toBe(true);
+			expect(injector.instantiate).toHaveBeenCalled();
+			expect(injector.invoke).toHaveBeenCalled();
+			expect(resultInjected).toBe(25)
+		})
+	});
+
+	it('command should work with promise resolution as well', function() {
+
+		provider.asSequence().add('Command3').add('Command2').mapTo(eventName);
+		spyOn(injector, 'instantiate').andCallThrough();
+		spyOn(injector, 'invoke').andCallThrough();
+		runs(function() {
+
+			scope.$apply(function() {
+
+				dispatcher.dispatch(eventName);
+			});
+
+		});
+
+		waitsFor(function() {
+
 			timeout.flush();
 			return executed && executed2;
 
@@ -111,5 +155,5 @@ describe("Injection from preceding command whit promise result test", function()
 		})
 	});
 
-
+	
 });

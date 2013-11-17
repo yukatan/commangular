@@ -22,11 +22,12 @@ describe("Injection from preceding command result test", function() {
 
 					$log.log('logging');
 					executed = true;
-					return {commandResult:25};
+					return 25;
 
 				}
 			};
-		});
+		},{resultKey:'commandResult'});
+		
 		commangular.create('Command2', function() {
 
 			return {

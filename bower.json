@@ -1,6 +1,6 @@
 {
   "name": "commangular",
-  "version": "0.2.1",
+  "version": "0.3.0",
   "main": "./dist/commangular.min.js",
   "description": "Command pattern implementation for AngularJS",
   "repository": {
@@ -9,9 +9,9 @@
   },
   "dependencies": {
     "angular": "*",
-    "angular-mocks" : "*"
+    "angular-mocks": "*"
   },
   "ignore": [
-	"node_modules"
-	]
+    "node_modules"
+  ]
 }

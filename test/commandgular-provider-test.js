@@ -29,11 +29,11 @@ describe("Provider Testing", function() {
 
 		var command = provider.get('Command1');
 		expect(command).toBeDefined();
-		expect(command).toEqual(command1);
+		expect(command.function).toEqual(command1);
 
 		var command = provider.get('Command2');
 		expect(command).toBeDefined();
-		expect(command).toEqual(command2);
+		expect(command.function).toEqual(command2);
 	});
 
 	it("should create the correct commandType", function() {
