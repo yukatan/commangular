@@ -5,13 +5,9 @@ describe("Command Sequence execution testing", function() {
 	var scope;
 	var injector;
 	var eventName = 'TestEvent';
-	var executed = false;
-	var executed2 = false;
-
+	
 	beforeEach(function() {
-
-		executed = false;
-		executed2 = false;
+		
 		commangular.functions = {};
 		commangular.create('Command1', function() {
 
@@ -20,8 +16,6 @@ describe("Command Sequence execution testing", function() {
 				execute: function($log) {
 
 					$log.log('logging');
-					executed = true;
-
 				}
 			};
 		});
@@ -32,8 +26,6 @@ describe("Command Sequence execution testing", function() {
 				execute: function($log) {
 
 					$log.log('logging');
-					executed2 = true;
-
 				}
 			};
 		});
@@ -71,6 +63,7 @@ describe("Command Sequence execution testing", function() {
 
 	it('command should be executed', function() {
 
+		var commandComplete = false;
 		provider.asSequence().add('Command1').add('Command2').mapTo(eventName);
 		spyOn(injector, 'instantiate').andCallThrough();
 		spyOn(injector, 'invoke').andCallThrough();
@@ -78,22 +71,22 @@ describe("Command Sequence execution testing", function() {
 
 			scope.$apply(function() {
 
-				dispatcher.dispatch(eventName);
+				dispatcher.dispatch(eventName).then(function(){
+					commandComplete = true;
+				});
 			});
 
 		});
 
 		waitsFor(function() {
 
-			return executed && executed2;
+			return commandComplete;
 
 		}, 'The command should be executed', 1000)
 
 
 		runs(function() {
-
-			expect(executed).toBe(true);
-			expect(executed2).toBe(true);
+			
 			expect(injector.instantiate).toHaveBeenCalled();
 			expect(injector.invoke).toHaveBeenCalled();
 		})
@@ -101,11 +94,11 @@ describe("Command Sequence execution testing", function() {
 
 	it('command.execute method should be called twice', function() {
 
+		var commandComplete = false;
 		var command = {
 
 			execute: function() {
-
-				executed = true;
+				
 			}
 		};
 		provider.asSequence().add('Command1').add('Command2').mapTo(eventName);
@@ -115,21 +108,22 @@ describe("Command Sequence execution testing", function() {
 
 			scope.$apply(function() {
 
-				dispatcher.dispatch(eventName);
+				dispatcher.dispatch(eventName).then(function(){
+					commandComplete = true;
+				});
 			});
 
 		});
 
 		waitsFor(function() {
 
-			return executed;
+			return commandComplete
 
 		}, 'The command should be executed', 1000)
 
 
 		runs(function() {
-
-			expect(executed).toBe(true);
+			
 			expect(command.execute).toHaveBeenCalled();
 			expect(command.execute.callCount).toBe(2);
 		})

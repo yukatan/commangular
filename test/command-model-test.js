@@ -5,14 +5,10 @@ describe("Command Sequence execution testing", function() {
 	var scope;
 	var injector;
 	var eventName = 'TestEvent';
-	var executed = false;
-	var executed2 = false;
 	var testValue;
 
 	beforeEach(function() {
-
-		executed = false;
-		executed2 = false;
+		
 		commangular.functions = {};
 		commangular.create('Command1', function(commandModel) {
 
@@ -21,8 +17,6 @@ describe("Command Sequence execution testing", function() {
 				execute: function() {
 					
 					commandModel.value1 = 25;
-					executed = true;
-
 				}
 			};
 		});
@@ -34,8 +28,6 @@ describe("Command Sequence execution testing", function() {
 
 					commandModel.value1++;
 					testValue = commandModel.value1;
-					executed2 = true;
-
 				}
 			};
 		});
@@ -73,6 +65,7 @@ describe("Command Sequence execution testing", function() {
 
 	it('testValue should be 26', function() {
 
+		var commandComplete = false;
 		provider.asSequence().add('Command1').add('Command2').mapTo(eventName);
 		spyOn(injector, 'instantiate').andCallThrough();
 		spyOn(injector, 'invoke').andCallThrough();
@@ -80,22 +73,22 @@ describe("Command Sequence execution testing", function() {
 
 			scope.$apply(function() {
 
-				dispatcher.dispatch(eventName);
+				dispatcher.dispatch(eventName).then(function() {
+					commandComplete = true;
+				});
 			});
 
 		});
 
 		waitsFor(function() {
 
-			return executed && executed2;
+			return commandComplete;
 
 		}, 'The command should be executed', 1000)
 
 
 		runs(function() {
-
-			expect(executed).toBe(true);
-			expect(executed2).toBe(true);
+	
 			expect(injector.instantiate).toHaveBeenCalled();
 			expect(injector.invoke).toHaveBeenCalled();
 			expect(testValue).toBe(26);

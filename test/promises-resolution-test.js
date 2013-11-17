@@ -5,15 +5,11 @@ describe("Injection from preceding command whit promise result test", function()
 	var scope;
 	var injector;
 	var eventName = 'TestEvent';
-	var executed = false;
-	var executed2 = false;
 	var resultInjected;
 	var timeout;
 
 	beforeEach(function() {
-
-		executed = false;
-		executed2 = false;
+		
 		commangular.functions = {};
 		commangular.create('Command1', function() {
 
@@ -23,13 +19,10 @@ describe("Injection from preceding command whit promise result test", function()
 
 					var deferred = $q.defer()
 					$timeout(function() {
-						executed = true;
 						deferred.resolve(25);
 					}, 500);
 					$log.log('logging');
 					return deferred.promise;
-					
-
 				}
 			};
 		},{resultKey:'result1'});
@@ -41,8 +34,6 @@ describe("Injection from preceding command whit promise result test", function()
 
 					$log.log(result1);
 					resultInjected = result1;
-					executed2 = true;
-
 				}
 			};
 		});
@@ -81,6 +72,7 @@ describe("Injection from preceding command whit promise result test", function()
 
 	it('command should be executed and resultInjected has to be 25', function() {
 
+		var commandComplete = false;
 		provider.asSequence().add('Command1').add('Command2').mapTo(eventName);
 		spyOn(injector, 'instantiate').andCallThrough();
 		spyOn(injector, 'invoke').andCallThrough();
@@ -88,7 +80,9 @@ describe("Injection from preceding command whit promise result test", function()
 
 			scope.$apply(function() {
 
-				dispatcher.dispatch(eventName);
+				dispatcher.dispatch(eventName).then(function(){
+					commandComplete = true;
+				});
 			});
 
 		});
@@ -96,15 +90,13 @@ describe("Injection from preceding command whit promise result test", function()
 		waitsFor(function() {
 			
 			timeout.flush();
-			return executed && executed2;
+			return commandComplete;
 
 		}, 'The command should be executed', 1000)
 
 
 		runs(function() {
 
-			expect(executed).toBe(true);
-			expect(executed2).toBe(true);
 			expect(injector.instantiate).toHaveBeenCalled();
 			expect(injector.invoke).toHaveBeenCalled();
 			expect(resultInjected).toBe(25)

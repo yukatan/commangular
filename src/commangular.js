@@ -261,7 +261,7 @@
 						return {
 							dispatch: function(eventName, data) {
 
-								commandExecutor.execute(eventName, data);
+								return commandExecutor.execute(eventName, data);
 							}
 						}
 					}

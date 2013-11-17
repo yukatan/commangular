@@ -5,8 +5,7 @@ describe("Command execution testing", function() {
 	var scope;
 	var injector;
 	var eventName = 'TestEvent';
-	var executed = false;
-
+	
 	var injectedScope;
 	var injectedInjector;
 	var injectedLog;
@@ -25,8 +24,6 @@ describe("Command execution testing", function() {
 				execute: function($injector) {
 
 					injectedInjector = $injector;
-					executed = true;
-
 				}
 			};
 		});
@@ -65,24 +62,26 @@ describe("Command execution testing", function() {
 
 	it('injection should be working', function() {
 
+		var commmandComplete = false;
 		provider.asSequence().add('Command1').mapTo(eventName);
 		runs(function() {
 
 			scope.$apply(function() {
 
-				dispatcher.dispatch(eventName);
+				dispatcher.dispatch(eventName).then(function(){
+					commmandComplete = true;
+				});
 			});
 		});
 
 		waitsFor(function() {
 
-			return executed;
+			return commmandComplete;
 		}, 'The command should be executed', 1000)
 
 
 		runs(function() {
-
-			expect(executed).toBe(true);
+			
 			expect(injectedInjector).toBeDefined();
 			expect(injectedInjector).toEqual(injector);
 			expect(injectedScope).toBeDefined();

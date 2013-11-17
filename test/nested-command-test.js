@@ -5,11 +5,7 @@ describe("Command parallel and sequence nested execution testing", function() {
 	var scope;
 	var injector;
 	var eventName = 'TestEvent';
-	var executed = false;
-	var executed2 = false;
-	var executed3 = false;
-	var executed4 = false;
-
+	
 	beforeEach(function() {
 
 		executed = false;
@@ -24,8 +20,6 @@ describe("Command parallel and sequence nested execution testing", function() {
 				execute: function($log) {
 
 					$log.log('logging');
-					executed = true;
-
 				}
 			};
 		});
@@ -36,8 +30,6 @@ describe("Command parallel and sequence nested execution testing", function() {
 				execute: function($log) {
 
 					$log.log('logging');
-					executed2 = true;
-
 				}
 			};
 		});
@@ -48,8 +40,6 @@ describe("Command parallel and sequence nested execution testing", function() {
 				execute: function($log) {
 
 					$log.log('logging');
-					executed3 = true;
-
 				}
 			};
 		});
@@ -60,8 +50,6 @@ describe("Command parallel and sequence nested execution testing", function() {
 				execute: function($log) {
 
 					$log.log('logging');
-					executed4 = true;
-
 				}
 			};
 		});
@@ -99,6 +87,7 @@ describe("Command parallel and sequence nested execution testing", function() {
 
 	it('command parallel nested should be executed', function() {
 
+		var commandComplete = false;
 		var parallel = provider.asParallel().add('Command3').add('Command4').create();
 		provider.asSequence().add('Command1').add('Command2').add(parallel).mapTo(eventName);
 		spyOn(injector, 'instantiate').andCallThrough();
@@ -107,24 +96,22 @@ describe("Command parallel and sequence nested execution testing", function() {
 
 			scope.$apply(function() {
 
-				dispatcher.dispatch(eventName);
+				dispatcher.dispatch(eventName).then(function() {
+					commandComplete = true;
+				});
 			});
 
 		});
 
 		waitsFor(function() {
 
-			return executed && executed2 && executed3 && executed4;
+			return commandComplete;
 
 		}, 'The command should be executed', 1000)
 
 
 		runs(function() {
-
-			expect(executed).toBe(true);
-			expect(executed2).toBe(true);
-			expect(executed3).toBe(true);
-			expect(executed4).toBe(true);
+			
 			expect(injector.instantiate).toHaveBeenCalled();
 			expect(injector.invoke).toHaveBeenCalled();
 		})
@@ -132,6 +119,7 @@ describe("Command parallel and sequence nested execution testing", function() {
 
 	it('command sequence nested should be executed', function() {
 
+		var commandComplete = false;
 		var sequence = provider.asSequence().add('Command3').add('Command4').create();
 		provider.asSequence().add('Command1').add('Command2').add(sequence).mapTo(eventName);
 		spyOn(injector, 'instantiate').andCallThrough();
@@ -140,24 +128,22 @@ describe("Command parallel and sequence nested execution testing", function() {
 
 			scope.$apply(function() {
 
-				dispatcher.dispatch(eventName);
+				dispatcher.dispatch(eventName).then(function() {
+					commandComplete = true;
+				});
 			});
 
 		});
 
 		waitsFor(function() {
 
-			return executed && executed2 && executed3 && executed4;
+			return commandComplete;
 
 		}, 'The command should be executed', 1000)
 
 
 		runs(function() {
 
-			expect(executed).toBe(true);
-			expect(executed2).toBe(true);
-			expect(executed3).toBe(true);
-			expect(executed4).toBe(true);
 			expect(injector.instantiate).toHaveBeenCalled();
 			expect(injector.invoke).toHaveBeenCalled();
 		})
@@ -165,12 +151,12 @@ describe("Command parallel and sequence nested execution testing", function() {
 
 	it('command.execute method should be called four times', function() {
 
+		var commandComplete = false;
 		var parallel = provider.asParallel().add('Command3').add('Command4').create();
 		var command = {
 
 			execute: function() {
-
-				executed = true;
+				
 			}
 		};
 		provider.asSequence().add('Command1').add('Command2').add(parallel).mapTo(eventName);
@@ -180,33 +166,35 @@ describe("Command parallel and sequence nested execution testing", function() {
 
 			scope.$apply(function() {
 
-				dispatcher.dispatch(eventName);
+				dispatcher.dispatch(eventName).then(function(){
+
+					commandComplete = true;
+				});
 			});
 
 		});
 
 		waitsFor(function() {
 
-			return executed;
+			return commandComplete;
 
 		}, 'The command should be executed', 1000)
 
 
 		runs(function() {
 
-			expect(executed).toBe(true);
 			expect(command.execute).toHaveBeenCalled();
 			expect(command.execute.callCount).toBe(4);
 		})
 	});
 	it('command.execute method should be called four times', function() {
 
+		var commandComplete = false;
 		var sequence = provider.asParallel().add('Command3').add('Command4').create();
 		var command = {
 
 			execute: function() {
-
-				executed = true;
+				
 			}
 		};
 		provider.asSequence().add('Command1').add('Command2').add(sequence).mapTo(eventName);
@@ -216,21 +204,22 @@ describe("Command parallel and sequence nested execution testing", function() {
 
 			scope.$apply(function() {
 
-				dispatcher.dispatch(eventName);
+				dispatcher.dispatch(eventName).then(function(){
+					commandComplete = true;
+				});
 			});
 
 		});
 
 		waitsFor(function() {
 
-			return executed;
+			return commandComplete;
 
 		}, 'The command should be executed', 1000)
 
 
 		runs(function() {
 
-			expect(executed).toBe(true);
 			expect(command.execute).toHaveBeenCalled();
 			expect(command.execute.callCount).toBe(4);
 		})

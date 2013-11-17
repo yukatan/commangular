@@ -5,15 +5,11 @@ describe("Injection using lastResult test", function() {
 	var scope;
 	var injector;
 	var eventName = 'TestEvent';
-	var executed = false;
-	var executed2 = false;
 	var resultInjected;
 	var timeout;
 
 	beforeEach(function() {
-
-		executed = false;
-		executed2 = false;
+		
 		commangular.functions = {};
 		commangular.create('Command1', function() {
 
@@ -22,9 +18,7 @@ describe("Injection using lastResult test", function() {
 				execute: function($log) {
 
 					$log.log('logging');
-					executed = true;
 					return 25;
-
 				}
 			};
 		});
@@ -37,8 +31,6 @@ describe("Injection using lastResult test", function() {
 
 					$log.log(lastResult);
 					resultInjected = lastResult;
-					executed2 = true;
-
 				}
 			};
 		});
@@ -50,8 +42,7 @@ describe("Injection using lastResult test", function() {
 
 					var deferred = $q.defer()
 					$timeout(function() {
-						executed = true;
-						deferred.resolve(25);
+						deferred.resolve(75);
 					}, 500);
 					$log.log('logging');
 					return deferred.promise;
@@ -93,6 +84,7 @@ describe("Injection using lastResult test", function() {
 
 	it('command should be executed and result injected has to be 25', function() {
 
+		var commmandComplete = false;
 		provider.asSequence().add('Command1').add('Command2').mapTo(eventName);
 		spyOn(injector, 'instantiate').andCallThrough();
 		spyOn(injector, 'invoke').andCallThrough();
@@ -100,7 +92,9 @@ describe("Injection using lastResult test", function() {
 
 			scope.$apply(function() {
 
-				dispatcher.dispatch(eventName);
+				dispatcher.dispatch(eventName).then(function() {
+					commmandComplete = true;
+				});
 			});
 
 		});
@@ -108,15 +102,13 @@ describe("Injection using lastResult test", function() {
 		waitsFor(function() {
 
 			
-			return executed && executed2;
+			return commmandComplete;
 
 		}, 'The command should be executed', 1000)
 
 
 		runs(function() {
-
-			expect(executed).toBe(true);
-			expect(executed2).toBe(true);
+	
 			expect(injector.instantiate).toHaveBeenCalled();
 			expect(injector.invoke).toHaveBeenCalled();
 			expect(resultInjected).toBe(25)
@@ -125,6 +117,7 @@ describe("Injection using lastResult test", function() {
 
 	it('command should work with promise resolution as well', function() {
 
+		var commmandComplete = false;
 		provider.asSequence().add('Command3').add('Command2').mapTo(eventName);
 		spyOn(injector, 'instantiate').andCallThrough();
 		spyOn(injector, 'invoke').andCallThrough();
@@ -132,7 +125,9 @@ describe("Injection using lastResult test", function() {
 
 			scope.$apply(function() {
 
-				dispatcher.dispatch(eventName);
+				dispatcher.dispatch(eventName).then(function() {
+					commmandComplete = true;
+				});
 			});
 
 		});
@@ -140,18 +135,16 @@ describe("Injection using lastResult test", function() {
 		waitsFor(function() {
 
 			timeout.flush();
-			return executed && executed2;
+			return commmandComplete;
 
 		}, 'The command should be executed', 1000)
 
 
 		runs(function() {
 
-			expect(executed).toBe(true);
-			expect(executed2).toBe(true);
 			expect(injector.instantiate).toHaveBeenCalled();
 			expect(injector.invoke).toHaveBeenCalled();
-			expect(resultInjected).toBe(25)
+			expect(resultInjected).toBe(75)
 		})
 	});
 
