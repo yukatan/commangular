@@ -27,6 +27,21 @@
 		this.descriptors.push(command);
 	}
 	//----------------------------------------------------------------------------------------------------------------------
+	function ResultKeyLinkDescriptor(key, value) {
+
+		this.key = key;
+		this.value = value;
+		this.commandDescriptor;
+	}
+	//----------------------------------------------------------------------------------------------------------------------
+	function ServiceLinkDescriptor(service,property, value) {
+
+		this.service = service;
+		this.property = property;
+		this.value = value;
+		this.commandDescriptor;
+	}
+	//----------------------------------------------------------------------------------------------------------------------
 	function CommandBase(context) {
 
 		this.context = context;
@@ -42,7 +57,7 @@
 		this.commandConfig = config;
 
 		this.execute = function() {
-			
+
 			var isError = false;
 			var $q = this.context.$q;
 			var $injector = this.context.$injector;
@@ -51,7 +66,7 @@
 			var command = $injector.instantiate(this.command, this.context.getContextData());
 			try {
 				var result = $injector.invoke(command.execute, this.command, this.context.getContextData());
-				var resultPromise = this.context.processResults(result, this.deferred,this.commandConfig);
+				var resultPromise = this.context.processResults(result, this.deferred, this.commandConfig);
 			} catch (error) {
 				isError = true;
 				if (command.hasOwnProperty('onError')) {
@@ -95,20 +110,13 @@
 	function CommandSequence(context, descriptors) {
 
 		CommandGroup.apply(this, [context, descriptors]);
-		this.currentIndex = 0;
+		var currentIndex = 0;
 
 		this.execute = function() {
 			var self = this;
-			var commandDescriptor = this.descriptors[this.currentIndex];
+			var commandDescriptor = this.descriptors[currentIndex];
 			var command = this.context.instantiate(commandDescriptor);
-			if (command instanceof CommandSequence || command instanceof CommandParallel)
-				command.start().then(
-					function() {
-						self.nextCommand();
-					},
-					function(error) {
-						self.deferred.reject(error);
-					});
+
 			if (command instanceof Command)
 				command.execute().then(
 					function() {
@@ -117,11 +125,20 @@
 					function(error) {
 						self.deferred.reject(error);
 					});
+			else
+				command.start().then(
+					function() {
+						self.nextCommand();
+					},
+					function(error) {
+						self.deferred.reject(error);
+					});
+
 
 		};
 		this.nextCommand = function() {
 
-			if (++this.currentIndex == this.descriptors.length) {
+			if (++currentIndex == this.descriptors.length) {
 
 				this.deferred.resolve();
 				return;
@@ -135,7 +152,7 @@
 	function CommandParallel(context, descriptors) {
 
 		CommandGroup.apply(this, [context, descriptors]);
-		this.totalComplete = 0;
+		var totalComplete = 0;
 
 		this.execute = function() {
 
@@ -144,16 +161,17 @@
 
 				var commandDescriptor = this.descriptors[x];
 				var command = this.context.instantiate(commandDescriptor);
-				if (command instanceof CommandSequence || command instanceof CommandParallel)
-					command.start().then(
+
+				if (command instanceof Command)
+					command.execute().then(
 						function() {
 							self.checkComplete();
 						},
 						function(error) {
 							self.deferred.reject(error);
 						});
-				if (command instanceof Command)
-					command.execute().then(
+				else
+					command.start().then(
 						function() {
 							self.checkComplete();
 						},
@@ -164,19 +182,71 @@
 		};
 		this.checkComplete = function() {
 
-			if (++this.totalComplete == this.descriptors.length) {
-
+			if (++totalComplete == this.descriptors.length)
 				this.deferred.resolve();
-			}
-
-
 		};
 	}
 
 	CommandParallel.prototype = CommandGroup
 	CommandParallel.prototype.constructor = CommandParallel;
 	//----------------------------------------------------------------------------------------------------------------------
+	function CommandFlow(context, descriptors) {
 
+		CommandGroup.apply(this, [context, descriptors]);
+		var currentIndex = 0;
+		this.execute = function() {
+
+			var self = this;
+			var descriptor = this.descriptors[currentIndex];
+			if (descriptor instanceof ResultKeyLinkDescriptor) {
+				if (this.context.contextData[descriptor.key] === descriptor.value) {
+						
+					var command = this.context.instantiate(descriptor.commandDescriptor);
+					if (command instanceof Command)
+						command.execute().then(function() {
+							self.next();
+						});
+					else
+						command.start().then(function() {
+							self.next();
+					});
+				} else {
+					this.next();
+				}
+			}
+			if (descriptor instanceof ServiceLinkDescriptor) {
+				console.log(descriptor.service)
+				var service = this.context.$injector.get(descriptor.service);
+				if (service[descriptor.property] === descriptor.value) {
+						
+					var command = this.context.instantiate(descriptor.commandDescriptor);
+					if (command instanceof Command)
+						command.execute().then(function() {
+							self.next();
+						});
+					else
+						command.start().then(function() {
+							self.next();
+					});
+				} else {
+					this.next();
+				}
+			}
+		};
+		this.next = function() {
+
+			if (++currentIndex == this.descriptors.length) {
+
+				this.deferred.resolve();
+				return;
+			}
+			this.execute();
+		};
+	}
+
+	CommandParallel.prototype = CommandGroup
+	CommandParallel.prototype.constructor = CommandFlow;
+	//----------------------------------------------------------------------------------------------------------------------
 	function CommandContext($injector, $q, instantiator, data) {
 
 		this.contextData = data || {};
@@ -205,7 +275,7 @@
 
 			self.contextData.lastResult = data;
 			if (config && config.resultKey) {
-					self.contextData[config.resultKey] = data;
+				self.contextData[config.resultKey] = data;
 			}
 			deferred.resolve();
 		});
@@ -225,20 +295,17 @@
 
 			instantiate: function(descriptor, context) {
 
-				var command = {};
-				if (descriptor.commandType == 'S') {
+				switch (descriptor.commandType) {
 
-					command = new CommandSequence(context, descriptor.descriptors)
+					case 'S':
+						return new CommandSequence(context, descriptor.descriptors);
+					case 'P':
+						return new CommandParallel(context, descriptor.descriptors);
+					case 'E':
+						return new Command(descriptor.command, context, descriptor.commandConfig);
+					case 'F':
+						return new CommandFlow(context, descriptor.descriptors);
 				}
-				if (descriptor.commandType == 'P') {
-
-					command = new CommandParallel(context, descriptor.descriptors)
-				}
-				if (descriptor.commandType == 'E') {
-
-					command = new Command(descriptor.command, context, descriptor.commandConfig);
-				}
-				return command;
 			}
 		}
 
@@ -251,7 +318,16 @@
 
 			var descriptors = {};
 			var currentCommandDescriptor;
+			var currentLink;
 			var pendingDescriptors = [];
+
+			function createDescriptor(command) {
+
+				var commandDescriptor = new CommandDescriptor('E');
+				commandDescriptor.command = command.function;
+				commandDescriptor.commandConfig = command.config;
+				return commandDescriptor;
+			}
 
 			return {
 				$get: ['commandExecutor',
@@ -286,6 +362,47 @@
 					return this;
 				},
 
+				asFlow: function() {
+
+					if (currentCommandDescriptor) {
+
+						pendingDescriptors.push(currentCommandDescriptor);
+					}
+					currentCommandDescriptor = new CommandDescriptor('F');
+					return this;
+				},
+
+				resultLink: function(key, value) {
+
+					currentLink = new ResultKeyLinkDescriptor(key, value);
+					return this;
+				},
+				serviceLink : function(service,property,value) {
+
+					currentLink = new ServiceLinkDescriptor(service,property,value);
+					return this;
+				},
+
+				to: function(command) {
+
+					if (angular.isString(command)) {
+
+						command = this.get(command);
+					}
+
+					if (command instanceof CommandDescriptor) {
+
+						currentLink.commandDescriptor = command;
+						currentCommandDescriptor.add(currentLink);
+						currentLink = null;
+						return this;
+					}
+					currentLink.commandDescriptor = createDescriptor(command);
+					currentCommandDescriptor.add(currentLink);
+					currentLink = null;
+					return this;
+				},
+
 				add: function(command) {
 
 					if (angular.isString(command)) {
@@ -298,16 +415,13 @@
 						currentCommandDescriptor.add(command);
 						return this;
 					}
-					var commandDescriptor = new CommandDescriptor('E');
-					commandDescriptor.command = command.function;
-					commandDescriptor.commandConfig = command.config;
-					currentCommandDescriptor.add(commandDescriptor);
+					currentCommandDescriptor.add(createDescriptor(command))
 					return this;
 				},
 
 				mapTo: function(eventName) {
 
-					if (pendingDescriptors.length > 0) {
+					if (pendingDescriptors.length > 0 || currentLink != null) {
 
 						throw "Incorrect command structure on " + eventName;
 					}
@@ -351,8 +465,7 @@
 						var commandDescriptor = this.descriptors[eventName];
 						var command = context.instantiate(commandDescriptor);
 						command.start().then(function(data) {
-
-							console.log("Command Complete");
+							
 							deferred.resolve();
 						}, function(error) {
 
