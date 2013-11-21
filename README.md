@@ -81,10 +81,9 @@ angular.module('YourApp')
   
   // Commands configuration goes here.
   //Create your sequence or parallel command structure and map it to an event name string
-  $commandgularProvider.asSequence()
-    .add('HelloWorldCommand')
-    .mapTo('HelloEvent');
-    
+  $commandgularProvider.mapTo('HelloEvent')
+   .asSequence()
+      .add('HelloWorldCommand');
    });
 ```
 *Inject the commangular service in your controller.*
@@ -295,12 +294,12 @@ commangular.create('Command3',['$log',function($log) {
 
 //We create the sequence in a config block as follows
 
-$commangularProvider.asSequence()
-  .add('Command1')
-  .add('Command2')
-  .add('Command3')
-  .mapTo('MyEvent');
-  
+$commangularProvider.mapTo('MyEvent')
+   .asSequence()
+      .add('Command1')
+      .add('Command2')
+      .add('Command3');
+
 ```
 When you dispatch 'MyEvent' from the commangular service the Command1 is going to be executed. After completion then the Command2 will be executed and then the Command3.
 
@@ -340,10 +339,11 @@ commangular.create('Command2',['$log',function($log) {
   }
 }]);
 
-$commangularProvider.asParallel()
-  .add('Command1')
-  .add('Command2')
-  .mapTo('ParallelExampleEvent');
+$commangularProvider.mapTo('ParallelExampleEvent')
+   .asParallel()
+      .add('Command1')
+      .add('Command2');
+  
   
 ```
 The execution of Command1 is getting and returning a promise. Command2 wont wait for this promise resolution. So in this example Command2 will complete the execution before Command1.
@@ -357,36 +357,34 @@ Yuo can create any kind of nesting with commangular. You can create a sequence o
 //You can user vars
 var parallel1 = $commangularProvider.asParallel().add('Command3').add('Command4').create();
 
-$commangularProvider.asSequence()
-  .add('Command1')
-  .add('Command2')
-  .add(parrallel)
-  .mapTo('ParallelExampleEvent');
- 
+$commangularProvider.mapTo('ParallelExampleEvent')
+   .asSequence()
+      .add('Command1')
+      .add('Command2')
+      .add(parrallel);
+
 //You can use inline
 
-$commangularProvider.asSequence()
-  .add('Command1')
-  .add('Command2')
-  .add($commangularProvider.asParallel()
+$commangularProvider.mapTo('ParallelExampleEvent')
+   .asSequence()
+      .add('Command1')
+      .add('Command2')
+      .add($commangularProvider.asParallel()
          .add('Command3')
-         .add('Command4')
-         .create())
-  .mapTo('ParallelExampleEvent');
-//Any level of nesting is allowed and all command are executed in the same comand context
+         .add('Command4'));
+
+//Any level of nesting is allowed and all commands are executed in the same comand context
 //You can reuse commands in the same or others command groups
-$commangularProvider.asSequence()
-  .add('Command1')
-  .add('Command2')
-  .add($commangularProvider.asParallel()
-         .add($commandgularProvider.asParrallel()
-               .add('Command7')
-               .add('Command1')
-               .create())
-         .add('Command4')
-         .create())
-  .mapTo('ParallelExampleEvent');
-  
+$commangularProvider.mapTo('ParallelExampleEvent')
+   .asSequence()
+     .add('Command1')
+     .add('Command2')
+     .add($commangularProvider.asParallel()
+            .add($commandgularProvider.asParrallel()
+                  .add('Command7')
+                  .add('Command1'))
+            .add('Command4'));
+
 ```
 
 
