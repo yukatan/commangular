@@ -134,6 +134,7 @@
 
 		this.execute = function() {
 
+			var self = this;
 			var isError = false;
 			var $q = this.context.$q;
 			var $injector = this.context.$injector;
