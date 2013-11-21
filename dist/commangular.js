@@ -1,6 +1,6 @@
 /**
  * Command pattern implementation for AngularJS
- * @version v0.4.0 - 2013-11-21
+ * @version v0.4.1 - 2013-11-21
  * @link https://github.com/yukatan/commangular
  * @author Jesús Barquín Cheda <yukatan@gmail.com>
  * @license MIT License, http://www.opensource.org/licenses/MIT
@@ -141,6 +141,7 @@
 
 		this.execute = function() {
 
+			var self = this;
 			var isError = false;
 			var $q = this.context.$q;
 			var $injector = this.context.$injector;
