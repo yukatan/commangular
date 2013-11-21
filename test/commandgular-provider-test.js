@@ -27,11 +27,11 @@ describe("Provider Testing", function() {
 
 	it("should find the commands", function() {
 
-		var command = provider.get('Command1');
+		var command = commangular.functions['Command1'];
 		expect(command).toBeDefined();
 		expect(command.function).toEqual(command1);
 
-		var command = provider.get('Command2');
+		var command = commangular.functions['Command2'];
 		expect(command).toBeDefined();
 		expect(command.function).toEqual(command2);
 	});
@@ -40,11 +40,11 @@ describe("Provider Testing", function() {
 
 		expect(provider).toBeDefined();
 
-		var sequence = provider.asSequence().add('Command1').create();
+		var sequence = provider.asSequence().add('Command1');
 		expect(sequence).toBeDefined();
 		expect(sequence.commandType).toBe('S');
 
-		var parallel = provider.asParallel().add('Command1').create();
+		var parallel = provider.asParallel().add('Command1');
 		expect(parallel).toBeDefined();
 		expect(parallel.commandType).toBe('P');
 
@@ -58,11 +58,11 @@ describe("Provider Testing", function() {
 
 		expect(provider).toBeDefined();
 
-		var sequence = provider.asSequence().add('Command1').create();
+		var sequence = provider.asSequence().add('Command1');
 		expect(sequence).toBeDefined();
 		expect(sequence.command).toBeNull();
 
-		var parallel = provider.asParallel().add('Command2').create();
+		var parallel = provider.asParallel().add('Command2');
 		expect(parallel).toBeDefined();
 		expect(parallel.command).toBeNull();
 
@@ -80,7 +80,7 @@ describe("Provider Testing", function() {
 
 		expect(provider).toBeDefined();
 		var eventName = 'TestEvent';
-		provider.asSequence().add('Command1').mapTo(eventName);
+		provider.mapTo(eventName).asSequence().add('Command1');
 		var commandDescriptor = provider.findCommand(eventName);
 		expect(commandDescriptor).toBeDefined();
 		expect(commandDescriptor.command).toBeDefined();
@@ -93,7 +93,7 @@ describe("Provider Testing", function() {
 
 		expect(provider).toBeDefined();
 		var eventName = 'TestEvent';
-		provider.asSequence().add('Command1').add('Command2').mapTo(eventName);
+		provider.mapTo(eventName).asSequence().add('Command1').add('Command2');
 		var commandDescriptor = provider.findCommand(eventName);
 		expect(commandDescriptor.commandType).toBe('S');
 		expect(commandDescriptor).toBeDefined();
@@ -106,7 +106,7 @@ describe("Provider Testing", function() {
 
 		expect(provider).toBeDefined();
 		var eventName = 'TestEvent';
-		provider.asParallel().add('Command1').add('Command2').mapTo(eventName);
+		provider.mapTo(eventName).asParallel().add('Command1').add('Command2');
 		var commandDescriptor = provider.findCommand(eventName);
 		expect(commandDescriptor.commandType).toBe('P');
 		expect(commandDescriptor).toBeDefined();
@@ -118,8 +118,8 @@ describe("Provider Testing", function() {
 
 		expect(provider).toBeDefined();
 		var eventName = 'TestEvent';
-		var sequence = provider.asSequence().add('Command1').add('Command2').create();
-		provider.asParallel().add('Command1').add('Command2').add(sequence).mapTo(eventName);
+		var sequence = provider.asSequence().add('Command1').add('Command2');
+		provider.mapTo(eventName).asParallel().add('Command1').add('Command2').add(sequence);
 		var commandDescriptor = provider.findCommand(eventName);
 		expect(commandDescriptor.commandType).toBe('P');
 		expect(commandDescriptor).toBeDefined();

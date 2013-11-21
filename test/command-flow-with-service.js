@@ -70,11 +70,11 @@ describe("Command Flow link to service execution testing", function() {
 		},{resultKey:'result1'});
 
 		var commandComplete = false;
-		provider.asSequence()
+		provider.mapTo(eventName).asSequence()
 			.add('Command1')
 			.add(provider.asFlow()
-				.serviceLink('UserDomainModel','username','monkey').to('Command2').create())
-			.mapTo(eventName);
+				.serviceLink('UserDomainModel','username','monkey').to('Command2'));
+			
 
 		spyOn(injector, 'instantiate').andCallThrough();
 		spyOn(injector, 'invoke').andCallThrough();
@@ -121,11 +121,12 @@ describe("Command Flow link to service execution testing", function() {
 
 
 		var commandComplete = false;
-		provider.asSequence()
-			.add('Command1')
-			.add(provider.asFlow()
-				.serviceLink('UserDomainModel','username','notMonkey').to('Command2').create())
-			.mapTo(eventName);
+		provider.mapTo(eventName)
+			.asSequence()
+				.add('Command1')
+				.add(provider.asFlow()
+					.serviceLink('UserDomainModel','username','notMonkey').to('Command2'));
+			
 
 		spyOn(injector, 'instantiate').andCallThrough();
 		spyOn(injector, 'invoke').andCallThrough();

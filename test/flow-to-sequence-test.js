@@ -1,4 +1,4 @@
-describe("Command Sequence execution testing", function() {
+describe("Flow To Sequence execution testing", function() {
 
 	var provider;
 	var dispatcher;
@@ -81,20 +81,18 @@ describe("Command Sequence execution testing", function() {
 	});
 
 	it('command 2 and 3 should be executed', function() {
-
 		
-		
-
-
 		var commandComplete = false;
-		
-		provider.asSequence()
-			.add('Command1')
-			.add(provider.asFlow()
-				.resultLink('result1',true).to(provider.asSequence().add('Command2').add('Command3').create())
-				.create())
-			.mapTo(eventName);
-	
+		var sequence = provider.asSequence().add('Command2');
+		provider.mapTo(eventName)
+			.asSequence()
+				.add('Command1')
+				.add(provider.asFlow()
+						.resultLink('result1',true).to(
+							provider.asSequence()
+								.add('Command2')
+								.add('Command3')));
+								
 		runs(function() {
 
 			scope.$apply(function() {

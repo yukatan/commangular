@@ -1,4 +1,4 @@
-describe("Command Sequence execution testing", function() {
+describe("Command Flow With Data passed test", function() {
 
 	var provider;
 	var dispatcher;
@@ -72,10 +72,11 @@ describe("Command Sequence execution testing", function() {
 		
 		var commandComplete = false;
 		
-		provider.asFlow()
-			.resultLink('data1',2).to('Command1')
-			.resultLink('data1',3).to('Command2')
-			.mapTo(eventName);
+		provider.mapTo(eventName)
+			.asFlow()
+				.resultLink('data1',2).to('Command1')
+				.resultLink('data1',3).to('Command2');
+				
 	
 		runs(function() {
 
@@ -119,10 +120,11 @@ describe("Command Sequence execution testing", function() {
 			};
 		},{resultKey:'result1'});
 
-		provider.asFlow()
-			.resultLink('data1',2).to('Command1')
-			.resultLink('data1',3).to('Command2')
-			.mapTo(eventName);
+		provider.mapTo(eventName)
+			.asFlow()
+				.resultLink('data1',2).to('Command1')
+				.resultLink('data1',3).to('Command2');
+				
 	
 		runs(function() {
 

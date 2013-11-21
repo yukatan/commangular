@@ -64,7 +64,7 @@ describe("Command Parallel execution testing", function() {
 	it('command should be executed', function() {
 
 		var commandComplete = false;
-		provider.asParallel().add('Command1').add('Command2').mapTo(eventName);
+		provider.mapTo(eventName).asParallel().add('Command1').add('Command2');
 		spyOn(injector, 'instantiate').andCallThrough();
 		spyOn(injector, 'invoke').andCallThrough();
 		runs(function() {
@@ -104,7 +104,7 @@ describe("Command Parallel execution testing", function() {
 				
 			}
 		};
-		provider.asParallel().add('Command1').add('Command2').mapTo(eventName);
+		provider.mapTo(eventName).asParallel().add('Command1').add('Command2');
 		spyOn(injector, 'instantiate').andReturn(command);
 		spyOn(command, 'execute').andCallThrough();
 		runs(function() {

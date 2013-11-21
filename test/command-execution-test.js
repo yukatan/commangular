@@ -54,7 +54,7 @@ describe("Command execution testing", function() {
 	it('command should be executed', function() {
 
 		var commandComplete = false;
-		provider.asSequence().add('Command1').mapTo(eventName);
+		provider.mapTo(eventName).asSequence().add('Command1');
 		spyOn(injector, 'instantiate').andCallThrough();
 		spyOn(injector, 'invoke').andCallThrough();
 		runs(function() {
@@ -92,7 +92,7 @@ describe("Command execution testing", function() {
 			}
 		};
 
-		provider.asSequence().add('Command1').mapTo(eventName);
+		provider.mapTo(eventName).asSequence().add('Command1');
 		spyOn(injector, 'instantiate').andReturn(command);
 		spyOn(command, 'execute').andCallThrough();
 		runs(function() {

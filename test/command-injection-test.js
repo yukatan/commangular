@@ -63,7 +63,7 @@ describe("Command execution testing", function() {
 	it('injection should be working', function() {
 
 		var commmandComplete = false;
-		provider.asSequence().add('Command1').mapTo(eventName);
+		provider.mapTo(eventName).asSequence().add('Command1');
 		runs(function() {
 
 			scope.$apply(function() {

@@ -88,8 +88,8 @@ describe("Command parallel and sequence nested execution testing", function() {
 	it('command parallel nested should be executed', function() {
 
 		var commandComplete = false;
-		var parallel = provider.asParallel().add('Command3').add('Command4').create();
-		provider.asSequence().add('Command1').add('Command2').add(parallel).mapTo(eventName);
+		var parallel = provider.asParallel().add('Command3').add('Command4');
+		provider.mapTo(eventName).asSequence().add('Command1').add('Command2').add(parallel);
 		spyOn(injector, 'instantiate').andCallThrough();
 		spyOn(injector, 'invoke').andCallThrough();
 		runs(function() {
@@ -120,8 +120,8 @@ describe("Command parallel and sequence nested execution testing", function() {
 	it('command sequence nested should be executed', function() {
 
 		var commandComplete = false;
-		var sequence = provider.asSequence().add('Command3').add('Command4').create();
-		provider.asSequence().add('Command1').add('Command2').add(sequence).mapTo(eventName);
+		var sequence = provider.asSequence().add('Command3').add('Command4');
+		provider.mapTo(eventName).asSequence().add('Command1').add('Command2').add(sequence);
 		spyOn(injector, 'instantiate').andCallThrough();
 		spyOn(injector, 'invoke').andCallThrough();
 		runs(function() {
@@ -152,14 +152,14 @@ describe("Command parallel and sequence nested execution testing", function() {
 	it('command.execute method should be called four times', function() {
 
 		var commandComplete = false;
-		var parallel = provider.asParallel().add('Command3').add('Command4').create();
+		var parallel = provider.asParallel().add('Command3').add('Command4');
 		var command = {
 
 			execute: function() {
 				
 			}
 		};
-		provider.asSequence().add('Command1').add('Command2').add(parallel).mapTo(eventName);
+		provider.mapTo(eventName).asSequence().add('Command1').add('Command2').add(parallel);
 		spyOn(injector, 'instantiate').andReturn(command);
 		spyOn(command, 'execute').andCallThrough();
 		runs(function() {
@@ -190,14 +190,14 @@ describe("Command parallel and sequence nested execution testing", function() {
 	it('command.execute method should be called four times', function() {
 
 		var commandComplete = false;
-		var sequence = provider.asParallel().add('Command3').add('Command4').create();
+		var sequence = provider.asParallel().add('Command3').add('Command4');
 		var command = {
 
 			execute: function() {
 				
 			}
 		};
-		provider.asSequence().add('Command1').add('Command2').add(sequence).mapTo(eventName);
+		provider.mapTo(eventName).asSequence().add('Command1').add('Command2').add(sequence);
 		spyOn(injector, 'instantiate').andReturn(command);
 		spyOn(command, 'execute').andCallThrough();
 		runs(function() {

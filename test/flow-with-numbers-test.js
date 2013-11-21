@@ -1,4 +1,4 @@
-describe("Command Sequence execution testing", function() {
+describe("Command Flow With Numbers execution testing", function() {
 
 	var provider;
 	var dispatcher;
@@ -95,13 +95,13 @@ describe("Command Sequence execution testing", function() {
 			};
 		},{resultKey:'result1'});
 
-		provider.asSequence()
-			.add('Command1')
-			.add(provider.asFlow()
-				.resultLink('result1',2).to('Command2')
-				.resultLink('result1',3).to('Command3')
-				.create())
-			.mapTo(eventName);
+		provider.mapTo(eventName)
+			.asSequence()
+				.add('Command1')
+				.add(provider.asFlow()
+					.resultLink('result1',2).to('Command2')
+					.resultLink('result1',3).to('Command3'));
+				
 	
 		runs(function() {
 
@@ -145,13 +145,12 @@ describe("Command Sequence execution testing", function() {
 			};
 		},{resultKey:'result1'});
 
-		provider.asSequence()
-			.add('Command1')
-			.add(provider.asFlow()
-				.resultLink('lastResult',2).to('Command2')
-				.resultLink('lastResult',3).to('Command3')
-				.create())
-			.mapTo(eventName);
+		provider.mapTo(eventName)
+			.asSequence()
+				.add('Command1')
+				.add(provider.asFlow()
+					.resultLink('lastResult',2).to('Command2')
+					.resultLink('lastResult',3).to('Command3'));
 	
 		runs(function() {
 

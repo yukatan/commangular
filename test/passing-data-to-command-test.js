@@ -66,7 +66,7 @@ describe("Passing data to commands test", function() {
 	it('calculation has to be 12 and 2', function() {
 
 		var commandComplete = false;
-		provider.asSequence().add('Command1').add('Command2').mapTo(eventName);
+		provider.mapTo(eventName).asSequence().add('Command1').add('Command2');
 		spyOn(injector, 'instantiate').andCallThrough();
 		spyOn(injector, 'invoke').andCallThrough();
 		runs(function() {

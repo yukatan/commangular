@@ -71,7 +71,7 @@ describe("Injection from preceding command result test", function() {
 	it('command should be executed and resultInjected has to be 25', function() {
 
 		var commandComplete = false;
-		provider.asSequence().add('Command1').add('Command2').mapTo(eventName);
+		provider.mapTo(eventName).asSequence().add('Command1').add('Command2');
 		spyOn(injector, 'instantiate').andCallThrough();
 		spyOn(injector, 'invoke').andCallThrough();
 		runs(function() {

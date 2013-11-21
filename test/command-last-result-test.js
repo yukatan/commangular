@@ -85,7 +85,7 @@ describe("Injection using lastResult test", function() {
 	it('command should be executed and result injected has to be 25', function() {
 
 		var commmandComplete = false;
-		provider.asSequence().add('Command1').add('Command2').mapTo(eventName);
+		provider.mapTo(eventName).asSequence().add('Command1').add('Command2');
 		spyOn(injector, 'instantiate').andCallThrough();
 		spyOn(injector, 'invoke').andCallThrough();
 		runs(function() {
@@ -118,7 +118,7 @@ describe("Injection using lastResult test", function() {
 	it('command should work with promise resolution as well', function() {
 
 		var commmandComplete = false;
-		provider.asSequence().add('Command3').add('Command2').mapTo(eventName);
+		provider.mapTo(eventName).asSequence().add('Command3').add('Command2');
 		spyOn(injector, 'instantiate').andCallThrough();
 		spyOn(injector, 'invoke').andCallThrough();
 		runs(function() {
