@@ -1,4 +1,4 @@
-#Commangular  (docs in progress)           
+#Commangular        
 
 [![Build Status](https://travis-ci.org/yukatan/commangular.png)](https://travis-ci.org/yukatan/commangular)
 
@@ -20,7 +20,7 @@ Commangular is an abstraction that aims at simplifying the creation of operation
 * Interception of command execution (on the way).
 * Command cancelation(on the way).
 * Custom result resolvers(on the way).
-* 
+
 
 ##Instalation
 
@@ -352,9 +352,45 @@ $commangularProvider.mapTo('ParallelExampleEvent')
 ```
 The execution of Command1 returns a promise. Command2 won't wait for this promise resolution. So, in this example, Command2 will complete the execution before Command1.
 
+
+##Building command flows
+
+A command flow is a decision point inside the command group.You can have any number of flows inside a command group and nesting them how you perfer.
+
+```javascript
+$commangularProvider.mapTo('FlowsEvent')
+   .add('Command1') // returns "result1"
+   .add($commangularProvider.asFlow()
+   // Command2 will be executed only if the value of the preceding "result1" is true.
+      .resultLink('result1',true).to('Command2')
+   // Command3 will be executed only if the value of the property "isAdmin" of "userModel" service is true.   
+      .serviceLink('userModel','isAdmin',true).to('Command3')) 
+```
+You have two options to link on flows :
+
+* resultLink : It links the command execution to the value of a preceding result. As you can see in the example, Command1 returns "result1" and then in the flow "resultLink" uses that value to decide wether 'Command2' should be executed.
+* serviceLink : It links the command execution to the actual value of an angular service. As you can see in the example, if "userModel.isAdmin == true" then Command3 will be executed. The evaluation of the condition is done every time the FlowsEvent is dispatched, so if "userModel.isAdmin = false", The next time the FlowsEvent is dispatched 'Command3' won't be executed.
+
+The link can be done to any kind of command group :
+
+```javascript
+var sequence = $commangularProvider.asSequence().add('Seq1Command').add('Seq2Command');
+var parallel = $commangularProvider.asParallel().add('Par1Command').add('Par2Command');
+var otherFlow = $commangularProvider.asFlow().serviceLink('userModel','logged',true).to('UserLoggedCommand');
+
+$commangularProvider.mapTo('FlowsEvent')
+   .add('Command1') // returns "result1"
+   .add($commangularProvider.asFlow()
+   // Link to sequence
+      .resultLink('result1',true).to(sequence)
+   // Link to parallel   
+      .serviceLink('userModel','isAdmin',true).to(parallel)
+      .resultLink('result1',false).to(otherFlow)); 
+```
+
 ##Nesting commands
 
-Yuo can create any kind of commands nesting with commangular. You can create a sequence of parallel commands or sequences in parallel. It's better to show it in code :
+You can create any kind of commands nesting with commangular. You can create a sequence of parallel commands or sequences in parallel. It's better to show it in code :
 
 ```javascript
 
