@@ -156,10 +156,13 @@
 			}
 			if (command.hasOwnProperty('onComplete') && !isError) {
 
-				resultPromise.then(function() {
+				if(resultPromise)
+					resultPromise.then(function() {
 
-					$injector.invoke(command.onComplete, self.command, self.context.getContextData());
-				});
+						$injector.invoke(command.onComplete, self.command, self.context.getContextData());
+					});
+				else
+					$injector.invoke(command.onComplete, self.command, self.context.getContextData());	
 			}
 			return this.deferred.promise;
 		}

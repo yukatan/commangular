@@ -1,6 +1,6 @@
 /**
  * Command pattern implementation for AngularJS
- * @version v0.4.1 - 2013-11-21
+ * @version v0.4.1 - 2013-11-22
  * @link https://github.com/yukatan/commangular
  * @author Jesús Barquín Cheda <yukatan@gmail.com>
  * @license MIT License, http://www.opensource.org/licenses/MIT
@@ -163,10 +163,13 @@
 			}
 			if (command.hasOwnProperty('onComplete') && !isError) {
 
-				resultPromise.then(function() {
+				if(resultPromise)
+					resultPromise.then(function() {
 
-					$injector.invoke(command.onComplete, self.command, self.context.getContextData());
-				});
+						$injector.invoke(command.onComplete, self.command, self.context.getContextData());
+					});
+				else
+					$injector.invoke(command.onComplete, self.command, self.context.getContextData());	
 			}
 			return this.deferred.promise;
 		}
