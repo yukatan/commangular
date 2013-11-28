@@ -10,7 +10,8 @@ describe("Command Flow link to service execution testing", function() {
 	beforeEach(function() {
 		
 		command2Executed = false;
-		commangular.functions = {};
+		commangular.commands = {};
+		commangular.aspects = [];
 		commangular.create('Command2', function() {
 
 			return {

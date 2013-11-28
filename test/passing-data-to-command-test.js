@@ -10,7 +10,8 @@ describe("Passing data to commands test", function() {
 
 	beforeEach(function() {
 
-		commangular.functions = {};
+		commangular.commands = {};
+		commangular.aspects = [];
 		commangular.create('Command1', function(data1,data2) {
 
 			return {

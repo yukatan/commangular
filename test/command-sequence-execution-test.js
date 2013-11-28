@@ -8,7 +8,8 @@ describe("Command Sequence execution testing", function() {
 	
 	beforeEach(function() {
 		
-		commangular.functions = {};
+		commangular.commands = {};
+		commangular.aspects = [];
 		commangular.create('Command1', function() {
 
 			return {
