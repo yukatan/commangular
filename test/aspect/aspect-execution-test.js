@@ -30,17 +30,14 @@ describe("Aspect execution testing", function() {
 
 		commangular.aspect('@Around(/Command(.*)/)', function(processor){
 
-			console.log('AroundExecuted');
+			
 			var result = processor.invoke();
-			console.log(result);
 			return "Return from around 1";
 		});
 
 		commangular.aspect('@Around(/Command(.*)/)', function(processor){
 
-			console.log('AroundExecuted');
 			var result = processor.invoke();
-			console.log(result);
 			return result;
 		});
 
@@ -50,7 +47,6 @@ describe("Aspect execution testing", function() {
 
 				execute : function() {
 					
-					console.log('Command1 execute');
 					if(interceptorExecutedBefore) {
 						commandExecutedAfter = true;
 					}

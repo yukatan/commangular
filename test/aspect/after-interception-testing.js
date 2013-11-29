@@ -38,7 +38,6 @@ describe("Aspect execution testing", function() {
 
 				execute : function() {
 										
-					console.log('returnning monkey');
 					return "monkey";
 				}
 			};

@@ -19,7 +19,6 @@
 		//console.log('result:' + result);
 		var poincut = result[1];
 		var matcher = result[2];
-		console.log(poincut)
 		if(!/(\bBefore\b|\bAfter\b|\bAfterThrowing\b|\bAround\b)/.test(poincut))
 			throw new Error('aspect descriptor ' + aspectDescriptor + ' contains errors');
 		aspects.push({poincut:poincut,
@@ -149,49 +148,65 @@
 		this.command = command;
 		this.commandConfig = config;
 		this.interceptors = interceptors;
+		var onError = function(error) {
+
+			var deferred = context.$q.defer();
+			deferred.reject(error);
+			return deferred.promise;
+		}	
 
 		this.execute = function() {
 
 			var self = this;
 			var context = this.context;
 			var isError = false;
-			
-			this.deferred = context.currentDeferred = context.$q.defer();
-			context.intercept('Before',interceptors);
-			if(context.isCanceled()) return this.deferred.promise;
-			var command = context.createCommand(this.command);
-			try {
-				var result;
-				if(interceptors['Around'])
-					result = context.intercept('Around',interceptors,command);
-				else					
-					result = context.invoke(command.execute, command);
-				var resultPromise = context.processResults(result, this.deferred, config);
-			} catch (error) {
-				isError = true;
-				context.intercept('AfterThrowing',interceptors);
-				if (command.hasOwnProperty('onError')) {
+			var command;
+					
+			var deferExecution = context.$q.defer();
+			deferExecution.resolve();
+			return deferExecution.promise
+				.then(function () {
+					
+					return context.intercept('Before',interceptors);
+				},onError)
+				.then(function() {
+					
+					var deferred = context.$q.defer();
+					command = context.createCommand(self.command);
+					try {
+						var result;
+						var resultPromise;
+						if(interceptors['Around'])
+							result = context.intercept('Around',interceptors,command);
+						else					
+							result = context.invoke(command.execute, command);
+						context.processResults(result,config).then(function(){
+							deferred.resolve();
+						});	
+					} catch (error) {
+						isError = true;
+						context.intercept('AfterThrowing',interceptors);
+						if (command.hasOwnProperty('onError')) {
 
-					var contextData = context.getContextData();
-					contextData.lastError = error;
-					context.invoke(command.onError,command);
-				}
-				this.deferred.reject(error);
+							var contextData = context.getContextData();
+							contextData.lastError = error;
+							context.invoke(command.onError,command);
+						}
+						deferred.reject(error);
+					}
+					return deferred.promise;
+
+				},onError)
+
+				.then(function(){
+
+					return context.intercept('After',interceptors);
+				},onError)
+				.then(function(){
+					if (command.hasOwnProperty('onComplete') && !isError) 
+						context.invoke(command.onComplete,command);	
+				},onError);
 			}
-			context.intercept('After',interceptors);
-			if(context.isCanceled()) return this.deferred.promise;
-			if (command.hasOwnProperty('onComplete') && !isError) {
-
-				if(resultPromise)
-					resultPromise.then(function() {
-
-						context.invoke(command.onComplete,command);
-					});
-				else
-					context.invoke(command.onComplete,command);	
-			}
-			return this.deferred.promise;
-		}
 	}
 	Command.prototype = new CommandBase();
 	Command.prototype.constructor = Command;
@@ -369,30 +384,29 @@
 		return command;
 	};
 
-	CommandContext.prototype.processResults = function(result, deferred, config) {
+	CommandContext.prototype.processResults = function(result,config) {
 
 		var self = this;
+		var deferred = self.$q.defer();
 		if (!result) {
 
 			deferred.resolve();
-			return;
+			return deferred.promise;
 		}
 
 		var promise = this.$q.when(result).then(function(data) {
 
 			self.contextData.lastResult = data;
-			console.log('Added ' + data + ' to lastResult');
 			if (config && config.resultKey) {
 				self.contextData[config.resultKey] = data;
 			}
 			deferred.resolve();
 		});
-		return promise;
+		return deferred.promise;
 	};
 
 	CommandContext.prototype.invoke = function(theFunction, self) {
 
-		console.log(this.contextData);
 		return this.$injector.invoke(theFunction,self,this.contextData);
 	};
 	CommandContext.prototype.createCommand = function(command) {
@@ -411,7 +425,7 @@
 	CommandContext.prototype.intercept = function(poincut,interceptors,command) {
 
 		var self = this;
-
+		var deferred = self.$q.defer();
 		switch(poincut) {
 
 			case 'Around' : {
@@ -421,20 +435,30 @@
 				
 					processor = new AroundProcessor(value,processor,self);
 				});
-				return processor.invoke();
+				self.$q.when(processor.invoke()).then(function(){
+					deferred.resolve();
+				});
 				break;
 			}
 			default : {
 
 				if(interceptors[poincut]) {
-					this.contextData.processor = new InterceptorProcessor(self);
+					this.contextData.processor = new InterceptorProcessor(self,deferred);
 					angular.forEach(interceptors[poincut],function(value){
-						self.invoke(value,value);
+						self.$q.when(self.invoke(value,value)).then(function() {
+							if(self.isCanceled())
+								deferred.reject();
+							else
+								deferred.resolve();
+						});
 					});
 				}
+				else
+					deferred.resolve();
 				break;
 			}
 		}
+		return deferred.promise;
 	};
 	//----------------------------------------------------------------------------------------------------------------------
 
@@ -455,14 +479,14 @@
 		}
 	};
 	//----------------------------------------------------------------------------------------------------------------------
-	function InterceptorProcessor(context) {
+	function InterceptorProcessor(context,deferred) {
 
+		this.deferred = deferred;
 		this.context = context;
 	}
 	InterceptorProcessor.prototype.cancel = function() {
 		
-		this.context.currentDeferred.reject('The command has been canceled');
-		this.context.state = 'canceled';		
+		this.deferred.reject('The command has been canceled');
 	}
 	InterceptorProcessor.prototype.setData = function(key,value) {
 		
@@ -485,10 +509,16 @@
 
 	AroundProcessor.prototype.invoke = function() {
 	
-		if(this.context.isCanceled())
-			return;
+		var deferred = this.context.$q.defer();
+		if(this.context.isCanceled()){
+			deferred.reject();
+			return;	
+		}
 		this.context.contextData.processor = this.next;
-		return this.context.invoke(this.executed,this.executed);
+		this.context.$q.when(this.context.invoke(this.executed,this.executed)).then(function(){
+			deferred.resolve();
+		});
+		return deferred.promise;
 	}
 	
 	//----------------------------------------------------------------------------------------------------------------------
