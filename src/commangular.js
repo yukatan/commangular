@@ -156,17 +156,16 @@
 			var context = this.context;
 			var isError = false;
 			
-			this.deferred = context.$q.defer();
-			var command = context.createCommand(this.command);
+			this.deferred = context.currentDeferred = context.$q.defer();
 			context.intercept('Before',interceptors);
+			if(context.isCanceled()) return this.deferred.promise;
+			var command = context.createCommand(this.command);
 			try {
 				var result;
 				if(interceptors['Around'])
 					result = context.intercept('Around',interceptors,command);
-				else{
-					
+				else					
 					result = context.invoke(command.execute, command);
-				}
 				var resultPromise = context.processResults(result, this.deferred, config);
 			} catch (error) {
 				isError = true;
@@ -180,6 +179,7 @@
 				this.deferred.reject(error);
 			}
 			context.intercept('After',interceptors);
+			if(context.isCanceled()) return this.deferred.promise;
 			if (command.hasOwnProperty('onComplete') && !isError) {
 
 				if(resultPromise)
@@ -359,6 +359,8 @@
 		this.$injector = $injector;
 		this.$q = $q;
 		this.contextData.commandModel = {};
+		this.currentDeferred;
+		this.state = 'running';
 	}
 
 	CommandContext.prototype.instantiate = function(descriptor) {
@@ -379,6 +381,7 @@
 		var promise = this.$q.when(result).then(function(data) {
 
 			self.contextData.lastResult = data;
+			console.log('Added ' + data + ' to lastResult');
 			if (config && config.resultKey) {
 				self.contextData[config.resultKey] = data;
 			}
@@ -389,6 +392,7 @@
 
 	CommandContext.prototype.invoke = function(theFunction, self) {
 
+		console.log(this.contextData);
 		return this.$injector.invoke(theFunction,self,this.contextData);
 	};
 	CommandContext.prototype.createCommand = function(command) {
@@ -398,6 +402,10 @@
 	CommandContext.prototype.getContextData = function(resultKey) {
 
 		return this.contextData;
+	};
+	CommandContext.prototype.isCanceled = function() {
+
+		return this.state == 'canceled';
 	};
 
 	CommandContext.prototype.intercept = function(poincut,interceptors,command) {
@@ -419,9 +427,8 @@
 			default : {
 
 				if(interceptors[poincut]) {
-
+					this.contextData.processor = new InterceptorProcessor(self);
 					angular.forEach(interceptors[poincut],function(value){
-						console.log(value);
 						self.invoke(value,value);
 					});
 				}
@@ -448,17 +455,42 @@
 		}
 	};
 	//----------------------------------------------------------------------------------------------------------------------
-	function AroundProcessor(executed,next,context) {
+	function InterceptorProcessor(context) {
 
 		this.context = context;
+	}
+	InterceptorProcessor.prototype.cancel = function() {
+		
+		this.context.currentDeferred.reject('The command has been canceled');
+		this.context.state = 'canceled';		
+	}
+	InterceptorProcessor.prototype.setData = function(key,value) {
+		
+		this.context.contextData[key] = value;		
+	}
+	InterceptorProcessor.prototype.getData = function(key) {
+		
+		return this.context.contextData[key];		
+	}
+	//----------------------------------------------------------------------------------------------------------------------
+	function AroundProcessor(executed,next,context) {
+		
+		InterceptorProcessor.apply(this,[context]);
 		this.executed = executed;
 		this.next = next;
+
 	}
+	AroundProcessor.prototype = new InterceptorProcessor();
+	AroundProcessor.prototype.constructor = AroundProcessor;
+
 	AroundProcessor.prototype.invoke = function() {
 	
+		if(this.context.isCanceled())
+			return;
 		this.context.contextData.processor = this.next;
 		return this.context.invoke(this.executed,this.executed);
 	}
+	
 	//----------------------------------------------------------------------------------------------------------------------
 	angular.module('commangular', [])
 		.provider('$commangular', function() {
@@ -539,7 +571,7 @@
 		]);
 	//------------------------------------------------------------------------------------------------------------------
 	angular.module('commangular')
-		.run(function() {
+		.run(['$rootScope','$commangular',function($rootScope,$commangular) {
 
 			for (var i = 0; i < commangular.aspects.length; i++) {
 				
@@ -556,6 +588,12 @@
 					}	
 				}
 			}
-		}); 
+
+			$rootScope.dispatch = function(eventName,data) {
+
+				return $commangular.dispatch(eventName,data);
+			}
+
+		}]); 
 	//------------------------------------------------------------------------------------------------------------------ 
 })(window, angular);
