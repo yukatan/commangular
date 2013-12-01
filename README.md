@@ -10,15 +10,14 @@ Commangular is an abstraction that aims at simplifying the creation of operation
 
 ###Main features :
 
-* Chaining of commands in command groups.
-* Execution of commands in sequence or in parallel.
-* Any level of nesting in groups.
+* Chaining commands in command groups.
+* Command execution in sequence or parallel.
+* Nesting commands at any level.
 * Dependency injection from angular.
-* Injection of precending results on the next command execution.
-* Automatic promise resolution before next execution.
-* Flows of commands with decision points to select the next commands based on result or service values.
+* Preceding result injection.
+* Cancelation and pause based on promises
+* Command flows with decision points. 
 * Interception of command execution (on the way).
-* Command cancelation(on the way).
 * Custom result resolvers(on the way).
 
 
