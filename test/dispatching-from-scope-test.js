@@ -1,18 +1,14 @@
-describe("Command Flow With Data passed test", function() {
+describe("Dispatching from scope testing", function() {
 
 	var provider;
-	var dispatcher;
 	var scope;
 	var injector;
 	var eventName = 'TestEvent';
-	var endValue = 0;
 	
 	beforeEach(function() {
 		
-		command2Executed = false;
 		commangular.commands = {};
 		commangular.aspects = [];
-		
 		commangular.create('Command1', function() {
 
 			return {
@@ -20,11 +16,9 @@ describe("Command Flow With Data passed test", function() {
 				execute: function($log) {
 
 					$log.log('logging');
-					endValue = 1;
 				}
 			};
 		});
-
 		commangular.create('Command2', function() {
 
 			return {
@@ -32,7 +26,6 @@ describe("Command Flow With Data passed test", function() {
 				execute: function($log) {
 
 					$log.log('logging');
-					endValue = 2;
 				}
 			};
 		});
@@ -45,9 +38,8 @@ describe("Command Flow With Data passed test", function() {
 			provider = $commangularProvider;
 
 		});
-		inject(function($commangular, $rootScope, $injector) {
-
-			dispatcher = $commangular;
+		inject(function($rootScope, $injector) {
+	
 			scope = $rootScope;
 			injector = $injector;
 		});
@@ -58,32 +50,22 @@ describe("Command Flow With Data passed test", function() {
 		expect(provider).toBeDefined();
 	});
 
-	it('dispatcher should be defined', function() {
-
-		expect(dispatcher).toBeDefined();
-	});
-
 	it('injector should be defined', function() {
 
 		expect(injector).toBeDefined();
 	});
 
-	it('endValue should be 1', function() {
-		
+	it('command should be executed', function() {
+
 		var commandComplete = false;
-		
-		provider.mapTo(eventName)
-			.asFlow()
-				.resultLink('data1',2).to('Command1')
-				.resultLink('data1',3).to('Command2');
-				
-	
+		provider.mapTo(eventName).asSequence().add('Command1').add('Command2');
+		spyOn(injector, 'instantiate').andCallThrough();
+		spyOn(injector, 'invoke').andCallThrough();
 		runs(function() {
 
 			scope.$apply(function() {
 
-				dispatcher.dispatch(eventName,{data1:2}).then(function(){
-					
+				scope.dispatch(eventName).then(function(){
 					commandComplete = true;
 				});
 			});
@@ -98,40 +80,29 @@ describe("Command Flow With Data passed test", function() {
 
 
 		runs(function() {
-						
-			expect(endValue).toBe(1);
 			
+			expect(injector.instantiate).toHaveBeenCalled();
+			expect(injector.invoke).toHaveBeenCalled();
 		})
 	});
 
-	it('endValue should be 3', function() {
-		
+	it('command.execute method should be called twice', function() {
+
 		var commandComplete = false;
-		
-		commangular.create('Command1', function() {
+		var command = {
 
-			return {
-
-				execute: function($log) {
-
-					$log.log('logging');
-					return 3;
-				}
-			};
-		},{resultKey:'result1'});
-
-		provider.mapTo(eventName)
-			.asFlow()
-				.resultLink('data1',2).to('Command1')
-				.resultLink('data1',3).to('Command2');
+			execute: function() {
 				
-	
+			}
+		};
+		provider.mapTo(eventName).asSequence().add('Command1').add('Command2');
+		spyOn(injector, 'instantiate').andReturn(command);
+		spyOn(command, 'execute').andCallThrough();
 		runs(function() {
 
 			scope.$apply(function() {
 
-				dispatcher.dispatch(eventName,{data1:3}).then(function(){
-					
+				scope.dispatch(eventName).then(function(){
 					commandComplete = true;
 				});
 			});
@@ -140,19 +111,15 @@ describe("Command Flow With Data passed test", function() {
 
 		waitsFor(function() {
 
-			return commandComplete;
+			return commandComplete
 
 		}, 'The command should be executed', 1000)
 
 
 		runs(function() {
-						
-			expect(endValue).toBe(2);
 			
+			expect(command.execute).toHaveBeenCalled();
+			expect(command.execute.callCount).toBe(2);
 		})
 	});
-
-	
-
-
 });

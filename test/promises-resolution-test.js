@@ -10,7 +10,8 @@ describe("Injection from preceding command whit promise result test", function()
 
 	beforeEach(function() {
 		
-		commangular.functions = {};
+		commangular.commands = {};
+		commangular.aspects = [];
 		commangular.create('Command1', function() {
 
 			return {

@@ -12,7 +12,8 @@ describe("Command parallel and sequence nested execution testing", function() {
 		executed2 = false;
 		executed3 = false;
 		executed4 = false;
-		commangular.functions = {};
+		commangular.commands = {};
+		commangular.aspects = [];
 		commangular.create('Command1', function() {
 
 			return {

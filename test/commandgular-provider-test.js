@@ -6,7 +6,8 @@ describe("Provider Testing", function() {
 
 	beforeEach(function() {
 
-		commangular.functions = {};
+		commangular.commands = {};
+		commangular.aspects = [];
 		commangular.create('Command1', command1);
 		commangular.create('Command2', command2);
 	});
@@ -27,11 +28,11 @@ describe("Provider Testing", function() {
 
 	it("should find the commands", function() {
 
-		var command = commangular.functions['Command1'];
+		var command = commangular.commands['Command1'];
 		expect(command).toBeDefined();
 		expect(command.function).toEqual(command1);
 
-		var command = commangular.functions['Command2'];
+		var command = commangular.commands['Command2'];
 		expect(command).toBeDefined();
 		expect(command.function).toEqual(command2);
 	});

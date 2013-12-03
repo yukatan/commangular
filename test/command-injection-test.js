@@ -13,7 +13,8 @@ describe("Command execution testing", function() {
 	beforeEach(function() {
 
 		executed = false;
-		commangular.functions = {};
+		commangular.commands = {};
+		commangular.aspects = [];
 		commangular.create('Command1', function($log, $rootScope) {
 
 			injectedLog = $log;

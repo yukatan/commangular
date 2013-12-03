@@ -9,7 +9,8 @@ describe("Injection from preceding command result test", function() {
 
 	beforeEach(function() {
 
-		commangular.functions = {};
+		commangular.commands = {};
+		commangular.aspects = [];
 		commangular.create('Command1', function() {
 
 			return {

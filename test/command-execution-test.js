@@ -9,6 +9,7 @@ describe("Command execution testing", function() {
 	beforeEach(function() {
 
 		commangular.functions = {};
+		commangular.aspects = [];
 		commangular.create('Command1', function() {
 
 			return {

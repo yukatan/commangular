@@ -10,8 +10,8 @@ describe("Command Flow With Numbers execution testing", function() {
 	beforeEach(function() {
 		
 		command2Executed = false;
-		commangular.functions = {};
-		
+		commangular.commands = {};
+		commangular.aspects = [];
 		commangular.create('Command1', function() {
 
 			return {

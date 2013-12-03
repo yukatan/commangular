@@ -1,16 +1,31 @@
 (function(window, angular, undefined) {
 
 	var commangular = window.commangular || (window.commangular = {});
+	var injector;
+	var q;
 
 	commangular.create = function(commandName, commandFunction, commandConfig) {
-
-		if (!commangular.functions) {
-			commangular.functions = {};
-		}
-		commangular.functions[commandName] = {
+		
+		var commands = commangular.commands || (commangular.commands = {});
+		commands[commandName] = {
 			function: commandFunction,
-			config: commandConfig
+			config: commandConfig,
+			interceptors:{}
 		};
+	}
+
+	commangular.aspect = function(aspectDescriptor,aspectFunction,order) {
+		
+		var aspects = commangular.aspects || (commangular.aspects = []);
+		var result = /@([^(]*)\((.*)\)/.exec(aspectDescriptor);
+		var poincut = result[1];
+		var matcher = result[2];
+		if(!/(\bBefore\b|\bAfter\b|\bAfterThrowing\b|\bAround\b)/.test(poincut))
+			throw new Error('aspect descriptor ' + aspectDescriptor + ' contains errors');
+		aspects.push({poincut:poincut,
+			matcher:matcher,
+			aspectFunction:aspectFunction,
+			order:order});
 	}
 
 	//----------------------------------------------------------------------------------------------------------------------
@@ -21,6 +36,7 @@
 		this.descriptors = [];
 		this.command = null;
 		this.commandConfig;
+		this.interceptors;
 	}
 
 	CommandDescriptor.prototype.asSequence = function() {
@@ -45,7 +61,7 @@
 
 		if (angular.isString(command)) {
 
-			command = commangular.functions[command];
+			command = commangular.commands[command];
 		}
 
 		if (command instanceof CommandDescriptor) {
@@ -56,6 +72,7 @@
 		var commandDescriptor = new CommandDescriptor('E');
 		commandDescriptor.command = command.function;
 		commandDescriptor.commandConfig = command.config;
+		commandDescriptor.interceptors = command.interceptors;
 		this.descriptors.push(commandDescriptor);
 		return this;
 	};
@@ -82,7 +99,7 @@
 
 		if (angular.isString(command)) {
 
-			command = commangular.functions[command];
+			command = commangular.commands[command];
 		}
 
 		if (command instanceof CommandDescriptor) {
@@ -93,6 +110,7 @@
 		var commandDescriptor = new CommandDescriptor('E');
 		commandDescriptor.command = command.function;
 		commandDescriptor.commandConfig = command.config;
+		commandDescriptor.interceptors = command.interceptors;
 		this.commandDescriptor = commandDescriptor;
 		return this.parent;
 	}; 
@@ -103,7 +121,6 @@
 		LinkDescriptor.apply(this,[parent])
 		this.key = key;
 		this.value = value;
-				
 	}
 	ResultKeyLinkDescriptor.prototype = new LinkDescriptor();
 	ResultKeyLinkDescriptor.prototype.constructor = ResultKeyLinkDescriptor;
@@ -126,46 +143,52 @@
 	}
 	//----------------------------------------------------------------------------------------------------------------------
 
-	function Command(command, context, config) {
+	function Command(command, context, config,interceptors) {
 
 		CommandBase.apply(this, [context]);
 		this.command = command;
 		this.commandConfig = config;
-
+		this.interceptors = interceptors;
+		
 		this.execute = function() {
 
 			var self = this;
-			var isError = false;
-			var $q = this.context.$q;
-			var $injector = this.context.$injector;
-
-			this.deferred = $q.defer();
-			var command = $injector.instantiate(this.command, this.context.getContextData());
-			try {
-				var result = $injector.invoke(command.execute, this.command, this.context.getContextData());
-				var resultPromise = this.context.processResults(result, this.deferred, this.commandConfig);
-			} catch (error) {
-				isError = true;
-				if (command.hasOwnProperty('onError')) {
-
-					var contextData = this.context.getContextData();
-					contextData.lastError = error;
-					$injector.invoke(command.onError, this.command, this.context.getContextData());
-				}
-				this.deferred.reject(error);
+			var context = this.context;
+								
+			var deferExecution = q.defer();
+			deferExecution.resolve();
+			return deferExecution.promise
+				.then(function () {
+					return context.intercept('Before',interceptors);
+				})
+				.then(function() {
+					var deferred = q.defer();
+					
+					try {
+						var result;
+						if(interceptors['Around']) 
+							result = context.intercept('Around',interceptors,self.command);
+						else {
+							command = injector.instantiate(self.command,self.context.contextData);
+							result = context.invoke(command.execute, command);
+						}
+						context.processResults(result,config).then(function(){
+							deferred.resolve();
+						},function(error){
+							deferred.reject(error);
+						});	
+					} catch (error) {
+						context.getContextData().lastError = error;
+						context.intercept('AfterThrowing',interceptors).then(function(){
+							deferred.reject(error.message);
+						},function(error){deferred.reject(error)});
+					}
+					return deferred.promise;
+				})
+				.then(function(){
+					return context.intercept('After',interceptors);
+				});
 			}
-			if (command.hasOwnProperty('onComplete') && !isError) {
-
-				if(resultPromise)
-					resultPromise.then(function() {
-
-						$injector.invoke(command.onComplete, self.command, self.context.getContextData());
-					});
-				else
-					$injector.invoke(command.onComplete, self.command, self.context.getContextData());	
-			}
-			return this.deferred.promise;
-		}
 	}
 	Command.prototype = new CommandBase();
 	Command.prototype.constructor = Command;
@@ -178,7 +201,7 @@
 
 		this.start = function() {
 
-			this.deferred = this.context.$q.defer();
+			this.deferred = q.defer();
 			this.execute();
 			return this.deferred.promise;
 		}
@@ -197,7 +220,7 @@
 			var commandDescriptor = this.descriptors[currentIndex];
 			var command = this.context.instantiate(commandDescriptor);
 
-			if (command instanceof Command)
+			if (command instanceof Command) {
 				command.execute().then(
 					function() {
 						self.nextCommand();
@@ -205,6 +228,7 @@
 					function(error) {
 						self.deferred.reject(error);
 					});
+		}
 			else
 				command.start().then(
 					function() {
@@ -294,7 +318,7 @@
 			}
 			if (descriptor instanceof ServiceLinkDescriptor) {
 								
-				var service = this.context.$injector.get(descriptor.service);
+				var service = injector.get(descriptor.service);
 				if (service[descriptor.property] === descriptor.value) {
 						
 					var command = this.context.instantiate(descriptor.commandDescriptor);
@@ -325,13 +349,12 @@
 	CommandParallel.prototype = new CommandGroup();
 	CommandParallel.prototype.constructor = CommandFlow;
 	//----------------------------------------------------------------------------------------------------------------------
-	function CommandContext($injector, $q, instantiator, data) {
+	function CommandContext(data) {
 
 		this.contextData = data || {};
-		this.instantiator = instantiator;
-		this.$injector = $injector;
-		this.$q = $q;
+		this.instantiator = new CommandInstantiator();
 		this.contextData.commandModel = {};
+		this.currentDeferred;
 	}
 
 	CommandContext.prototype.instantiate = function(descriptor) {
@@ -340,31 +363,83 @@
 		return command;
 	};
 
-	CommandContext.prototype.processResults = function(result, deferred, config) {
+	CommandContext.prototype.processResults = function(result,config) {
 
 		var self = this;
+		var deferred = q.defer();
 		if (!result) {
 
 			deferred.resolve();
-			return;
+			return deferred.promise;
 		}
 
-		var promise = this.$q.when(result).then(function(data) {
+		var promise = q.when(result).then(function(data) {
 
 			self.contextData.lastResult = data;
 			if (config && config.resultKey) {
 				self.contextData[config.resultKey] = data;
 			}
 			deferred.resolve();
-		});
-		return promise;
+		},function(error){deferred.reject(error)});
+		return deferred.promise;
 	};
 
+	CommandContext.prototype.invoke = function(theFunction, self) {
+
+		return injector.invoke(theFunction,self,this.contextData);
+	};
+	
 	CommandContext.prototype.getContextData = function(resultKey) {
 
 		return this.contextData;
 	};
+	
+	CommandContext.prototype.intercept = function(poincut,interceptors,command) {
 
+		var self = this;
+		var deferred = q.defer();
+		if(!interceptors[poincut]){
+			deferred.resolve();
+			return deferred.promise;
+		}
+		interceptors[poincut].sort(function(a,b){
+			return b.order - a.order;
+		})
+		switch(poincut) {
+			case 'Around' : {
+				var processor = new AroundProcessor(command,null,self,deferred);
+				angular.forEach(interceptors[poincut],function(value){
+					processor = new AroundProcessor(value.func,processor,self,deferred);
+				});
+				q.when(processor.invoke()).then(function(result){
+					deferred.resolve(result);
+				},function(error){
+					deferred.reject(error);});
+				break;
+			}
+			default : {
+				var processor = this.contextData.processor = new InterceptorProcessor(self,deferred);
+				interceptors[poincut].reverse();
+				var x = 0;
+				(function invocationChain(){
+					
+					try{
+						if(x == interceptors[poincut].length || processor.canceled){
+						deferred.resolve();
+						return;
+						}
+						var interceptor = injector.instantiate(interceptors[poincut][x++].func,self.contextData);
+						q.when(self.invoke(interceptor.execute,interceptor)).then(function(){
+							invocationChain();
+						});
+					}catch(error){deferred.reject(error)};
+					
+				})();
+				break;
+			}
+		}
+		return deferred.promise;
+	};
 	//----------------------------------------------------------------------------------------------------------------------
 
 	function CommandInstantiator() {};
@@ -378,13 +453,56 @@
 			case 'P':
 				return new CommandParallel(context, descriptor.descriptors);
 			case 'E':
-				return new Command(descriptor.command, context, descriptor.commandConfig);
+				return new Command(descriptor.command, context, descriptor.commandConfig,descriptor.interceptors);
 			case 'F':
 				return new CommandFlow(context, descriptor.descriptors);
 		}
 	};
 	//----------------------------------------------------------------------------------------------------------------------
+	function InterceptorProcessor(context,deferred) {
 
+		this.deferred = deferred;
+		this.context = context;
+		this.canceled = false;
+	}
+	InterceptorProcessor.prototype.cancel = function() {
+		
+		this.canceled = true;
+		this.deferred.reject('The command has been canceled');
+	}
+	InterceptorProcessor.prototype.setData = function(key,value) {
+		
+		this.context.contextData[key] = value;		
+	}
+	InterceptorProcessor.prototype.getData = function(key) {
+		
+		return this.context.contextData[key];		
+	}
+	//----------------------------------------------------------------------------------------------------------------------
+	function AroundProcessor(executed,next,context,deferred) {
+		
+		InterceptorProcessor.apply(this,[context,deferred]);
+		this.executed = executed;
+		this.next = next;
+	}
+	AroundProcessor.prototype = new InterceptorProcessor();
+	AroundProcessor.prototype.constructor = AroundProcessor;
+
+	AroundProcessor.prototype.invoke = function() {
+			
+		var self = this;
+		var deferred = q.defer();
+		self.context.contextData.processor = self.next;
+		var instance = injector.instantiate(self.executed,self.context.contextData);
+				
+		q.when(self.context.invoke(instance.execute,instance)).then(function(data){
+			deferred.resolve(data);
+		},function(error){
+			deferred.reject(error)
+		});
+		return deferred.promise;
+	}
+		
 	//----------------------------------------------------------------------------------------------------------------------
 	angular.module('commangular', [])
 		.provider('$commangular', function() {
@@ -429,28 +547,21 @@
 
 					return descriptors[eventName];
 				}
-
 			};
-
 		});
-
 	//-----------------------------------------------------------------------------------------------------------------
-
 	angular.module('commangular')
-		.service('commandExecutor', ['$injector', '$q',
-			function($injector, $q) {
+		.service('commandExecutor',function() {
 
 				return {
 
 					descriptors: {},
-
 					execute: function(eventName, data) {
-						var deferred = $q.defer();
-						var context = new CommandContext($injector, $q, new CommandInstantiator(), data);
+						var deferred = q.defer();
+						var context = new CommandContext(data);
 						var commandDescriptor = this.descriptors[eventName];
 						var command = context.instantiate(commandDescriptor);
 						command.start().then(function(data) {
-							
 							deferred.resolve();
 						}, function(error) {
 
@@ -459,9 +570,38 @@
 						});
 						return deferred.promise;
 					},
-
 				};
 			}
-		]);
-	//------------------------------------------------------------------------------------------------------------------  
+		);
+	//------------------------------------------------------------------------------------------------------------------
+	angular.module('commangular')
+		.run(['$rootScope','$commangular','$injector','$q',function($rootScope,$commangular,$injector,$q) {
+
+			injector = $injector;
+			q = $q;
+			for (var i = 0; i < commangular.aspects.length; i++) {
+				
+				var aspect = commangular.aspects[i];
+				aspect.order = aspect.order || (aspect.order = 0);
+				if(/\/(.*)\//.test(aspect.matcher)) {
+
+					for(var key in commangular.commands) {
+						var regex = new RegExp(/\/(.*)\//.exec(aspect.matcher)[1]);
+						if(regex.test(key)){
+							if(!commangular.commands[key].interceptors[aspect.poincut])
+								commangular.commands[key].interceptors[aspect.poincut] = [];
+							commangular.commands[key].interceptors[aspect.poincut]
+								.push({func:aspect.aspectFunction,order:aspect.order});
+						}
+					}	
+				}
+			}
+
+			$rootScope.dispatch = function(eventName,data) {
+
+				return $commangular.dispatch(eventName,data);
+			}
+
+		}]); 
+	//------------------------------------------------------------------------------------------------------------------ 
 })(window, angular);
