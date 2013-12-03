@@ -32,28 +32,28 @@ describe("Aspect definition testing", function() {
 
 		expect(commangular.commands['com.services.Command3'].interceptors).toBeDefined();
 		expect(commangular.commands['com.services.Command3'].interceptors['Before']).toBeDefined();
-		expect(commangular.commands['com.services.Command3'].interceptors['Before'][0]).toEqual(aspectTest);
+		expect(commangular.commands['com.services.Command3'].interceptors['Before'][0].func).toEqual(aspectTest);
 	});
 
 	it("should create the interceptor After on com.services.Command3", function() {
 
 		expect(commangular.commands['com.services.Command3'].interceptors).toBeDefined();
 		expect(commangular.commands['com.services.Command3'].interceptors['After']).toBeDefined();
-		expect(commangular.commands['com.services.Command3'].interceptors['After'][0]).toEqual(aspectTest);
+		expect(commangular.commands['com.services.Command3'].interceptors['After'][0].func).toEqual(aspectTest);
 	});
 
 	it("should create the interceptor AfterThrowing on com.services.Command3", function() {
 
 		expect(commangular.commands['com.services.Command3'].interceptors).toBeDefined();
 		expect(commangular.commands['com.services.Command3'].interceptors['AfterThrowing']).toBeDefined();
-		expect(commangular.commands['com.services.Command3'].interceptors['AfterThrowing'][0]).toEqual(aspectTest);
+		expect(commangular.commands['com.services.Command3'].interceptors['AfterThrowing'][0].func).toEqual(aspectTest);
 	});
 
 	it("should create the interceptor Around on com.services.Command3", function() {
 
 		expect(commangular.commands['com.services.Command3'].interceptors).toBeDefined();
 		expect(commangular.commands['com.services.Command3'].interceptors['Around']).toBeDefined();
-		expect(commangular.commands['com.services.Command3'].interceptors['Around'][0]).toEqual(aspectTest);
+		expect(commangular.commands['com.services.Command3'].interceptors['Around'][0].func).toEqual(aspectTest);
 	});
 
 	

@@ -1,4 +1,4 @@
-describe("Aspect execution testing", function() {
+describe("Multiple After execution testing", function() {
 
 	var provider;
 	var scope;
@@ -45,18 +45,6 @@ describe("Aspect execution testing", function() {
 				}
 			};
 		});
-
-		commangular.create('com.test2.Command2',function(){
-
-			return {
-
-				execute : function() {
-										
-					return "monkey";
-				}
-			};
-		});
-	
 	});
 
 	beforeEach(function() {

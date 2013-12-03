@@ -1,8 +1,8 @@
-describe("Aspect execution testing", function() {
+describe("@Around cancelation testing", function() {
 
 	var provider;
 	var scope;
-	var interceptorExecutedAfter = false;
+	var interceptorExecutedBefore = false;
 	var commandExecuted = false;
 
 	beforeEach(function() {
@@ -10,30 +10,20 @@ describe("Aspect execution testing", function() {
 		commangular.commands = {};
 		commangular.aspects = [];
 		
-		commangular.aspect('@After(/com.test1/)', function(){
+		commangular.aspect('@Around(/com.test1/)', function(processor){
 
 			return {
 
-				execute : function () {
+				execute:function() {
 
-					interceptorExecutedAfter = true;
+					expect(commandExecuted).toBe(false)
+					processor.cancel();
+					interceptorExecutedBefore = true;
 				}
 			}
 			
 		});
-		
-		commangular.aspect('@After(/com.test2/)', function(lastResult){
-			
-			return {
-
-				execute : function() {
-
-					expect(lastResult).toBeDefined();
-					expect(lastResult).toBe('monkey');
-				}
-			}
-			
-		});
+				
 
 		commangular.create('com.test1.Command1',function(){
 
@@ -41,22 +31,13 @@ describe("Aspect execution testing", function() {
 
 				execute : function() {
 										
-						commandExecuted = true;
+					commandExecuted = true;
 				}
 			};
 		});
 
-		commangular.create('com.test2.Command2',function(){
-
-			return {
-
-				execute : function() {
-										
-					return "monkey";
-				}
-			};
-		});
-	
+		
+		
 	});
 
 	beforeEach(function() {
@@ -77,13 +58,16 @@ describe("Aspect execution testing", function() {
 	it("should execute the interceptor before the command", function() {
 	
 		var complete = false;
-		provider.mapTo('BeforeTestEvent').asSequence().add('com.test1.Command1');
+		provider.mapTo('AroundTestEvent').asSequence().add('com.test1.Command1');
 
 		runs(function() {
 
 			scope.$apply(function(){
 
-				scope.dispatch('BeforeTestEvent').then(function(){
+				scope.dispatch('AroundTestEvent').then(function(){
+
+					complete = true;
+				},function(){
 
 					complete = true;
 				});
@@ -93,17 +77,13 @@ describe("Aspect execution testing", function() {
 		waitsFor(function() {
 
 			return complete;
-		});
+		},1000);
 		
 		runs(function() {
 
-			expect(interceptorExecutedAfter).toBe(true);
-			expect(commandExecuted).toBe(true);
-
+			expect(interceptorExecutedBefore).toBe(true);
+			expect(commandExecuted).toBe(false);
 		});
-
 	});
-	
-	
-	
+
 });

@@ -12,20 +12,40 @@ describe("Aspect execution testing", function() {
 		
 		commangular.aspect('@Before(/com.test1/)', function(){
 
-			interceptorExecutedBefore = true;
+			return {
+
+				execute : function() {
+
+					interceptorExecutedBefore = true;
+				}
+			}
+			
 		});
 		
 		commangular.aspect('@Before(/com.test2/)', function(processor){
 			
-			expect(processor.getData('username')).toBe('userName');
-			expect(processor.getData('password')).toBe('fuckingpassword');
-			processor.setData('username','monkey');
-			processor.setData('password','password');
+			return {
+
+				execute : function() {
+
+					expect(processor.getData('username')).toBe('userName');
+					expect(processor.getData('password')).toBe('fuckingpassword');
+					processor.setData('username','monkey');
+					processor.setData('password','password');
+				}
+			}
+			
 		});
 
 		commangular.aspect('@Before(/com.test3/)', function(processor){
 			
-			processor.cancel();
+			return {
+
+				execute:function() {
+					
+					processor.cancel();
+				}
+			}
 		});
 
 		commangular.create('com.test1.Command1',function(){

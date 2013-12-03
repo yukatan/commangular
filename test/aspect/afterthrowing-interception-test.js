@@ -1,8 +1,8 @@
-describe("Aspect execution testing", function() {
+describe("@AfterThrowing interception test", function() {
 
 	var provider;
 	var scope;
-	var interceptorExecutedAfter = false;
+	var interceptorExecuted = false;
 	var commandExecuted = false;
 
 	beforeEach(function() {
@@ -10,49 +10,28 @@ describe("Aspect execution testing", function() {
 		commangular.commands = {};
 		commangular.aspects = [];
 		
-		commangular.aspect('@After(/com.test1/)', function(){
+		commangular.aspect('@AfterThrowing(/com.test1/)', function(processor,lastError){
 
 			return {
 
-				execute : function () {
+				execute:function() {
 
-					interceptorExecutedAfter = true;
+					expect(commandExecuted).toBe(false)
+					expect(lastError.message).toBe('Error from command');
+					interceptorExecuted = true;
 				}
 			}
 			
 		});
-		
-		commangular.aspect('@After(/com.test2/)', function(lastResult){
-			
-			return {
-
-				execute : function() {
-
-					expect(lastResult).toBeDefined();
-					expect(lastResult).toBe('monkey');
-				}
-			}
-			
-		});
-
+	
 		commangular.create('com.test1.Command1',function(){
 
 			return {
 
 				execute : function() {
 										
+						throw new Error('Error from command');
 						commandExecuted = true;
-				}
-			};
-		});
-
-		commangular.create('com.test2.Command2',function(){
-
-			return {
-
-				execute : function() {
-										
-					return "monkey";
 				}
 			};
 		});
@@ -77,13 +56,16 @@ describe("Aspect execution testing", function() {
 	it("should execute the interceptor before the command", function() {
 	
 		var complete = false;
-		provider.mapTo('BeforeTestEvent').asSequence().add('com.test1.Command1');
+		provider.mapTo('AroundTestEvent').asSequence().add('com.test1.Command1');
 
 		runs(function() {
 
 			scope.$apply(function(){
 
-				scope.dispatch('BeforeTestEvent').then(function(){
+				scope.dispatch('AroundTestEvent').then(function(){
+
+					
+				},function() {
 
 					complete = true;
 				});
@@ -93,17 +75,13 @@ describe("Aspect execution testing", function() {
 		waitsFor(function() {
 
 			return complete;
-		});
+		},500);
 		
 		runs(function() {
 
-			expect(interceptorExecutedAfter).toBe(true);
-			expect(commandExecuted).toBe(true);
-
+			expect(interceptorExecuted).toBe(true);
+			expect(commandExecuted).toBe(false);
 		});
-
 	});
-	
-	
-	
+
 });

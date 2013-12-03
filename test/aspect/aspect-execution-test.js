@@ -14,31 +14,62 @@ describe("Aspect execution testing", function() {
 		commangular.aspects = [];
 		commangular.aspect('@Before(/Command(.*)/)', function(){
 
-			interceptorExecutedBefore = true;
+			return {
+
+				execute:function () {
+					
+					interceptorExecutedBefore = true;
+				}
+			}
+			
 		});
 		commangular.aspect('@After(/Command(.*)/)', function(){
 
-			if(commandExecutedAfter)
-				afterInterceptorExecutedAfterCommand = true;
+			return {
+
+				execute : function() {
+
+					if(commandExecutedAfter)
+						afterInterceptorExecutedAfterCommand = true;
+				}
+			}
 		});
 
 		commangular.aspect('@AfterThrowing(/Command(.*)/)', function(){
 
-			if(commandExecutedAfter)
-				afterThrowingInterceptorExecutedAfterCommand = true;
+			return {
+
+				execute : function() {
+
+					if(commandExecutedAfter)
+						afterThrowingInterceptorExecutedAfterCommand = true;
+				}
+			}
+		});
+
+		commangular.aspect('@Around(/Command(.*)/)', function(processor){
+
+			return {
+
+				execute : function() {
+
+					var result = processor.invoke();
+					return "Return from around 1";
+				}
+			}
 		});
 
 		commangular.aspect('@Around(/Command(.*)/)', function(processor){
 
 			
-			var result = processor.invoke();
-			return "Return from around 1";
-		});
+			return {
 
-		commangular.aspect('@Around(/Command(.*)/)', function(processor){
+				execute : function() {
 
-			var result = processor.invoke();
-			return result;
+					var result = processor.invoke();
+					return result;
+				}
+			}
 		});
 
 		commangular.create('Command1',function(){
