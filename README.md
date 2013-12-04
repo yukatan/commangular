@@ -485,19 +485,7 @@ angular.module('YourApp')
 
    });
 ```
-*Dispatching from any scope*
 
-```javascript
-//commangular attach a function 'dispatch' to the $rootScope
-angular.module('YourApp')
-  .controller('MyCtrl',['$scope',function($scope) {
-  
-    $scope.onButtonClick = function() {
-      $scope.dispatch('HelloEvent'); // Dispatching here
-    }
-
-   });
-```  
 *Dispatching from any scope*
 
 ```javascript
@@ -519,7 +507,74 @@ angular.module('YourApp')
    <button ng-click="dispatch('HelloEvent')">Click Me</button>
 </div>
 ```
+Every event dispatched returns a promise, so you can control when a command group has completed the execution like that:
 
+```javascript
+//exactly what you'd do with any promise
+$scope.dispatch('HelloEvent').then(function result(){},function error(){})});
+```
+### Passing data to commands at dispatching time
+
+If you want to send some data to the command group at dispatching you can do it using the second param of the dispatch function.
+
+```javascript
+//commangular attach a function 'dispatch' to the $rootScope
+angular.module('YourApp')
+  .controller('MyCtrl',['$scope',function($scope) {
+  
+    $scope.onButtonClick = function() {
+      $scope.dispatch('HelloEvent',{username:'mandril'}); // Dispatching with data 'username'
+    }
+
+   });
+   
+//Then you can inject 'username' on every command in that context.
+
+commangular.create('HelloWorldCommand',['$log','username',function($log,username) {
+  
+  return {
+     
+        execute: function() {
+        
+          $log.log('Username is :' + username);
+        }]
+      }
+  }
+}]);
+
+```  
+
+
+
+
+### The command execution context
+
+Every time an event is dispatched, a new command context is created. Every command context runs isolated from other command context.
+The command context is responsible for execute the command group, organize the correct injections for every command and instatiate the commands before the execution using the angular injector.
+You can launch 100 times the same event and all of them will be executed at the same time, but on diferents context, so you can't inject results from commands running in a diferent context.
+
+### The command livecycle
+
+Every command is instantitated before the execution using the angular injector and then the command execute function is invoked using the injector as well. The command is discarted after that. So don't think of command as a singleton. There is a new instance for every invocation. 
+
+### Injection from angular context.
+
+Commands are instantiated using the angular injector, so you can inject any angular service the same way you'd do in a service or controller.
+You can inject on constructor or method (execute method) and thre is no diference, but the recomended way is to do it in constructor.
+
+```javascript
+commangular.create('HelloWorldCommand',['$log','$http','MyService',function($log,$http,MyService) {
+  
+  return {
+     
+        execute: function() {
+        
+          //Some code using the injected content here.
+        }]
+      }
+  }
+}]);
+```
 
 ##License
 
