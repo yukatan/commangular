@@ -32,30 +32,33 @@ Remember to add commangular.js after angular.js. Commangular only depends on ang
 ##Table of Contents
 * [Quick guide](#quick-guide)
 * [Creating commands](#creating-commands)
-   * [Commangular namespace](#commangular-namespace)
-   * [How to create commands](#how-to-create-commands)
-   * [The command config object](#the-command-config-object)
-   * [Returning results from commands](#returning-result-from-commands)
+    * [Commangular namespace](#commangular-namespace)
+    * [How to create commands](#how-to-create-commands)
+    * [The command config object](#the-command-config-object)
+    * [Returning results from commands](#returning-result-from-commands)
 * [Using the provider](#using-the-provider)
-   * [Building command sequences.](#building-command-sequences)
-   * [Building parallel commands.](#building-parallel-commands)
-   * [Building command flows.](#building-command-flows)
-   * [Nesting commands.](#nesting-commands)
-   * [Mapping commands to events](#mapping-commands-to-events)
+    * [Building command sequences.](#building-command-sequences)
+    * [Building parallel commands.](#building-parallel-commands)
+    * [Building command flows.](#building-command-flows)
+    * [Nesting commands.](#nesting-commands)
+    * [Mapping commands to events](#mapping-commands-to-events)
 * [Command execution](#command-execution)
-   * [Dispatching events.](#dispatching-events)
-   * [The command execution context.](#the-command-execution-context)
-   * [Command livecycle.](#command-livecycle)
-   * [Passing data to commands at dispatching time.](#passing-data-to-commands-at-dispatching-time)
-   * [Injection from angular context.](#injection-from-angular-context)
-   * [Returning promises from commands.](#returning-promises-from-commands)
+    * [Dispatching events.](#dispatching-events)
+    * [The command execution context.](#the-command-execution-context)
+    * [Command livecycle.](#command-livecycle)
+    * [Passing data to commands at dispatching time.](#passing-data-to-commands-at-dispatching-time)
+    * [Injection from angular context.](#injection-from-angular-context)
+    * [Returning promises from commands.](#returning-promises-from-commands)
 * Command Aspects (Advanced interception).
-   * Intercepting commands.
-   * @Before.
-   * @After.
-   * @AfterThrowing.
-   * @Around.
+    * Intercepting commands.
+    * @Before.
+    * @After.
+    * @AfterThrowing.
+    * @Around.
 * Unit testing commands
+    * commangular-mocks module
+* Backendless development with commangular
+    * commangular-spoof module
 
 
 ##Quick Guide
@@ -559,7 +562,7 @@ Every command is instantitated before the execution using the angular injector a
 ### Injection from angular context.
 
 Commands are instantiated using the angular injector, so you can inject any angular service the same way you'd do in a service or controller.
-You can inject on constructor or method (execute method) and thre is no diference, but the recomended way is to do it in constructor.
+You can inject on constructor or method (execute method) and there isn't diference, but the recomended way is to do it in constructor.
 
 ```javascript
 commangular.create('HelloWorldCommand',['$log','$http','MyService',function($log,$http,MyService) {
