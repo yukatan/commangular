@@ -48,7 +48,6 @@ Remember to add commangular.js after angular.js. Commangular only depends on ang
    * Command livecycle.
    * Passing data to commands at dispatching time.
    * Injection from angular context.
-   * Injection of preceding results.
    * Returning promises from commands.
 * Command Aspects (Advanced interception).
    * Intercepting commands.
@@ -575,6 +574,80 @@ commangular.create('HelloWorldCommand',['$log','$http','MyService',function($log
   }
 }]);
 ```
+
+### Returning promises from commands.
+
+All commands can return a promise. When a command return a promise commangular wait until the promise resolution.
+
+on sequences :
+
+```javascript
+
+commangular.create('Command1',function($timeout) {
+  
+  return {
+     
+        execute: function() {
+        
+          var promise = $timeout(function(){
+            return 'Result from promise';
+          },2000);
+          return promise;
+        }
+      }
+},{resultKey:'result'}); //Keep the result in the command context in key 'result'
+
+//This command won't be executed until the promise from Command1 is resolved.
+commangular.create('Command2',function(,$log,result) { //Inject the key result
+  
+  return {
+     
+        execute: function() {
+        
+          $log.log(result); //This will log "Result from promise"  
+        }
+      }
+  }
+}]);
+
+provider.mapTo('PromisesEvent').asSequece().add('Command1').add('Command2');
+
+```
+parallels work diferently with promises :
+
+```javascript
+
+commangular.create('Command1',function($timeout) {
+  
+  return {
+     
+        execute: function() {
+        
+          var promise = $timeout(function(){
+            return 'Result from promise';
+          },2000);
+          return promise;
+        }
+      }
+},{resultKey:'result'}); //Keep the result in the command context in key 'result'
+
+//This command will be executed at the same time that Command1
+commangular.create('Command2',function(,$log,result) { //This will throw an exception because result can't be injected
+  
+  return {
+     
+        execute: function() {
+        
+          $log.log(result); 
+        }
+      }
+  }
+}]);
+
+provider.mapTo('PromisesEvent').asParallel().add('Command1').add('Command2');
+
+```
+
 
 ##License
 
