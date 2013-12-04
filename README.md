@@ -677,11 +677,27 @@ commangular.aspect('@Before(/regexp/)',function() {
 ```
 #### Interceptor descriptor
 
-The interceptor descriptor has to parts 'Where' and 'What'.Where do you want to intercept? you've 4 options :
+The interceptor descriptor has two parts 'Where' and 'What'.Where do you want to intercept? you've 4 options :
 * @Before : The interceptor will be executed before the command. You will be able to cancel the command or modify the data that will be injected in the command or do some other operation you need before de command execution.
 * @After : The interceptor will be executed just after the command and before any other next command. You can get the lastResult from the command, cancel execution etc etc.
 * @AfterTrowing : This interceptor will be executed if the command or any interceptor of the command throws an exception. You can get the error throwed injected to do what you need.
-* @Around : 
+* @Around : The interceptor is executed around a command.That means that a especial object 'processor' will be injected in the interceptor and you can invoke the command or the next interceptor. It will be better explained below.
+ 
+The second part of the interceptor descriptor is what command or commands I want to intercept. It is a regular expresion maching the name of the command.
+
+```javascript
+
+//Example
+commangular.aspect('@Before(/Secured/)',function(){}) // any command name that contains 'Secured'
+
+commangular.aspect('@After(/Secured\b/)',function(){}) // any command name that ends with 'Secured'
+
+commangular.aspect('@After(/\bcom.security/)',function(){}) // any command name that starts with 'com.security'
+
+commangular.aspect('@AfterThrowing(/.*/)',function(){}) // any command
+
+//And any combination you can do with regular expresions.
+```
 
 ##License
 
