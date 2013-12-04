@@ -43,7 +43,7 @@ Remember to add commangular.js after angular.js. Commangular only depends on ang
    * [Nesting commands.](#nesting-commands)
    * [Mapping commands to events](#mapping-commands-to-events)
 * Command execution
-   * Dispatching an Event.
+   * Dispatching events.
    * The command execution context.
    * Command livecycle.
    * Passing data to commands at dispatching time.
@@ -468,8 +468,58 @@ $commangularProvider.mapTo('ParallelExampleEvent')
 
 ```
 ## Command Execution
+### Dispatching events
 
+Events in commangular are just strings. When an event is dispatched, commangular executes the command group mapped to that string. There are three ways to dispatch an event in commangular :
+
+*Dispatching from $commangular service*
+
+```javascript
+//You can inject $commangular in any controller or service
+angular.module('YourApp')
+  .controller('MyCtrl',['$commangular','$scope',function($commangular,$scope) {
   
+    $scope.onButtonClick = function() {
+      $commangular.dispatch('HelloEvent'); // Dispatching here
+    }
+
+   });
+```
+*Dispatching from any scope*
+
+```javascript
+//commangular attach a function 'dispatch' to the $rootScope
+angular.module('YourApp')
+  .controller('MyCtrl',['$scope',function($scope) {
+  
+    $scope.onButtonClick = function() {
+      $scope.dispatch('HelloEvent'); // Dispatching here
+    }
+
+   });
+```  
+*Dispatching from any scope*
+
+```javascript
+//commangular attach a function 'dispatch' to the $rootScope
+angular.module('YourApp')
+  .controller('MyCtrl',['$scope',function($scope) {
+  
+    $scope.onButtonClick = function() {
+      $scope.dispatch('HelloEvent'); // Dispatching here
+    }
+
+   });
+```  
+*Dispatching from the view*
+
+```html
+<!--There is a function 'dispatch' on every scope, so you can dispatch directly in your html code-->
+<div ng-controller="CommandCtrl">
+   <button ng-click="dispatch('HelloEvent')">Click Me</button>
+</div>
+```
+
 
 ##License
 
