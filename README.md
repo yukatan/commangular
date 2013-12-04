@@ -469,8 +469,8 @@ $commangularProvider.mapTo('ParallelExampleEvent')
 
 
 ```
-## Command Execution
-### Dispatching events
+## Command Execution.
+### Dispatching events.
 
 Events in commangular are just strings. When an event is dispatched, commangular executes the command group mapped to that string. There are three ways to dispatch an event in commangular :
 
@@ -515,7 +515,7 @@ Every event dispatched returns a promise, so you can control when a command grou
 //exactly what you'd do with any promise
 $scope.dispatch('HelloEvent').then(function result(){},function error(){})});
 ```
-### Passing data to commands at dispatching time
+### Passing data to commands at dispatching time.
 
 If you want to send some data to the command group at dispatching you can do it using the second param of the dispatch function.
 
@@ -549,13 +549,13 @@ commangular.create('HelloWorldCommand',['$log','username',function($log,username
 
 
 
-### The command execution context
+### The command execution context.
 
 Every time an event is dispatched, a new command context is created. Every command context runs isolated from other command context.
 The command context is responsible for execute the command group, organize the correct injections for every command and instatiate the commands before the execution using the angular injector.
 You can launch 100 times the same event and all of them will be executed at the same time, but on diferents context, so you can't inject results from commands running in a diferent context.
 
-### Command livecycle
+### Command livecycle.
 
 Every command is instantitated before the execution using the angular injector and then the command execute function is invoked using the injector as well. The command is discarted after that. So don't think of command as a singleton. There is a new instance for every invocation. 
 
@@ -651,6 +651,37 @@ provider.mapTo('PromisesEvent').asParallel().add('Command1').add('Command2');
 
 ```
 
+## Command Aspects (Advanced interception).
+### Intercepting commands.
+
+Interception is one of the most interesting things in commangular. It will allow you control when a command has to be executed or not, override command results, update data before the command instanciation, capture exceptions throwed by commands etc etc.
+If you are familiar with Spring AOP it looks very familiar to you, of course it is not as powerfull as Spring AOP, but it has some similarities.
+
+to define an interceptor : 
+
+```javascript
+
+commangular.aspect(InterceptorDescriptor,InterceptionFunction,Order)
+
+//Example
+commangular.aspect('@Before(/regexp/)',function() {
+  
+  return {
+     
+        execute: function() {
+        
+          // Interception code here
+        }
+      }
+},2);
+```
+#### Interceptor descriptor
+
+The interceptor descriptor has to parts 'Where' and 'What'.Where do you want to intercept? you've 4 options :
+* @Before : The interceptor will be executed before the command. You will be able to cancel the command or modify the data that will be injected in the command or do some other operation you need before de command execution.
+* @After : The interceptor will be executed just after the command and before any other next command. You can get the lastResult from the command, cancel execution etc etc.
+* @AfterTrowing : This interceptor will be executed if the command or any interceptor of the command throws an exception. You can get the error throwed injected to do what you need.
+* @Around : 
 
 ##License
 
