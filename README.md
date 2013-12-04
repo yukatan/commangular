@@ -17,7 +17,7 @@ Commangular is an abstraction that aims at simplifying the creation of operation
 * Preceding result injection.
 * Cancelation and pause based on promises
 * Command flows with decision points. 
-* Interception of command execution (on the way).
+* Command aspects (Interception of command execution).
 * Custom result resolvers(on the way).
 
 
@@ -29,25 +29,33 @@ Commangular is an abstraction that aims at simplifying the creation of operation
 Remember to add commangular.js after angular.js. Commangular only depends on angularJs, it is not using other libraries.
 
 
-##Table of Contents (Extended guide)
+##Table of Contents
 * [Quick guide](#quick-guide)
 * [Creating commands](#creating-commands)
-    * [Commangular namespace](#commangular-namespace)
-    * [How to create commands](#how-to-create-commands)
-    * [The command config object](#the-command-config-object)
-    * [Returning results from commands](#returning-result-from-commands)
+   * [Commangular namespace](#commangular-namespace)
+   * [How to create commands](#how-to-create-commands)
+   * [The command config object](#the-command-config-object)
+   * [Returning results from commands](#returning-result-from-commands)
 * [Using the provider](#using-the-provider)
-    * [Building command sequences.](#building-command-sequences)
-    * [Building parallel commands.](#building-parallel-commands)
-    * [Building command flows.](#building-command-flows)
-    * [Nesting commands.](#nesting-commands)
-    * [Mapping commands to events](#mapping-commands-to-events)
+   * [Building command sequences.](#building-command-sequences)
+   * [Building parallel commands.](#building-parallel-commands)
+   * [Building command flows.](#building-command-flows)
+   * [Nesting commands.](#nesting-commands)
+   * [Mapping commands to events](#mapping-commands-to-events)
 * Command execution
-    * Dispatching an Event
-    * Passing data to commands at dispatching time
-    * Injection from angular context
-    * Injection of preceding results
-    * Returning promises from commands
+   * Dispatching an Event.
+   * The command execution context.
+   * Command livecycle.
+   * Passing data to commands at dispatching time.
+   * Injection from angular context.
+   * Injection of preceding results.
+   * Returning promises from commands.
+* Command Aspects (Advanced interception).
+   * Intercepting commands.
+   * @Before.
+   * @After.
+   * @AfterThrowing.
+   * @Around.
 * Unit testing commands
 
 
@@ -74,7 +82,7 @@ commangular.create('HelloWorldCommand',['$log',function($log) {
   }
 }]);
 ```
-*Create a config block and inject de commangular provider.*
+*Create a config block and inject the commangular provider.*
 ```javascript 
 //Config block in commands-config.js for example
 angular.module('YourApp')
@@ -99,7 +107,28 @@ angular.module('YourApp')
 
    });
 ```
-You will see the message "Hello from my first command" in the logs when the onButtonClick function is executed, so the command has been executed.
+*You can dispatch directly from any scope as well*
+```javascript 
+//Regular angular controller
+angular.module('YourApp')
+  .controller('MyCtrl',['$scope',function($scope) {
+  
+    $scope.onButtonClick = function() {
+      $scope.dispatch('HelloEvent');
+    }
+
+   });
+```
+*Or you can dispatch directly from the view*
+
+```html 
+<div ng-controller="CommandCtrl">
+   <button ng-click="dispatch('HelloEvent')">Click Me</button>
+</div>
+```
+
+
+You will see the message "Hello from my first command" in the logs when the HelloEvent is dispatched, so the command has been executed.
 
 
 ##Creating commands
@@ -113,11 +142,11 @@ There is a function attached to this namespace called commangular.create(). With
 The create() function has this parameters :
 
 
-_commangular.create([TheCommandName],[TheCommandFunction],[TheCommandConfig])_
+_commangular.create([CommandName],[CommandFunction],[CommandConfig])_
 
-* _TheCommandName_ : It's the name of the command you are creating. It's useful to reference the command from the command provider.
-* _TheCommandFunction_ : It's the function that will be executed when commangular runs this command. It can be a normal function or an array with parameters. Same as angular syntax
-* _TheCommandConfig_ : It's and object with paramaters to configure the command execution.
+* _CommandName_ : It's the name of the command you are creating. It's useful to reference the command from the command provider.
+* _CommandFunction_ : It's the function that will be executed when commangular runs this command. It can be a normal function or an array with parameters. Same as angular syntax
+* _CommandConfig_ : It's and object with paramaters to configure the command execution.
 
 
 You can invoke the create function like this :
@@ -438,7 +467,7 @@ $commangularProvider.mapTo('ParallelExampleEvent')
 
 
 ```
-
+## Command Execution
 
   
 
