@@ -2,7 +2,7 @@
 
 [![Build Status](https://travis-ci.org/yukatan/commangular.png)](https://travis-ci.org/yukatan/commangular)
 
-A command pattern implementation for AngularJS.
+Command pattern implementation for AngularJS.
 
 ##Overview
 
@@ -42,13 +42,13 @@ Remember to add commangular.js after angular.js. Commangular only depends on ang
    * [Building command flows.](#building-command-flows)
    * [Nesting commands.](#nesting-commands)
    * [Mapping commands to events](#mapping-commands-to-events)
-* Command execution
-   * Dispatching events.
-   * The command execution context.
-   * Command livecycle.
-   * Passing data to commands at dispatching time.
-   * Injection from angular context.
-   * Returning promises from commands.
+* [Command execution](#command-execution)
+   * [Dispatching events.](#dispatching-events)
+   * [The command execution context.](#the-command-execution-context)
+   * [Command livecycle.](#command-livecycle)
+   * [Passing data to commands at dispatching time.](#passing-data-to-commands-at-dispatching-time)
+   * [Injection from angular context.](#injection-from-angular-context)
+   * [Returning promises from commands.](#returning-promises-from-commands)
 * Command Aspects (Advanced interception).
    * Intercepting commands.
    * @Before.
@@ -552,7 +552,7 @@ Every time an event is dispatched, a new command context is created. Every comma
 The command context is responsible for execute the command group, organize the correct injections for every command and instatiate the commands before the execution using the angular injector.
 You can launch 100 times the same event and all of them will be executed at the same time, but on diferents context, so you can't inject results from commands running in a diferent context.
 
-### The command livecycle
+### Command livecycle
 
 Every command is instantitated before the execution using the angular injector and then the command execute function is invoked using the injector as well. The command is discarted after that. So don't think of command as a singleton. There is a new instance for every invocation. 
 
