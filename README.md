@@ -704,6 +704,55 @@ commangular.aspect('@AfterThrowing(/.*/)',function(){}) // any command
 //And any combination you can do with regular expresions.
 ```
 
+#### Interception function 
+
+The same as commands, you can use a function or an array to support minification. The function is instantiated with the injector, so you can inject any angular service and others objects like "lastResult", "lastError" , "processor", etc
+
+```javascript
+
+//Example
+//We want execute the interceptor before Command1
+commangular.aspect('@Before(/Command1/)',['userProfile','processor',function(userProfile,processor) {
+  
+  return {
+     
+        execute: function() {
+        
+          if(!userProfile.isLogged)
+               processor.cancel(); //Canceling the command group execution because the user is not logged.
+        }
+      }
+}]);
+```
+#### Order
+
+You can chain any number of interceptors to the same command, so if you need to executed the interceptor in a specific order you can indicate it here. An order of 0 is assigned by default.
+
+```javascript
+commangular.aspect('@Before(/Command1/)',['$log',function($log) {
+  
+  return {
+     
+        execute: function() {
+        
+         $log.log('This will be executed before') 
+        }
+      }
+}],1); // this will be executed before the second interceptor
+
+commangular.aspect('@Before(/Command1/)',['$log',function($log) {
+  
+  return {
+     
+        execute: function() {
+        
+          $log.log('this will be executed after');
+        }
+      }
+}],2); // this is a bigger number so it executes after
+```
+
+
 ##License
 
 The MIT License
