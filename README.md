@@ -754,7 +754,7 @@ commangular.aspect('@Before(/Command1/)',['$log',function($log) {
 ```
 ### Interceptor processor
 
-All command can have injected a processor object :
+All command can be injected with a 'processor' object :
 
 ```javascript 
 commangular.aspect('@Before(/Command1/)',['processor',function(processor) {
