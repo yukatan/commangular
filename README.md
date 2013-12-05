@@ -56,6 +56,7 @@ Remember to add commangular.js after angular.js. Commangular only depends on ang
     * [Returning promises from commands.](#returning-promises-from-commands)
 * Command Aspects (Advanced interception).
     * Intercepting commands.
+    * Interceptor processor.
     * @Before.
     * @After.
     * @AfterThrowing.
@@ -750,6 +751,133 @@ commangular.aspect('@Before(/Command1/)',['$log',function($log) {
         }
       }
 }],2); // this is a bigger number so it executes after
+```
+### Interceptor processor
+
+All command can have injected a processor object :
+
+```javascript 
+commangular.aspect('@Before(/Command1/)',['processor',function(processor) {
+  
+  return {
+     
+        execute: function() {
+        
+          processor.getData('result1') // get data from the current context
+          processor.setData('result1',25) // Update the key 'result1' with value 25
+          processor.cancel(); // Cancelation of the current command context execution
+          
+        }
+      }
+}); 
+```
+The @Around interceptor has a special method 'invoke' to execute the next element in the chain of interceptors or the command itself
+
+```javascript 
+commangular.aspect('@Around(/Command1/)',['processor',function(processor) {
+  
+  return {
+     
+        execute: function() {
+        
+          //Some code here
+          
+          var result = processor.invoke();
+          
+          //Some other code here
+        }
+      }
+}); 
+```
+
+### @Before
+
+This interceptor is executed just before the command and allow you update the data is going to be injected  or cancel the command execution
+
+```javascript 
+//Example checking authentication before the execution
+commangular.aspect('@Before(/Command1/)',['processor','userProfile','$q',function(processor,userProfile,$q) {
+  
+  return {
+     
+        execute: function() {
+         
+         if(!userProfile.isLogged) {
+            
+            var deferred = $q.defer();
+            //Show popup for login and wait response callback here
+            //......
+            onCallback(function(){
+               
+               if(userProfile.isLogged)
+                  deferred.resolve();
+               else
+                  deferred.reject('User not logged in');
+            });
+            return deferred.promise
+         }
+        }
+      }
+}); 
+```
+### @After
+
+This intercetor is executed just after the command execution and it can get the result from the command.
+
+```javascript 
+commangular.create('Command1',function() {
+
+   return {
+   
+         execute: function() {
+            
+            return 25
+         }
+   }
+});
+
+
+commangular.aspect('@After(/Command1/)',['processor','lastResult',function(processor,lastResult) {
+  
+  return {
+     
+        execute: function() {
+           
+         expect(lastResult).toBe(25);
+         if(result < 25)
+            processor.cancel(); // The chain of command is broken here
+        }
+      }
+}); 
+```
+### @AfterThrowing
+
+This intercetor is executed when a command or an interceptor of that command throw an exception.
+
+```javascript 
+commangular.create('Command1',function() {
+
+   return {
+   
+         execute: function() {
+            
+            var x = 100/0; // Division by 0 throw exception infinite
+            return 25
+         }
+   }
+});
+
+
+commangular.aspect('@AfterThrowing(/Command1/)',['processor','lastError',function(processor,lastError) {
+  
+  return {
+     
+        execute: function() {
+           
+         expect(lastError).toBe('Infinity'); //The execution of the command is canceled after exceptions
+        }
+      }
+}); 
 ```
 
 
