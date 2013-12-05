@@ -7,6 +7,7 @@ Command pattern implementation for AngularJS.
 ##Overview
 
 Commangular is a concept on top of angularJS that aims at simplifying the creation and organization of operations in a self-contained code units and chain them together with an easy and fluent API.That code units are called 'commands'
+
 Commands can be easily tested, reused, and developed in isolation.
 
 It is inspired by [Parsley 3 Command Framework and spicelib commands](https://github.com/spicefactory) from [Jens Halm](https://github.com/jenshalm) 
