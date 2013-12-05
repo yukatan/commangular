@@ -2,7 +2,8 @@ describe("Multiple After execution testing", function() {
 
 	var provider;
 	var scope;
-	var interceptorExecutedAfter = false;
+	var interceptor1Executed = false;
+	var interceptor2Executed = false;
 	var commandExecuted = false;
 
 	beforeEach(function() {
@@ -16,24 +17,27 @@ describe("Multiple After execution testing", function() {
 
 				execute : function () {
 
-					interceptorExecutedAfter = true;
+					console.log('hola1');
+					expect(commandExecuted).toBe(true);
+					interceptor1Executed = true;
 				}
 			}
 			
-		});
+		},1);
 		
-		commangular.aspect('@After(/com.test2/)', function(lastResult){
+		commangular.aspect('@After(/com.test1/)', function(lastResult){
 			
 			return {
 
 				execute : function() {
 
-					expect(lastResult).toBeDefined();
-					expect(lastResult).toBe('monkey');
+					expect(interceptor1Executed).toBe(true);;
+					expect(lastResult).toBe(50);
+					interceptor2Executed = true;
 				}
 			}
 			
-		});
+		},2);
 
 		commangular.create('com.test1.Command1',function(){
 
@@ -42,6 +46,7 @@ describe("Multiple After execution testing", function() {
 				execute : function() {
 										
 						commandExecuted = true;
+						return 50;
 				}
 			};
 		});
@@ -85,7 +90,7 @@ describe("Multiple After execution testing", function() {
 		
 		runs(function() {
 
-			expect(interceptorExecutedAfter).toBe(true);
+			expect(interceptor1Executed).toBe(true);
 			expect(commandExecuted).toBe(true);
 
 		});
