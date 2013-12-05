@@ -54,13 +54,13 @@ Remember to add commangular.js after angular.js. Commangular only depends on ang
     * [Passing data to commands at dispatching time.](#passing-data-to-commands-at-dispatching-time)
     * [Injection from angular context.](#injection-from-angular-context)
     * [Returning promises from commands.](#returning-promises-from-commands)
-* Command Aspects (Advanced interception).
-    * Intercepting commands.
-    * Interceptor processor.
-    * @Before.
-    * @After.
-    * @AfterThrowing.
-    * @Around.
+* [Command Aspects (Advanced interception).](#command-aspects-advanced-interception)
+    * [Intercepting commands.](#intercepting-commands)
+    * [Interceptor processor.](#interceptor-processor)
+    * [@Before.](#before)
+    * [@After.](#after)
+    * [@AfterThrowing.](#afterthrowing)
+    * [@Around.](#around)
 * Unit testing commands
     * commangular-mocks module
 * Backendless development with commangular
@@ -515,7 +515,7 @@ angular.module('YourApp')
    <button ng-click="dispatch('HelloEvent')">Click Me</button>
 </div>
 ```
-Every event dispatched returns a promise, so you can control when a command group has completed the execution like that:
+All events dispatched return a promise, so you can control when a command group has completed the execution like that:
 
 ```javascript
 //exactly what you'd do with any promise
@@ -536,7 +536,7 @@ angular.module('YourApp')
 
    });
    
-//Then you can inject 'username' on every command in that context.
+//Then you can inject 'username' on all commands in that context.
 
 commangular.create('HelloWorldCommand',['$log','username',function($log,username) {
   
@@ -661,7 +661,7 @@ provider.mapTo('PromisesEvent').asParallel().add('Command1').add('Command2');
 ### Intercepting commands.
 
 Interception is one of the most interesting things in commangular. It will allow you control when a command has to be executed or not, override command results, update data before the command instanciation, capture exceptions throwed by commands etc etc.
-If you are familiar with Spring AOP it looks very familiar to you, of course it is not as powerfull as Spring AOP, but it has some similarities.
+If you are familiar with Spring AOP it will look very familiar to you, of course it is not as powerfull as Spring AOP, but it has some similarities.
 
 to define an interceptor : 
 
@@ -880,6 +880,86 @@ commangular.aspect('@AfterThrowing(/Command1/)',['processor','lastError',functio
 }); 
 ```
 
+### @Around 
+
+This is the most powerfull interceptor in commangular. It will allow you change data before, after, or event bypass a command execution in a chain. Cause this interceptor is the most complicated to understand as well, It's going to be explianed with an example. Below you will see two @Around interceptor on 'Command1'
+
+```javascript 
+
+//Dispatcher for execution
+$scope.dispatch('AroundEvent',{data1:25}); //Data passed to the command context
+
+commangular.create('Command1',function(data1,$log) {
+
+   return {
+   
+         execute: function() {
+            
+            $log.log(data1) //this log '50'
+            return 100;
+         }
+   }
+});
+
+//First interceptor
+commangular.aspect('@Around(/Command1/)',['processor',function(processor) {
+  
+  return {
+     
+        execute: function() {
+         
+         var data1 = processor.getData('data1');
+         expect(data1).toBe(25); //The data1 should be 25
+         processor.setData('data1',50);
+         var result = processor.invoke(); //The second interceptor is executed here
+         expect(result).toBe(75) // The return from second interceptor 
+        }
+      }
+},1);
+//Second interceptor
+commangular.aspect('@Around(/Command1/)',['processor',function(processor,data1) {
+  
+  return {
+     
+        execute: function() {
+         
+         expect(data1).toBe(50) // the data1 has been modified by the first interceptor
+         data1++ //This is not changing the value in the context
+         var result = processor.invoke() // The command is executed here (The last component in the chain)
+         expect(result).toBe(100) //The result from the command
+         return 75;
+        }
+      }
+},2); 
+```
+One example bypassing a command
+
+```javascript
+commangular.create('Command1',function($log) {
+
+   return {
+   
+         execute: function() {
+            
+            $log.log('This is not going to be executed'); 
+            return 10;
+         }
+   }
+});
+
+//First interceptor
+commangular.aspect('@Around(/Command1/)',['processor',function(processor) {
+  
+  return {
+     
+        execute: function() {
+         
+         //processor.invoke(); //The line is not executed,so command is not executed
+         return 100; //This is considered the return from the command instead
+        }
+      }
+},1);
+```
 
 ##License
 
