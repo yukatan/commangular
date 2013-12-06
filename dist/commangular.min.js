@@ -1,6 +1,6 @@
 /**
  * Command pattern implementation for AngularJS
- * @version v0.5.0 - 2013-12-06
+ * @version v0.5.2 - 2013-12-06
  * @link https://github.com/yukatan/commangular
  * @author Jesús Barquín Cheda <yukatan@gmail.com>
  * @license MIT License, http://www.opensource.org/licenses/MIT
