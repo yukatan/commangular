@@ -34,7 +34,6 @@ describe("Custom resolver test", function() {
 
 				execute : function() {
 										
-					console.log('command2 executed');
 					expect(lastResult).toBe(75)
 				}
 			};

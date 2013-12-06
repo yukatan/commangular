@@ -17,7 +17,6 @@ describe("Multiple After execution testing", function() {
 
 				execute : function () {
 
-					console.log('hola1');
 					expect(commandExecuted).toBe(true);
 					interceptor1Executed = true;
 				}

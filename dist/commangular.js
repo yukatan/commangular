@@ -41,7 +41,6 @@
 	commangular.resolver = function (commandName,resolverFunction) {
 
 		var aspectResolverFunction = ['lastResult','processor',function(lastResult,processor) {
-	
 			return {
 				execute : function() {
 					var result = injector.invoke(resolverFunction,this,{result:lastResult});
@@ -451,7 +450,6 @@
 				var processor = this.contextData.processor = new InterceptorProcessor(self,deferred);
 				interceptors[poincut].reverse();
 				var x = 0;
-				console.log(poincut);
 				(function invocationChain(){
 					
 					try{
