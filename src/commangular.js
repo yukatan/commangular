@@ -3,20 +3,23 @@
 	var commangular = window.commangular || (window.commangular = {});
 	var injector;
 	var q;
+	var commands;
+	var aspects
 
 	commangular.create = function(commandName, commandFunction, commandConfig) {
 		
-		var commands = commangular.commands || (commangular.commands = {});
+		commands = commangular.commands || (commangular.commands = {});
 		commands[commandName] = {
 			function: commandFunction,
 			config: commandConfig,
 			interceptors:{}
 		};
 	}
+	commangular.command = commangular.create;
 
 	commangular.aspect = function(aspectDescriptor,aspectFunction,order) {
 		
-		var aspects = commangular.aspects || (commangular.aspects = []);
+		aspects = commangular.aspects || (commangular.aspects = []);
 		var result = /@([^(]*)\((.*)\)/.exec(aspectDescriptor);
 		var poincut = result[1];
 		var matcher = result[2];
@@ -26,6 +29,26 @@
 			matcher:matcher,
 			aspectFunction:aspectFunction,
 			order:order});
+	}
+
+	commangular.resolver = function (commandName,resolverFunction) {
+
+		var aspectResolverFunction = ['lastResult','processor',function(lastResult,processor) {
+	
+			return {
+				execute : function() {
+					var result = injector.invoke(resolverFunction,this,{result:lastResult});
+					processor.setData('lastResult',result);
+					if(commands[commandName] && 
+						commands[commandName].config &&
+						commands[commandName].config.resultKey)
+							processor.setData(commands[commandName].config.resultKey,result);
+					return result;	
+				}
+			}
+		}];	
+		var aspectDescriptor = "@After(/" + commandName + "/)";
+		commangular.aspect(aspectDescriptor,aspectResolverFunction,-100);
 	}
 
 	//----------------------------------------------------------------------------------------------------------------------
@@ -421,6 +444,7 @@
 				var processor = this.contextData.processor = new InterceptorProcessor(self,deferred);
 				interceptors[poincut].reverse();
 				var x = 0;
+				console.log(poincut);
 				(function invocationChain(){
 					
 					try{
