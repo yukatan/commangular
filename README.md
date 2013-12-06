@@ -10,7 +10,7 @@ Commangular is a concept on top of angularJS that aims at simplifying the creati
 
 Commands can be easily tested, reused, and developed in isolation.
 
-It is inspired by [Parsley 3 Command Framework and spicelib commands](https://github.com/spicefactory) from [Jens Halm](https://github.com/jenshalm) 
+It is inspired by [Parsley 3 Framework](https://github.com/spicefactory) and [Jens Halm](https://github.com/jenshalm) command concept. 
 
 
 ###Main features :
