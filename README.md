@@ -977,3 +977,7 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 [![githalytics.com alpha](https://cruel-carlota.gopagoda.com/4e4c83003a160db1279836eedc98f99a "githalytics.com")](http://githalytics.com/yukatan/commangular)
 
 
+
+
+[![Bitdeli Badge](https://d2weczhvl823v0.cloudfront.net/yukatan/commangular/trend.png)](https://bitdeli.com/free "Bitdeli Badge")
+
