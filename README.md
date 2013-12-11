@@ -2,7 +2,7 @@
 
 [![Build Status](https://travis-ci.org/yukatan/commangular.png)](https://travis-ci.org/yukatan/commangular)
 
-Command pattern implementation for AngularJS.
+Command framework for AngularJS.
 
 ##Overview
 
