@@ -1,3 +1,8 @@
+{% capture lvl %}{{ page.url | append:'index.html' | split:'/' | size }}{% endcapture %}
+{% capture relative %}{% for i in (3..lvl) %}../{% endfor %}{% endcapture %}
+
+<link href="{{ relative }}css/main.css" rel="stylesheet" />
+<script src="{{ relative }}scripts/jquery.js"></script>
 <!DOCTYPE html>
 <html class="no-js">
   <head>
@@ -10,15 +15,15 @@
     <!-- Place favicon.ico and apple-touch-icon(s) in the root directory -->
 
     <!-- build:css({app,.tmp}) /css/main.css -->
-    <link rel="stylesheet" href="/_bower_components/normalize-css/normalize.css">
-    <link rel="stylesheet" href="/css/syntax.css">
-    <link rel="stylesheet" href="/css/main.css">
+    <link rel="stylesheet" href="{{relative}}/_bower_components/normalize-css/normalize.css">
+    <link rel="stylesheet" href="{{realtive}}/css/syntax.css">
+    <link rel="stylesheet" href="{{relative}}/css/main.css">
     <link href='http://fonts.googleapis.com/css?family=Open+Sans:400italic,400,700' rel='stylesheet' type='text/css'>
     <!-- endbuild -->
 
     <!-- build:js(app) /js/head-scripts.js -->
     <!-- Replace with a custom modernizer build for production -->
-    <script src="/_bower_components/modernizr/modernizr.js"></script>
+    <script src="{{relative}}/_bower_components/modernizr/modernizr.js"></script>
     <!-- endbuild -->
 
   </head>
