@@ -4,6 +4,7 @@
 # 3. config.yml
 
 url : http://yukatan.github.io/commangular
+baseurl: /
 name: commangular-web
 description: 
 author:
