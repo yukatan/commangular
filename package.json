@@ -1,0 +1,35 @@
+{
+  "name": "commangular-web",
+  "version": "0.0.0",
+  "description": "Yeoman workflow for commangular-web",
+  "dependencies": {},
+  "devDependencies": {
+    "grunt": "~0.4.1",
+    "grunt-autoprefixer": "~0.2.0",
+    "grunt-build-control": "~0.1.2",
+    "grunt-concurrent": "~0.3.0",
+    "grunt-contrib-clean": "~0.5.0",
+    "grunt-contrib-compass": "~0.5.0",
+    "grunt-contrib-concat": "~0.3.0",
+    "grunt-contrib-connect": "~0.5.0",
+    "grunt-contrib-copy": "~0.4.1",
+    "grunt-contrib-csslint": "~0.1.2",
+    "grunt-contrib-cssmin": "~0.6.0",
+    "grunt-contrib-htmlmin": "~0.1.3",
+    "grunt-contrib-imagemin": "~0.2.0",
+    "grunt-contrib-jshint": "~0.6.3",
+    "grunt-contrib-uglify": "~0.2.0",
+    "grunt-contrib-watch": "git://github.com/gruntjs/grunt-contrib-watch.git#a1cb33b83458b72d068fdef7e4c8e51b8f76b8ec",
+    "grunt-csscss": "~0.5.0",
+    "grunt-jekyll": "git://github.com/dannygarcia/grunt-jekyll.git#aa03074ee0f5b69dc9d7a0e6ced6bb8cd923add6",
+    "grunt-rev": "~0.1.0",
+    "grunt-svgmin": "~0.2.0",
+    "grunt-usemin": "~0.1.12",
+    "jshint-stylish": "~0.1.3",
+    "load-grunt-tasks": "~0.2.0",
+    "time-grunt": "~0.1.1"
+  },
+  "engines": {
+    "node": ">=0.8.0"
+  }
+}

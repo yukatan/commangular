@@ -1,0 +1,11 @@
+.mvc-image {
+
+	display: block;
+	@media(max-width: 700px){display: none};
+}
+
+.mvc-image-link {
+
+	display: none;
+	@media(max-width: 700px){display: block};
+}

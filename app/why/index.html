@@ -1,0 +1,21 @@
+---
+layout : default
+title : Commangular
+---
+
+{% assign pageActive = 'why' %}
+{% assign subHeaderTitle = 'Where and Why' %}
+{% assign iconClass = 'fa fa-question' %}
+{% assign subtitle = 'WHERE COMMANGULAR FITS AND WHY' %}
+
+{% include header.html %}
+{% include sub-header.html %}
+{% include socialbar.html %}
+<div class="container markdown-content">
+	{% capture markContent %}
+	{% include why-content.markdown %}
+	{% endcapture %}
+	{{ markContent | markdownify }}
+</div>
+
+{% include footer.html %}

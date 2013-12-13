@@ -1,0 +1,22 @@
+---
+layout: default
+title: Commangular Get Started
+---
+
+{% assign pageActive = 'get-started' %}
+{% assign subHeaderTitle = 'Get Started' %}
+{% assign iconClass = 'fa fa-gears' %}
+{% assign subtitle = 'LEARN HOW TO INSTALL AND START USING COMMANGULAR' %}
+
+{% include header.html %}
+{% include sub-header.html %}
+{% include socialbar.html %}
+
+<div class="container markdown-content">
+	{% capture markContent %}
+	{% include get-started-content.markdown %}
+	{% endcapture %}
+	{{ markContent | markdownify }}
+</div>
+
+{% include footer.html %}
