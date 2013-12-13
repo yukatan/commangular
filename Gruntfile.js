@@ -180,7 +180,7 @@ module.exports = function (grunt) {
     // page (hackery!) and point this task there.
     useminPrepare: {
       options: {
-        dest: '<%= yeoman.dist %>'
+        dest: '<%= yeoman.dist %>',
       },
       html: '<%= yeoman.dist %>/index.html'
     },
@@ -216,7 +216,7 @@ module.exports = function (grunt) {
     cssmin: {
       dist: {
         options: {
-          check: 'gzip'
+          check: 'gzip',
         }
       }
     },

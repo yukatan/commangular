@@ -4,7 +4,7 @@
 # 3. config.yml
 
 url: http://yukatan.github.io/commangular
-baseurl: /commangular/
+baseurl: /commangular
 future: false
 show_drafts: false
 
