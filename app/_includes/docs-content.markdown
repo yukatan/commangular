@@ -9,6 +9,7 @@
     * [How to create commands](#how-to-create-commands)
     * [The command config object](#the-command-config-object)
     * [Returning results from commands](#returning-result-from-commands)
+    * [Command onResult and Command onError](#command-onresult-onerror)
 * [Using the provider](#using-the-provider)
     * [Building command sequences.](#building-command-sequences)
     * [Building parallel commands.](#building-parallel-commands)
@@ -269,6 +270,51 @@ commangular.create('Command3',['$log','theResult',function($log,theResult) {
 If the command is asynchronous it should return a promise. At the moment, all the promises are managed by commangular, so if you make an http call and you get a promise as a result you can return that promise. Commangular will wait until the promise is resolved or rejected. If the promise is resolved, the result will be available to the next command. if the promise is rejected all the command context execution is cancelled.
 
 In the future you will be able to instruct commangular to use the promise as a result value and not to wait to promise resolution. 
+
+### <a name="command-onresult-onerror"></a>Command onResult and Command onError
+
+You have available two callbacks for every command execution :
+
+* onResult : Is executed after the execute method and the interception chain and can receive the result from the execute method of the same command.
+
+```javascript
+
+commangular.create('Command1',function(){
+  
+  return {
+      execute:function() {
+
+        return 25; // this is the result passed to the onResult callback. Remember the interception chain has preference.
+      },
+      onResult : function(result) {
+
+        expect(result).toBe(25)
+      }
+
+  }
+})
+```
+
+* onError : Is executed when the executed method ends with an error. Can receive the error throw by the execute method.
+
+```javascript
+
+commangular.create('Command1',function(){
+  
+  return {
+      execute:function() {
+
+        throw new Error('This is an error');
+        return 25; // this is the result passed to the onResult callback. Remember the interception chain has preference.
+      },
+      onError : function(error) {
+
+        expect(error.message).toEqual('This is an error');
+      }
+
+  }
+})
+```
     
 ##<a name="using-the-provider"></a>Using The Provider.
 ***
