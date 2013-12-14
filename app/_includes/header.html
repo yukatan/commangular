@@ -10,10 +10,10 @@
   </div>
   <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
     <ul class="nav navbar-nav">
-      <li {% if pageActive == 'home' %} class="active" {% endif %}><a href="{{site.baseurl}}"><i class="fa fa-home"></i>Home</a></li>
-       <li {% if pageActive == 'why' %} class="active" {% endif %}><a href="{{site.baseurl}}/why"><i class="fa fa-question"></i>Where and Why?</a></li>
-      <li {% if pageActive == 'get-started' %} class="active" {% endif %}><a href="{{site.baseurl}}/get-started"><i class="fa fa-gears"></i>Get Started</a></li>
-      <li {% if pageActive == 'docs' %} class="active" {% endif %}><a href="{{site.baseurl}}/docs"><i class="fa fa-book"></i>Documentation</a></li>
+      <li {% if pageActive == 'home' %} class="active" {% endif %}><a href="{{site.baseurl}}" onclick="_gaq.push(['_trackEvent', 'Outbound Link', 'Home Clicked']);"><i class="fa fa-home"></i>Home</a></li>
+       <li {% if pageActive == 'why' %} class="active" {% endif %}><a href="{{site.baseurl}}/why" onclick="_gaq.push(['_trackEvent', 'Outbound Link', 'Why Clicked']);"><i class="fa fa-question"></i>Where and Why?</a></li>
+      <li {% if pageActive == 'get-started' %} class="active" {% endif %}><a href="{{site.baseurl}}/get-started" onclick="_gaq.push(['_trackEvent', 'Outbound Link', 'Started Clicked']);"><i class="fa fa-gears"></i>Get Started</a></li>
+      <li {% if pageActive == 'docs' %} class="active" {% endif %}><a href="{{site.baseurl}}/docs" onclick="_gaq.push(['_trackEvent', 'Outbound Link', 'Docs Clicked']);"><i class="fa fa-book"></i>Documentation</a></li>
     </ul>
   </div>
 </nav>
