@@ -8,7 +8,10 @@
     "url": "git://github.com/yukatan/commangular.git"
   },
   "dependencies": {
-    "angular": "*",
+    "angular": "*"
+    
+  },
+  "devDependencies" {
     "angular-mocks": "*"
   },
   "ignore": [
