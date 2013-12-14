@@ -1,6 +1,6 @@
 /**
  * Command pattern implementation for AngularJS
- * @version v0.5.2 - 2013-12-06
+ * @version v0.6.0 - 2013-12-14
  * @link https://github.com/yukatan/commangular
  * @author Jesús Barquín Cheda <yukatan@gmail.com>
  * @license MIT License, http://www.opensource.org/licenses/MIT
@@ -183,7 +183,7 @@
 
 			var self = this;
 			var context = this.context;
-								
+			var result;					
 			var deferExecution = q.defer();
 			deferExecution.resolve();
 			return deferExecution.promise
@@ -194,11 +194,10 @@
 					var deferred = q.defer();
 					
 					try {
-						var result;
 						if(interceptors['Around']) 
 							result = context.intercept('Around',interceptors,self.command);
 						else {
-							command = injector.instantiate(self.command,self.context.contextData);
+							command = context.instantiate(self.command,true);
 							result = context.invoke(command.execute, command);
 						}
 						context.processResults(result,config).then(function(){
@@ -209,14 +208,26 @@
 					} catch (error) {
 						context.getContextData().lastError = error;
 						context.intercept('AfterThrowing',interceptors).then(function(){
-							deferred.reject(error.message);
+							deferred.reject(error);
 						},function(error){deferred.reject(error)});
 					}
 					return deferred.promise;
 				})
 				.then(function(){
 					return context.intercept('After',interceptors);
-				});
+				},function(error) {
+
+					var deferred = q.defer();
+					deferred.reject(error);
+					if(context.currentCommand && context.currentCommand.hasOwnProperty('onError'))
+						context.currentCommand.onError(error);
+					return deferred.promise;
+				})
+				.then(function(){
+
+					if(context.currentCommand.hasOwnProperty('onResult'))
+						context.currentCommand.onResult(result);
+				})
 			}
 	}
 	Command.prototype = new CommandBase();
@@ -247,7 +258,7 @@
 		this.execute = function() {
 			var self = this;
 			var commandDescriptor = this.descriptors[currentIndex];
-			var command = this.context.instantiate(commandDescriptor);
+			var command = this.context.instantiateDescriptor(commandDescriptor);
 
 			if (command instanceof Command) {
 				command.execute().then(
@@ -291,7 +302,7 @@
 			for (var x = 0; x < this.descriptors.length; x++) {
 
 				var commandDescriptor = this.descriptors[x];
-				var command = this.context.instantiate(commandDescriptor);
+				var command = this.context.instantiateDescriptor(commandDescriptor);
 
 				if (command instanceof Command)
 					command.execute().then(
@@ -332,7 +343,7 @@
 			if (descriptor instanceof ResultKeyLinkDescriptor) {
 				if (this.context.contextData[descriptor.key] === descriptor.value) {
 						
-					var command = this.context.instantiate(descriptor.commandDescriptor);
+					var command = this.context.instantiateDescriptor(descriptor.commandDescriptor);
 					if (command instanceof Command)
 						command.execute().then(function() {
 							self.next();
@@ -350,7 +361,7 @@
 				var service = injector.get(descriptor.service);
 				if (service[descriptor.property] === descriptor.value) {
 						
-					var command = this.context.instantiate(descriptor.commandDescriptor);
+					var command = this.context.instantiateDescriptor(descriptor.commandDescriptor);
 					if (command instanceof Command)
 						command.execute().then(function() {
 							self.next();
@@ -384,13 +395,21 @@
 		this.instantiator = new CommandInstantiator();
 		this.contextData.commandModel = {};
 		this.currentDeferred;
+		this.currentCommand;
 	}
 
-	CommandContext.prototype.instantiate = function(descriptor) {
+	CommandContext.prototype.instantiateDescriptor = function(descriptor) {
 
 		var command = this.instantiator.instantiate(descriptor, this);
 		return command;
 	};
+
+	CommandContext.prototype.instantiate = function(funct,isCommand) {
+
+		instance = injector.instantiate(funct,this.contextData);
+		if(isCommand) this.currentCommand = instance;
+		return instance;
+	}
 
 	CommandContext.prototype.processResults = function(result,config) {
 
@@ -457,7 +476,7 @@
 						deferred.resolve();
 						return;
 						}
-						var interceptor = injector.instantiate(interceptors[poincut][x++].func,self.contextData);
+						var interceptor = self.instantiate(interceptors[poincut][x++].func,false);
 						q.when(self.invoke(interceptor.execute,interceptor)).then(function(){
 							invocationChain();
 						});
@@ -522,7 +541,7 @@
 		var self = this;
 		var deferred = q.defer();
 		self.context.contextData.processor = self.next;
-		var instance = injector.instantiate(self.executed,self.context.contextData);
+		var instance = self.context.instantiate(self.executed,this.next == null);
 				
 		q.when(self.context.invoke(instance.execute,instance)).then(function(data){
 			deferred.resolve(data);
@@ -589,9 +608,9 @@
 						var deferred = q.defer();
 						var context = new CommandContext(data);
 						var commandDescriptor = this.descriptors[eventName];
-						var command = context.instantiate(commandDescriptor);
+						var command = context.instantiateDescriptor(commandDescriptor);
 						command.start().then(function(data) {
-							deferred.resolve();
+							deferred.resolve(context.contextData);
 						}, function(error) {
 
 							console.log("Command context end with error :" + error);
