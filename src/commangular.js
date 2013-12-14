@@ -603,7 +603,7 @@
 						var commandDescriptor = this.descriptors[eventName];
 						var command = context.instantiateDescriptor(commandDescriptor);
 						command.start().then(function(data) {
-							deferred.resolve();
+							deferred.resolve(context.contextData);
 						}, function(error) {
 
 							console.log("Command context end with error :" + error);
