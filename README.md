@@ -26,7 +26,7 @@ It is inspired by [Parsley 3 Framework](https://github.com/spicefactory) and [Je
 * Custom result resolvers(on the way).
 
 
-##Instalation
+##Installation
 
 * Using bower : ``` bower install commangular ```
 * Download it and add commangular.js or commangular.min.js to your index.html.
