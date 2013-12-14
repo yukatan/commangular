@@ -3,6 +3,7 @@
 # 2. config.build.yml
 # 3. config.yml
 
+url : http://www.commangular.org
 name: commangular-web
 baseurl: 
 description: 
