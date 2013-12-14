@@ -4,6 +4,10 @@
 
 Command framework for AngularJS.
 
+* Website  : [http://commangular.org](http://commangular.org)
+* Quick Guide : [http://commangular.org/get-started/](http://commangular.org/get-started)
+* Documentation : [http://commangular.org/docs/](http://commangular.org/docs/)
+
 ##Overview
 
 Commangular is a concept on top of angularJS that aims at simplifying the creation and organization of operations in a self-contained code units and chain them together with an easy and fluent API.That code units are called 'commands'
@@ -33,11 +37,7 @@ It is inspired by [Parsley 3 Framework](https://github.com/spicefactory) and [Je
 
 Remember to add commangular.js after angular.js. Commangular only depends on angularJs, it is not using other libraries.
 
-Website  : [http://commangular.org](http://commangular.org)
 
-Quick Guide : [http://commangular.org/get-started/](http://commangular.org/get-started)
-
-Documentation : [http://commangular.org/docs/](http://commangular.org/docs/)
 
 ##License
 
