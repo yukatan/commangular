@@ -3,12 +3,11 @@
 # 2. config.build.yml
 # 3. config.yml
 
-url : http://yukatan.github.io/commangular
-baseurl: /
 name: commangular-web
+baseurl: 
 description: 
 author:
-  name: jefe
+  name: Jesús Barquín Cheda
   email: yukatan@gmail.com
 
 # Grunt handles images and assets.

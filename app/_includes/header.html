@@ -6,14 +6,14 @@
       <span class="icon-bar"></span>
       <span class="icon-bar"></span>
     </button>
-    <a class="navbar-brand" href="#">Commangular</a>
+    <a class="navbar-brand" href="{{site.baseurl}}">Commangular</a>
   </div>
   <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
     <ul class="nav navbar-nav">
-      <li {% if pageActive == 'home' %} class="active" {% endif %}><a href="/"><i class="fa fa-home"></i>Home</a></li>
-       <li {% if pageActive == 'why' %} class="active" {% endif %}><a href="/why"><i class="fa fa-question"></i>Where and Why?</a></li>
-      <li {% if pageActive == 'get-started' %} class="active" {% endif %}><a href="/get-started"><i class="fa fa-gears"></i>Get Started</a></li>
-      <li {% if pageActive == 'docs' %} class="active" {% endif %}><a href="/docs"><i class="fa fa-book"></i>Documentation</a></li>
+      <li {% if pageActive == 'home' %} class="active" {% endif %}><a href="{{site.baseurl}}"><i class="fa fa-home"></i>Home</a></li>
+       <li {% if pageActive == 'why' %} class="active" {% endif %}><a href="{{site.baseurl}}/why"><i class="fa fa-question"></i>Where and Why?</a></li>
+      <li {% if pageActive == 'get-started' %} class="active" {% endif %}><a href="{{site.baseurl}}/get-started"><i class="fa fa-gears"></i>Get Started</a></li>
+      <li {% if pageActive == 'docs' %} class="active" {% endif %}><a href="{{site.baseurl}}/docs"><i class="fa fa-book"></i>Documentation</a></li>
     </ul>
   </div>
 </nav>

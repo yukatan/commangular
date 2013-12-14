@@ -9,8 +9,7 @@
 /* ==========================================================================
    Base styles: opinionated defaults
    ========================================================================== */
-$icon-font-path: "/_bower_components/sass-bootstrap/fonts/";
-$fa-font-path : "../_bower_components/font-awesome/fonts";
+$fa-font-path : "/_bower_components/font-awesome/fonts";
 
 @import '../_bower_components/sass-bootstrap/lib/bootstrap';
 @import '../_bower_components/font-awesome/scss/font-awesome';
