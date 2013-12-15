@@ -94,7 +94,7 @@ commangular.command('AddItemToCartCommand',function(CartItemList,CurrentSelected
 });
 
 angular.module('CartShopping')
-	.service('CartItemsList',function($http){
+	.service('CartService',function($http){
 
 		this.addItem()  = function(item) {
 
