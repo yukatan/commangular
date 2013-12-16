@@ -1,0 +1,22 @@
+---
+layout: default
+title: Commangular Blog
+---
+
+{% assign pageActive = 'Blog' %}
+{% assign subHeaderTitle = 'Blog' %}
+{% assign iconClass = 'fa fa-gears' %}
+{% assign subtitle = 'IDEAS AND EXAMPLES ABOUT COMMANGULAR' %}
+
+{% include header.html %}
+{% include sub-header.html %}
+{% include socialbar.html %}
+
+<div class="container markdown-content">
+	{% capture markContent %}
+	{% include blog-content.markdown %}
+	{% endcapture %}
+	{{ markContent | markdownify }}
+</div>
+
+{% include footer.html %}
