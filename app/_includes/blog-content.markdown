@@ -142,6 +142,9 @@ var FlightDashboard = function($scope,FlighData) {
 	})
 }
 ```
+We end with organized and clean code and really easy to test and understand. Just looking at the config block you can see what happen. I have planned a chrome extension to do some introspection on config blocks. I think it will be a killer feature.
 
-You can use any commangular flavour you like :). I have no comments available here so, comment your feedback on twitter, it will help me a lot. And sorry about my english problems. I hope everybody understand me.
+You can use any commangular flavour you like :). I show the two options just to demostrate how commangular works.
+
+I have no comments available here so, comment your feedback on twitter, it will help me a lot. And sorry about my english problems. I hope everybody understand me.
 
