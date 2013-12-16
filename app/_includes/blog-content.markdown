@@ -8,7 +8,7 @@ You can see the sample [here](https://github.com/ThomasBurleson/angularjs-Flight
 
 I'm not going to write the FlightService because it is the same and I'm going to show two examples, one with a FlightData model and one without it.
 
-#### Without FlighData
+#### Without FlightData
 
 ```javascript
  //We have 3 commands doing the stuff. It can be separated in multiple js files to keep the code organized
@@ -27,7 +27,7 @@ commangular.command('getFlightDetailsCommand',function(flight,FlightService) {
 	return {
 		execute :function() {
 
-			return FlightService.getFlightdDetails(flight.id);
+			return FlightService.getFlightDetails(flight.id);
 		}
 	}
 },{resultKey:'planeStatus'});
@@ -68,7 +68,7 @@ var FlightDashboard = function( $scope,$log) {
 ```
 This is ok.. but I think it can be improved using a model and some interception magic.
 
-#### With FlighData
+#### With FlightData
 
 ```javascript
  //FlightData injection and onResult Handler. As you can see we don't use the 'resultKey' because we have the model.
@@ -91,7 +91,7 @@ commangular.command('getFlightDetailsCommand',function(FlightData,FlightService)
 	return {
 		execute :function() {
 
-			return FlightService.getFlightdDetails(FlightData.flight.id);
+			return FlightService.getFlightDetails(FlightData.flight.id);
 		},
 		onResult: function(flightStatus) {
 
@@ -114,7 +114,7 @@ commangular.command('getForecastCommand',function(FlightData,WeatherService) {
 	}
 });
 
-//We are going to intercept all the command execution to controll errors.
+//We are going to intercept all the command execution to control errors.
 commangular.aspect('@AfterThrowing(/(.)/)',function(lastError,$log) {
 	
 	return {
