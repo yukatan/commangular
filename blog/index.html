@@ -120,7 +120,7 @@
 <span class=kd>var</span> <span class=nx>FlightDashboard</span> <span class=o>=</span> <span class=kd>function</span><span class=p>(</span><span class=nx>$scope</span><span class=p>,</span><span class=nx>FlighData</span><span class=p>)</span> <span class=p>{</span>
 
     <span class=nx>$scope</span><span class=p>.</span><span class=nx>dispatch</span><span class=p>(</span><span class=s1>&#39;LoadFlightEvent&#39;</span><span class=p>).</span><span class=nx>then</span><span class=p>(</span><span class=kd>function</span><span class=p>(){</span>
-        <span class=c1>//We do it this here because we want the data when it is all load complete.</span>
+        <span class=c1>//We do it this here because we want the data when it is all load.</span>
         <span class=nx>$scope</span><span class=p>.</span><span class=nx>flightData</span> <span class=o>=</span> <span class=nx>FlightData</span><span class=p>;</span>
     <span class=p>})</span>
 <span class=p>}</span>
