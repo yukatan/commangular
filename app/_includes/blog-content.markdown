@@ -137,7 +137,7 @@ $commangularProvider.mapTo('LoadFlightEvent').asSequence()
 var FlightDashboard = function($scope,FlighData) {
 	 
 	$scope.dispatch('LoadFlightEvent').then(function(){
-		//We do it this here because we want the data when it is all load complete.
+		//We do it this here because we want the data when it is all load.
 		$scope.flightData = FlightData;
 	})
 }
