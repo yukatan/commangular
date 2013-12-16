@@ -6,7 +6,7 @@ This is the first post and the blog programming is still not ready but I saw and
 
 You can see the sample [here](https://github.com/ThomasBurleson/angularjs-FlightDashboard)
 
-I'm not going to write the FlightService because it is the same and I'm going to show two examples, one with a FlightData model and one Without it.
+I'm not going to write the FlightService because it is the same and I'm going to show two examples, one with a FlightData model and one without it.
 
 #### Without FlighData
 
