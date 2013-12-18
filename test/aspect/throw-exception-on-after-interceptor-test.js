@@ -1,4 +1,4 @@
-describe("Aspect execution testing", function() {
+describe("Throw exception on after interception testing", function() {
 
 	var provider;
 	var scope;

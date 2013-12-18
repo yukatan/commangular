@@ -210,6 +210,10 @@
 						context.currentCommand.onResult(result);
 				},function(error) {
 					var deferred = q.defer();
+					if(context.canceled){
+						deferred.reject(error);
+						return deferred.promise;
+					}
 					if(context.currentCommand && context.currentCommand.hasOwnProperty('onError'))
 						context.currentCommand.onError(error);
 					context.getContextData().lastError = error;
@@ -386,6 +390,7 @@
 		this.contextData.commandModel = {};
 		this.currentDeferred;
 		this.currentCommand;
+		this.canceled = false;
 	}
 
 	CommandContext.prototype.instantiateDescriptor = function(descriptor) {
@@ -462,9 +467,9 @@
 				(function invocationChain(){
 					
 					try{
-						if(x == interceptors[poincut].length || processor.canceled){
-						deferred.resolve();
-						return;
+						if(x == interceptors[poincut].length || self.canceled){
+							deferred.resolve();
+							return;
 						}
 						var interceptor = self.instantiate(interceptors[poincut][x++].func,false);
 						q.when(self.invoke(interceptor.execute,interceptor)).then(function(){
@@ -501,11 +506,11 @@
 
 		this.deferred = deferred;
 		this.context = context;
-		this.canceled = false;
+		
 	}
 	InterceptorProcessor.prototype.cancel = function(reason) {
 		
-		this.canceled = true;
+		this.context.canceled = true;		
 		this.deferred.reject(reason);
 	}
 	InterceptorProcessor.prototype.setData = function(key,value) {

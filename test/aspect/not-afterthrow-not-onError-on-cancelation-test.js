@@ -1,29 +1,17 @@
-describe("Throw exception on around interceptor testing", function() {
+describe("Aspect execution testing", function() {
 
 	var provider;
 	var scope;
-	var interceptorExecutedBefore = false;
+	var interceptorExecuted = false;
 	var afterThrowingExecuted = false;
-	var commandExecutedAfter = false;
+	var onErrorExecuted = false;
+	var commandExecuted = false;
 
 	beforeEach(function() {
 
 		commangular.commands = {};
 		commangular.aspects = [];
 		
-		commangular.aspect('@Around(/com.test1/)', function(){
-
-			return {
-
-				execute : function() {
-
-					throw new Error('This is an error');
-					processor.invoke();
-					interceptorExecutedBefore = true;
-				}
-			}
-			
-		});
 
 		commangular.aspect('@AfterThrowing(/com.test1/)', function(){
 
@@ -36,18 +24,33 @@ describe("Throw exception on around interceptor testing", function() {
 			}
 			
 		});
+
+		commangular.aspect('@Before(/com.test1/)', function(processor){
+
+			return {
+
+				execute : function() {
+
+					processor.cancel('Canceling');
+					interceptorExecuted = true;
+				}
+			}
+			
+		});
 			
 
-		commangular.create('com.test1.Command1',function(){
+		commangular.command('com.test1.Command1',function(){
 
 			return {
 
 				execute : function() {
 										
-					if(interceptorExecutedBefore) {
-						
-						commandExecutedAfter = true;
-					}
+						commandExecuted = true;
+					
+				},
+				onError : function() {
+
+					onErrorExecuted = true;
 				}
 			};
 		});
@@ -92,9 +95,9 @@ describe("Throw exception on around interceptor testing", function() {
 		
 		runs(function() {
 
-			expect(interceptorExecutedBefore).toBe(false);
-			expect(commandExecutedAfter).toBe(false);
-			expect(afterThrowingExecuted).toBe(true);
+			expect(interceptorExecuted).toBe(true);
+			expect(commandExecuted).toBe(false);
+			expect(afterThrowingExecuted).toBe(false);
 
 		});
 

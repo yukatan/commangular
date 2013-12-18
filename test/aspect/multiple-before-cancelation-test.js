@@ -18,7 +18,7 @@ describe("Multiple @Before execution testing", function() {
 				execute : function() {
 					
 					interceptor1Executed = true;
-					processor.cancel();
+					processor.cancel('Cancelation');
 				}
 			}
 			
