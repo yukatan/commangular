@@ -618,6 +618,7 @@
 	angular.module('commangular')
 		.run(['$rootScope','$commangular','$injector','$q',function($rootScope,$commangular,$injector,$q) {
 
+			//TODO: improve the speed here.
 			injector = $injector;
 			q = $q;
 			for (var i = 0; i < commangular.aspects.length; i++) {
