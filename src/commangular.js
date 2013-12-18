@@ -506,10 +506,10 @@
 		this.context = context;
 		this.canceled = false;
 	}
-	InterceptorProcessor.prototype.cancel = function() {
+	InterceptorProcessor.prototype.cancel = function(reason) {
 		
 		this.canceled = true;
-		this.deferred.reject('The command has been canceled');
+		this.deferred.reject(reason);
 	}
 	InterceptorProcessor.prototype.setData = function(key,value) {
 		
