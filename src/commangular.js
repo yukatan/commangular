@@ -185,8 +185,7 @@
 				})
 				.then(function() {
 					var deferred = q.defer();
-					
-					try {
+					try{
 						if(interceptors['Around']) 
 							result = context.intercept('Around',interceptors,self.command);
 						else {
@@ -198,29 +197,27 @@
 						},function(error){
 							deferred.reject(error);
 						});	
-					} catch (error) {
-						context.getContextData().lastError = error;
-						context.intercept('AfterThrowing',interceptors).then(function(){
-							deferred.reject(error);
-						},function(error){deferred.reject(error)});
+					}catch(error){
+						deferred.reject(error);
 					}
 					return deferred.promise;
 				})
 				.then(function(){
 					return context.intercept('After',interceptors);
-				},function(error) {
-
-					var deferred = q.defer();
-					deferred.reject(error);
-					if(context.currentCommand && context.currentCommand.hasOwnProperty('onError'))
-						context.currentCommand.onError(error);
-					return deferred.promise;
 				})
 				.then(function(){
-
 					if(context.currentCommand.hasOwnProperty('onResult'))
 						context.currentCommand.onResult(result);
-				})
+				},function(error) {
+					var deferred = q.defer();
+					if(context.currentCommand && context.currentCommand.hasOwnProperty('onError'))
+						context.currentCommand.onError(error);
+					context.getContextData().lastError = error;
+					context.intercept('AfterThrowing',interceptors).then(function(){
+						deferred.reject(error)
+					},function(){deferred.reject(error)});
+					return deferred.promise;
+				});
 			}
 	}
 	Command.prototype = new CommandBase();
