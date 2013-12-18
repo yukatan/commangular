@@ -12,7 +12,8 @@
 		commands[commandName] = {
 			function: commandFunction,
 			config: commandConfig,
-			interceptors:{}
+			interceptors:{},
+			commandName:commandName
 		};
 	}
 	commangular.command = commangular.create;
