@@ -4,7 +4,10 @@
 	var injector;
 	var q;
 	var commands;
+	var commandNameString = "";
 	var aspects
+	var eventAspect;
+	var interceptorExtractor = /\/(.*)\//;
 
 	commangular.create = function(commandName, commandFunction, commandConfig) {
 		
@@ -15,6 +18,7 @@
 			interceptors:{},
 			commandName:commandName
 		};
+		commandNameString = commandNameString.concat("{" + commandName + "}");
 	}
 	commangular.command = commangular.create;
 
@@ -23,10 +27,25 @@
 		aspects = commangular.aspects || (commangular.aspects = []);
 		var result = /@([^(]*)\((.*)\)/.exec(aspectDescriptor);
 		var poincut = result[1];
-		var matcher = result[2];
+		var matcher = new RegExp(interceptorExtractor.exec(result[2])[1]);
+		aspectOrder = order || (order = 0);
 		if(!/(\bBefore\b|\bAfter\b|\bAfterThrowing\b|\bAround\b)/.test(poincut))
 			throw new Error('aspect descriptor ' + aspectDescriptor + ' contains errors');
 		aspects.push({poincut:poincut,
+			matcher:matcher,
+			aspectFunction:aspectFunction,
+			order:aspectOrder});
+	}
+
+	commangular.eventAspect = function(aspectDescriptor,aspectFunction,order) {
+		
+		eventAspect = commangular.eventAspect || (commangular.eventAspect = []);
+		var result = /@([^(]*)\((.*)\)/.exec(aspectDescriptor);
+		var poincut = result[1];
+		var matcher = result[2];
+		if(!/(\bBefore\b|\bAfter\b|\bAfterThrowing\b)/.test(poincut))
+			throw new Error('eventAspect descriptor ' + aspectDescriptor + ' contains errors');
+		eventAspects.push({poincut:poincut,
 			matcher:matcher,
 			aspectFunction:aspectFunction,
 			order:order});
@@ -627,19 +646,15 @@
 			for (var i = 0; i < commangular.aspects.length; i++) {
 				
 				var aspect = commangular.aspects[i];
-				aspect.order = aspect.order || (aspect.order = 0);
-				if(/\/(.*)\//.test(aspect.matcher)) {
-
-					for(var key in commangular.commands) {
-						var regex = new RegExp(/\/(.*)\//.exec(aspect.matcher)[1]);
-						if(regex.test(key)){
-							if(!commangular.commands[key].interceptors[aspect.poincut])
-								commangular.commands[key].interceptors[aspect.poincut] = [];
-							commangular.commands[key].interceptors[aspect.poincut]
-								.push({func:aspect.aspectFunction,order:aspect.order});
-						}
-					}	
-				}
+				for(var key in commangular.commands) {
+					if(aspect.matcher.test(key)){
+						if(!commangular.commands[key].interceptors[aspect.poincut])
+							commangular.commands[key].interceptors[aspect.poincut] = [];
+						commangular.commands[key].interceptors[aspect.poincut]
+							.push({func:aspect.aspectFunction,order:aspect.order});
+					}
+				}	
+				
 			}
 
 			$rootScope.dispatch = function(eventName,data) {
