@@ -27,3 +27,5 @@ markdown: redcarpet
 extensions: ['with_toc_data']
 
 pygments: true
+
+excerpt_separator: <!--more-->

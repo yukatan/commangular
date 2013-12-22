@@ -23,13 +23,15 @@
     * [Passing data to commands at dispatching time.](#passing-data-to-commands-at-dispatching-time)
     * [Injection from angular context.](#injection-from-angular-context)
     * [Returning promises from commands.](#returning-promises-from-commands)
-* [Command Aspects (Advanced interception).](#command-aspects-advanced-interception)
+* [Command Aspects.](#command-aspects)
     * [Intercepting commands.](#intercepting-commands)
     * [Interceptor processor.](#interceptor-processor)
     * [@Before.](#before)
     * [@After.](#after)
     * [@AfterThrowing.](#after-throwing)
     * [@Around.](#around)
+* [Event Aspects.](#event-aspects)
+    * [Intercepting events.](#intercepting-events)
 * Unit testing commands
     * commangular-mocks module
 * Backendless development with commangular
@@ -453,8 +455,7 @@ $commangularProvider.mapTo('FlowsEvent')
       .resultLink('result1',false).to(otherFlow)); 
 ```
 
-##<a name="nesting-commands"></a>Nesting commands
-***
+###<a name="nesting-commands"></a>Nesting commands
 
 You can create any kind of commands nesting with commangular. You can create a sequence of parallel commands or sequences in parallel. It's better to show it in code :
 
@@ -505,6 +506,23 @@ $commangularProvider.mapTo('ParallelExampleEvent')
 
 
 ```
+###<a name="mapping-commands-to-events"></a>Mapping commands to events.
+
+It is really easy to map command groups to events using the commangularProvider. In an angular config block just use the mapTo function. It is the starting point to any config group definition.
+
+```javascript
+
+angular.module('YourApp')
+  .config(function($commangularProvider) {
+  
+      $commangularProvider.mapTo('EventName').asSequence().add('Command1');
+    }
+
+  });
+```
+
+
+
 ## <a name="command-execution"></a>Command Execution.
 ***
 ### <a name="dispatching-events"></a>Dispatching events.
@@ -688,7 +706,7 @@ provider.mapTo('PromisesEvent').asParallel().add('Command1').add('Command2');
 
 ```
 
-##<a name="command-aspects-advanced-interception"></a> Command Aspects (Advanced interception).
+##<a name="command-aspects"></a> Command Aspects (Advanced interception).
 ***
 ###<a name="intercepting-commands"></a>Intercepting commands.
 
@@ -996,3 +1014,74 @@ commangular.aspect('@Around(/Command1/)',['processor',function(processor) {
       }
 },1);
 ```
+##<a name="event-aspects"></a> Event Aspects (Advanced interception).
+***
+###<a name="intercepting-events"></a>Intercepting events.
+
+Event aspects work the same way command aspects do, but they intercept all the command groups instead, so you can run some function before the command group starts it's execution , after or when any command or interceptor in the group throw an exception. Read the command aspect documentation before to better understand how aspects work. [Command aspects](#command-aspects).
+
+The main difference with command aspects is that you don't have the @Around interceptor because it doesn't have any sense here.
+
+You can use event aspects like it is showed in the example below:
+
+```javascript
+// We create the command
+commangular.create('Command1',function($log) {
+
+   return {
+   
+         execute: function() {
+            
+            $log.log('This is the command'); 
+         }
+   }
+});
+
+//We map the command in a config block.
+$commangularProvider.mapTo(TestEvent).asSequece().add('Command1');
+
+
+
+//We are using a regular expresion to match the Event(Any event that ends with 'Event').
+//The same way as command we can cancel the execution using the processor.
+commangular.eventAspect('@Before(/.*Event/)',['processor',function(processor,datapassedtocommand) {
+  
+  return {
+     
+        execute: function() {
+         //Some code here.
+         // processor.cancel('I want to cancel'); We can cancel the command group execution here.
+         // processor.setData('valueKey',value); We can set data in the command context.
+         // processor.getData('valueKey'): We can get data from the command context.
+         return 100; // You can return a value but it will be ignored.
+        }
+      }
+});
+
+//You can use any resultKey from all the command execution in an @After aspect
+commangular.eventAspect('@After(/.*Event/)',['processor',function(processor,anyresultkey) {
+  
+  return {
+     
+        execute: function() {
+         //Some code here to do after all the command group completes.
+        }
+      }
+});
+
+//You can intercept any error on all the command group execution.
+//Inject the lastError to get the error throwed.
+commangular.eventAspect('@AfterThrowing(/.*Event/)',['processor',function(processor,lastError) {
+  
+  return {
+     
+        execute: function() {
+         //Some code here to do after the error.
+        }
+      }
+});
+```
+
+
+
+

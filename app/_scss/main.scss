@@ -108,14 +108,18 @@ textarea {
 .navbar {margin-bottom: 0px;border-radius: 0px;}
 .text-center{text-align: center;}
 body,html{font-family: "Open Sans";}
-.markdown-content{margin-top: 30px;}
+.markdown-content{margin-top: 60px;}
 a{color:#005a66}
 a:hover{color:#005a66}
+.btn{i{ padding-right: 20px;}font-size: 18px; background-color: #005a66;}
 @import 'footer';
 @import 'home';
 @import 'header';
 @import 'sub-header';
 @import 'why-content';
+@import 'disqus';
+@import 'post';
+@import 'blog';
 
 
 /* ==========================================================================

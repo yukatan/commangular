@@ -13,10 +13,16 @@ title: Commangular Blog
 {% include socialbar.html %}
 
 <div class="container markdown-content">
-	{% capture markContent %}
-	{% include blog-content.markdown %}
-	{% endcapture %}
-	{{ markContent | markdownify }}
+	
+  {% for post in site.posts %}
+   	<div class="blog-index">
+    	<h3>{{ post.title }}</h3>
+    	<h5><strong>{{ post.date | date: "%-d %B %Y" }}</strong></h5>
+    	<p>{{ post.excerpt }}</p>
+    	<a href="{{ post.url }}">Read more</a>
+    	<hr><br>
+    </div> 
+  {% endfor %}
 </div>
 
 {% include footer.html %}

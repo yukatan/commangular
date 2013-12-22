@@ -1,6 +1,27 @@
 ---
 layout: default
 ---
-<article class="post">
-{{ content }}
-</article>
+
+{% assign pageActive = 'blog' %}
+{% assign subHeaderTitle = 'Blog' %}
+{% assign iconClass = 'fa fa-bullhorn' %}
+{% assign subtitle = 'IDEAS AND EXAMPLES ABOUT COMMANGULAR' %}
+
+{% include header.html %}
+{% include sub-header.html %}
+{% include socialbar.html %}
+
+
+<div class="container">
+	<article class="markdown-content">
+	<h3>{{page.title}}</h3>
+	<hr>
+	{{ content }}
+	</article>
+	<div>
+		<a href="/blog" class="back-button"><i class="fa fa-angle-double-left"></i>  Back</a>
+	</div>
+{% include disqus.html %}	
+</div>
+
+{% include footer.html %}
