@@ -1,6 +1,6 @@
 /**
  * Command pattern implementation for AngularJS
- * @version v0.6.0 - 2013-12-14
+ * @version v0.7.0 - 2013-12-23
  * @link https://github.com/yukatan/commangular
  * @author Jesús Barquín Cheda <yukatan@gmail.com>
  * @license MIT License, http://www.opensource.org/licenses/MIT
@@ -11,31 +11,64 @@
 	var injector;
 	var q;
 	var commands;
-	var aspects
+	var commandNameString = "";
+	var eventNameString = "";
+	var aspects;
+	var eventAspect;
+	var descriptors = {};
+	var eventInterceptors= {};
+	var interceptorExtractor = /\/(.*)\//;
+	var aspectExtractor = /@([^(]*)\((.*)\)/;
+
+	function escapeRegExp(str) {
+  		return str.replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, "\\$&");
+	}
 
 	commangular.create = function(commandName, commandFunction, commandConfig) {
-		
+				
 		commands = commangular.commands || (commangular.commands = {});
 		commands[commandName] = {
 			function: commandFunction,
 			config: commandConfig,
-			interceptors:{}
+			interceptors:{},
+			commandName:commandName
 		};
+		commandNameString = commandNameString.concat("%" + commandName + "%{" + commandName + "}\n");
 	}
 	commangular.command = commangular.create;
 
 	commangular.aspect = function(aspectDescriptor,aspectFunction,order) {
 		
 		aspects = commangular.aspects || (commangular.aspects = []);
-		var result = /@([^(]*)\((.*)\)/.exec(aspectDescriptor);
+		var result = aspectExtractor.exec(aspectDescriptor);
 		var poincut = result[1];
-		var matcher = result[2];
+		var matcherString = interceptorExtractor.exec(result[2])[1];
+		var matcher = new RegExp("^%" + matcherString + "%\{(.*)\}$","mg");
+		aspectOrder = order || (order = 0);
 		if(!/(\bBefore\b|\bAfter\b|\bAfterThrowing\b|\bAround\b)/.test(poincut))
 			throw new Error('aspect descriptor ' + aspectDescriptor + ' contains errors');
 		aspects.push({poincut:poincut,
 			matcher:matcher,
 			aspectFunction:aspectFunction,
-			order:order});
+			order:aspectOrder,
+			descriptor:aspectDescriptor});
+	}
+
+	commangular.eventAspect = function(aspectDescriptor,aspectFunction,order) {
+		
+		eventAspects = commangular.eventAspects || (commangular.eventAspects = []);
+		var result = aspectExtractor.exec(aspectDescriptor);
+		var poincut = result[1];
+		var matcherString = interceptorExtractor.exec(result[2])[1];
+		var matcher = new RegExp("^%" + matcherString + "%\{(.*)\}$","mg");
+		aspectOrder = order || (order = 0);
+		if(!/(\bBefore\b|\bAfter\b|\bAfterThrowing\b)/.test(poincut))
+			throw new Error('aspect descriptor ' + aspectDescriptor + ' contains errors');
+		eventAspects.push({poincut:poincut,
+			matcher:matcher,
+			aspectFunction:aspectFunction,
+			order:aspectOrder,
+			descriptor:aspectDescriptor});
 	}
 
 	commangular.resolver = function (commandName,resolverFunction) {
@@ -53,8 +86,22 @@
 				}
 			}
 		}];	
-		var aspectDescriptor = "@After(/" + commandName + "/)";
+		var aspectDescriptor = "@After(/" + escapeRegExp(commandName) + "/)";
 		commangular.aspect(aspectDescriptor,aspectResolverFunction,-100);
+	}
+
+	commangular.reset = function() {
+
+		aspects = [];
+		eventAspects = [];
+		commands = {};
+		commangular.aspects = [];
+		commangular.eventAspects = [];
+		commangular.commands = {};
+		eventInterceptors = {};
+		commandNameString = "";
+		eventNameString = "";
+
 	}
 
 	//----------------------------------------------------------------------------------------------------------------------
@@ -192,8 +239,7 @@
 				})
 				.then(function() {
 					var deferred = q.defer();
-					
-					try {
+					try{
 						if(interceptors['Around']) 
 							result = context.intercept('Around',interceptors,self.command);
 						else {
@@ -205,29 +251,31 @@
 						},function(error){
 							deferred.reject(error);
 						});	
-					} catch (error) {
-						context.getContextData().lastError = error;
-						context.intercept('AfterThrowing',interceptors).then(function(){
-							deferred.reject(error);
-						},function(error){deferred.reject(error)});
+					}catch(error){
+						deferred.reject(error);
 					}
 					return deferred.promise;
 				})
 				.then(function(){
 					return context.intercept('After',interceptors);
-				},function(error) {
-
-					var deferred = q.defer();
-					deferred.reject(error);
-					if(context.currentCommand && context.currentCommand.hasOwnProperty('onError'))
-						context.currentCommand.onError(error);
-					return deferred.promise;
 				})
 				.then(function(){
-
 					if(context.currentCommand.hasOwnProperty('onResult'))
 						context.currentCommand.onResult(result);
-				})
+				},function(error) {
+					var deferred = q.defer();
+					if(context.canceled){
+						deferred.reject(error);
+						return deferred.promise;
+					}
+					if(context.currentCommand && context.currentCommand.hasOwnProperty('onError'))
+						context.currentCommand.onError(error);
+					context.getContextData().lastError = error;
+					context.intercept('AfterThrowing',interceptors).then(function(){
+						deferred.reject(error)
+					},function(){deferred.reject(error)});
+					return deferred.promise;
+				});
 			}
 	}
 	Command.prototype = new CommandBase();
@@ -396,6 +444,7 @@
 		this.contextData.commandModel = {};
 		this.currentDeferred;
 		this.currentCommand;
+		this.canceled = false;
 	}
 
 	CommandContext.prototype.instantiateDescriptor = function(descriptor) {
@@ -472,9 +521,9 @@
 				(function invocationChain(){
 					
 					try{
-						if(x == interceptors[poincut].length || processor.canceled){
-						deferred.resolve();
-						return;
+						if(x == interceptors[poincut].length || self.canceled){
+							deferred.resolve();
+							return;
 						}
 						var interceptor = self.instantiate(interceptors[poincut][x++].func,false);
 						q.when(self.invoke(interceptor.execute,interceptor)).then(function(){
@@ -511,12 +560,12 @@
 
 		this.deferred = deferred;
 		this.context = context;
-		this.canceled = false;
-	}
-	InterceptorProcessor.prototype.cancel = function() {
 		
-		this.canceled = true;
-		this.deferred.reject('The command has been canceled');
+	}
+	InterceptorProcessor.prototype.cancel = function(reason) {
+		
+		this.context.canceled = true;		
+		this.deferred.reject(reason);
 	}
 	InterceptorProcessor.prototype.setData = function(key,value) {
 		
@@ -554,14 +603,11 @@
 	//----------------------------------------------------------------------------------------------------------------------
 	angular.module('commangular', [])
 		.provider('$commangular', function() {
-
-			var descriptors = {};
 						
 			return {
 				$get: ['commandExecutor',
 					function(commandExecutor) {
-
-						commandExecutor.descriptors = descriptors;
+						
 						return {
 							dispatch: function(eventName, data) {
 
@@ -573,6 +619,10 @@
 		
 				mapTo: function(eventName) {
 
+					var interceptorChain = eventInterceptors[eventName] || (eventInterceptors[eventName] = {});
+					if(!interceptorChain.interceptors)
+						interceptorChain.interceptors = {};
+					eventNameString = eventNameString.concat("%" + eventName + "%{" + eventName + "}\n");
 					var descriptor = new CommandDescriptor();
 					descriptors[eventName] = descriptor;
 					return descriptor
@@ -602,21 +652,33 @@
 		.service('commandExecutor',function() {
 
 				return {
-
-					descriptors: {},
+					
 					execute: function(eventName, data) {
 						var deferred = q.defer();
 						var context = new CommandContext(data);
-						var commandDescriptor = this.descriptors[eventName];
-						var command = context.instantiateDescriptor(commandDescriptor);
-						command.start().then(function(data) {
-							deferred.resolve(context.contextData);
-						}, function(error) {
+						var command = context.instantiateDescriptor(descriptors[eventName]);
+						var interceptors = eventInterceptors[eventName].interceptors;
+						deferred.resolve();
+						return deferred.promise.then(function() {
+														
+							return context.intercept('Before',interceptors);
+						}).then(function() {
 
-							console.log("Command context end with error :" + error);
-							deferred.reject(error);
+							return command.start();
+						}).then(function(){
+
+							return context.intercept('After',interceptors);	
+						}).then(function() {
+							
+							return context.contextData;
+						},function(error){
+							var defer = q.defer();
+							context.intercept('AfterThrowing',interceptors).then(function(){
+								defer.reject(error);
+							},function(){defer.reject(error)});
+							return defer.promise;
 						});
-						return deferred.promise;
+						
 					},
 				};
 			}
@@ -624,26 +686,32 @@
 	//------------------------------------------------------------------------------------------------------------------
 	angular.module('commangular')
 		.run(['$rootScope','$commangular','$injector','$q',function($rootScope,$commangular,$injector,$q) {
-
+			
 			injector = $injector;
 			q = $q;
-			for (var i = 0; i < commangular.aspects.length; i++) {
-				
-				var aspect = commangular.aspects[i];
-				aspect.order = aspect.order || (aspect.order = 0);
-				if(/\/(.*)\//.test(aspect.matcher)) {
-
-					for(var key in commangular.commands) {
-						var regex = new RegExp(/\/(.*)\//.exec(aspect.matcher)[1]);
-						if(regex.test(key)){
-							if(!commangular.commands[key].interceptors[aspect.poincut])
-								commangular.commands[key].interceptors[aspect.poincut] = [];
-							commangular.commands[key].interceptors[aspect.poincut]
-								.push({func:aspect.aspectFunction,order:aspect.order});
-						}
-					}	
+			angular.forEach(aspects,function(aspect){
+							
+				while((result = aspect.matcher.exec(commandNameString)) != null) {
+					
+					if(!commands[result[1]].interceptors[aspect.poincut])
+						commands[result[1]].interceptors[aspect.poincut] = [];
+					commands[result[1]].interceptors[aspect.poincut]
+							.push({func:aspect.aspectFunction,order:aspect.order});
 				}
-			}
+			});
+			commandNameString = "";
+			angular.forEach(eventAspects,function(aspect){
+							
+				while((result = aspect.matcher.exec(eventNameString)) != null) {
+										
+					if(eventInterceptors[result[1]] &&
+						!eventInterceptors[result[1]].interceptors[aspect.poincut])
+						eventInterceptors[result[1]].interceptors[aspect.poincut] = [];
+					eventInterceptors[result[1]].interceptors[aspect.poincut]
+							.push({func:aspect.aspectFunction,order:aspect.order});
+				}
+			});
+			eventNameString = "";
 
 			$rootScope.dispatch = function(eventName,data) {
 
