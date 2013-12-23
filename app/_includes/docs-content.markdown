@@ -1038,7 +1038,7 @@ commangular.create('Command1',function($log) {
 });
 
 //We map the command in a config block.
-$commangularProvider.mapTo(TestEvent).asSequece().add('Command1');
+$commangularProvider.mapTo('TestEvent').asSequence().add('Command1');
 
 
 
