@@ -446,8 +446,8 @@
 <span class=nx>commangular</span><span class=p>.</span><span class=nx>aspect</span><span class=p>(</span><span class=s1>&#39;@Before(/Secured/)&#39;</span><span class=p>,</span><span class=kd>function</span><span class=p>(){})</span> <span class=c1>// any command name that contains &#39;Secured&#39;</span>
 
 <span class=nx>commangular</span><span class=p>.</span><span class=nx>aspect</span><span class=p>(</span><span class=s1>&#39;@After(/Secured\b/)&#39;</span><span class=p>,</span><span class=kd>function</span><span class=p>(){})</span> <span class=c1>// any command name that ends with &#39;Secured&#39;</span>
-
-<span class=nx>commangular</span><span class=p>.</span><span class=nx>aspect</span><span class=p>(</span><span class=s1>&#39;@After(/\bcom.security/)&#39;</span><span class=p>,</span><span class=kd>function</span><span class=p>(){})</span> <span class=c1>// any command name that starts with &#39;com.security&#39;</span>
+<span class=c1>//Remember to use escaped characters, because you are writing a regular expresion.</span>
+<span class=nx>commangular</span><span class=p>.</span><span class=nx>aspect</span><span class=p>(</span><span class=s1>&#39;@After(/\bcom\.security/)&#39;</span><span class=p>,</span><span class=kd>function</span><span class=p>(){})</span> <span class=c1>// any command name that starts with &#39;com.security&#39;</span>
 
 <span class=nx>commangular</span><span class=p>.</span><span class=nx>aspect</span><span class=p>(</span><span class=s1>&#39;@AfterThrowing(/.*/)&#39;</span><span class=p>,</span><span class=kd>function</span><span class=p>(){})</span> <span class=c1>// any command</span>
 
