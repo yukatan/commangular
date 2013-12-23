@@ -751,8 +751,8 @@ The second part of the interceptor descriptor is what command or commands I want
 commangular.aspect('@Before(/Secured/)',function(){}) // any command name that contains 'Secured'
 
 commangular.aspect('@After(/Secured\b/)',function(){}) // any command name that ends with 'Secured'
-
-commangular.aspect('@After(/\bcom.security/)',function(){}) // any command name that starts with 'com.security'
+//Remember to use escaped characters, because you are writing a regular expresion.
+commangular.aspect('@After(/\bcom\.security/)',function(){}) // any command name that starts with 'com.security'
 
 commangular.aspect('@AfterThrowing(/.*/)',function(){}) // any command
 
