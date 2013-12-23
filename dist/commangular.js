@@ -1,6 +1,6 @@
 /**
  * Command pattern implementation for AngularJS
- * @version v0.7.0 - 2013-12-23
+ * @version v0.7.1 - 2013-12-23
  * @link https://github.com/yukatan/commangular
  * @author Jesús Barquín Cheda <yukatan@gmail.com>
  * @license MIT License, http://www.opensource.org/licenses/MIT
@@ -13,8 +13,8 @@
 	var commands;
 	var commandNameString = "";
 	var eventNameString = "";
-	var aspects;
-	var eventAspect;
+	var aspects = [];
+	var eventAspects = [];
 	var descriptors = {};
 	var eventInterceptors= {};
 	var interceptorExtractor = /\/(.*)\//;
@@ -644,6 +644,10 @@
 				findCommand: function(eventName) {
 
 					return descriptors[eventName];
+				},
+				modelBinding : function(eventName,serviceName,resultKey) {
+
+					
 				}
 			};
 		});

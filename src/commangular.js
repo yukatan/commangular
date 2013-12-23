@@ -6,8 +6,8 @@
 	var commands;
 	var commandNameString = "";
 	var eventNameString = "";
-	var aspects;
-	var eventAspect;
+	var aspects = [];
+	var eventAspects = [];
 	var descriptors = {};
 	var eventInterceptors= {};
 	var interceptorExtractor = /\/(.*)\//;
@@ -637,6 +637,10 @@
 				findCommand: function(eventName) {
 
 					return descriptors[eventName];
+				},
+				modelBinding : function(eventName,serviceName,resultKey) {
+
+					
 				}
 			};
 		});
