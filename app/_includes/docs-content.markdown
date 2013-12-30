@@ -459,7 +459,7 @@ $commangularProvider.mapTo('FlowsEvent')
 
 ####<a name="flow-break"></a> *Breaking change from v0.8.0*
 
-From version 0.8.0 the command flow creation has changed. Now it is more powerfull using the angular $parse service against the command context. You can create flows like in the example below.
+From version 0.8.0 the command flow creation has changed. Now it is more powerful using the angular $parse service against the command context. You can create flows like in the example below.
 
 ```javascript
 var sequence = $commangularProvider.asSequence().add('Seq1Command').add('Seq2Command');
