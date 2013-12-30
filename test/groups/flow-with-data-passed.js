@@ -73,8 +73,8 @@ describe("Command Flow With Data passed test", function() {
 		
 		provider.mapTo(eventName)
 			.asFlow()
-				.resultLink('data1',2).to('Command1')
-				.resultLink('data1',3).to('Command2');
+				.link('data1 == 2').to('Command1')
+				.link('data1 == 3').to('Command2');
 				
 	
 		runs(function() {
@@ -121,8 +121,8 @@ describe("Command Flow With Data passed test", function() {
 
 		provider.mapTo(eventName)
 			.asFlow()
-				.resultLink('data1',2).to('Command1')
-				.resultLink('data1',3).to('Command2');
+				.link('data1 == 2').to('Command1')
+				.link('data1 == 3').to('Command2');
 				
 	
 		runs(function() {

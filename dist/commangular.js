@@ -1,6 +1,6 @@
 /**
  * Command pattern implementation for AngularJS
- * @version v0.7.1 - 2013-12-23
+ * @version v0.8.0 - 2013-12-30
  * @link https://github.com/yukatan/commangular
  * @author Jesús Barquín Cheda <yukatan@gmail.com>
  * @license MIT License, http://www.opensource.org/licenses/MIT
@@ -10,6 +10,7 @@
 	var commangular = window.commangular || (window.commangular = {});
 	var injector;
 	var q;
+	var parse;
 	var commands;
 	var commandNameString = "";
 	var eventNameString = "";
@@ -152,22 +153,19 @@
 		this.descriptors.push(commandDescriptor);
 		return this;
 	};
-	CommandDescriptor.prototype.resultLink = function(key, value) {
+	CommandDescriptor.prototype.link = function(expresion, services) {
 
-		var descriptor = new ResultKeyLinkDescriptor(key, value,this);
+		var descriptor = new LinkDescriptor(expresion,services,this);
 		this.descriptors.push(descriptor); 
 		return descriptor;
 	};
-	CommandDescriptor.prototype.serviceLink = function(service,property,value) {
-
-		var descriptor = new ServiceLinkDescriptor(service, property,value,this);
-		this.descriptors.push(descriptor); 
-		return descriptor;
-	};
+	
 	//----------------------------------------------------------------------------------------------------------------------
-	function LinkDescriptor(parent) {
+	function LinkDescriptor(expresion,services,parent) {
 
 		this.commandDescriptor;
+		this.expresion = expresion;
+		this.services = services;
 		this.parent = parent;
 	}
 
@@ -190,26 +188,7 @@
 		this.commandDescriptor = commandDescriptor;
 		return this.parent;
 	}; 
-	
-	//----------------------------------------------------------------------------------------------------------------------
-	function ResultKeyLinkDescriptor(key, value,parent) {
-
-		LinkDescriptor.apply(this,[parent])
-		this.key = key;
-		this.value = value;
-	}
-	ResultKeyLinkDescriptor.prototype = new LinkDescriptor();
-	ResultKeyLinkDescriptor.prototype.constructor = ResultKeyLinkDescriptor;
-	//----------------------------------------------------------------------------------------------------------------------
-	function ServiceLinkDescriptor(service,property, value,parent) {
-
-		LinkDescriptor.apply(this,[parent])
-		this.service = service;
-		this.property = property;
-		this.value = value;
-	}
-	ServiceLinkDescriptor.prototype = new LinkDescriptor();
-	ServiceLinkDescriptor.prototype.constructor = ServiceLinkDescriptor;
+		
 	//----------------------------------------------------------------------------------------------------------------------
 	function CommandBase(context) {
 
@@ -388,41 +367,33 @@
 
 			var self = this;
 			var descriptor = this.descriptors[currentIndex];
-			if (descriptor instanceof ResultKeyLinkDescriptor) {
-				if (this.context.contextData[descriptor.key] === descriptor.value) {
-						
-					var command = this.context.instantiateDescriptor(descriptor.commandDescriptor);
-					if (command instanceof Command)
-						command.execute().then(function() {
-							self.next();
-						});
-					else
-						command.start().then(function() {
-							self.next();
-					});
-				} else {
-					this.next();
-				}
+			var locals = {};
+			if(descriptor.services) {
+				
+				angular.forEach(descriptor.services.split(','), function(service, key){
+					locals[service] = injector.get(service);
+				});
 			}
-			if (descriptor instanceof ServiceLinkDescriptor) {
-								
-				var service = injector.get(descriptor.service);
-				if (service[descriptor.property] === descriptor.value) {
-						
-					var command = this.context.instantiateDescriptor(descriptor.commandDescriptor);
-					if (command instanceof Command)
-						command.execute().then(function() {
-							self.next();
-						});
-					else
-						command.start().then(function() {
-							self.next();
+			var result = parse(descriptor.expresion)(this.context.contextData,locals);
+			if(typeof result != 'boolean')
+				throw new Error('Result from expresion :' + descriptor.expresion + ' is not boolean');
+			if(result){
+
+				var command = this.context.instantiateDescriptor(descriptor.commandDescriptor);
+				if (command instanceof Command)
+					command.execute().then(function() {
+						self.next();
 					});
-				} else {
-					this.next();
-				}
+				else
+					command.start().then(function() {
+						self.next();
+				});
+			} else {
+				this.next();
 			}
+			
 		};
+
 		this.next = function() {
 
 			if (++currentIndex == this.descriptors.length) {
@@ -689,10 +660,11 @@
 		);
 	//------------------------------------------------------------------------------------------------------------------
 	angular.module('commangular')
-		.run(['$rootScope','$commangular','$injector','$q',function($rootScope,$commangular,$injector,$q) {
+		.run(['$rootScope','$commangular','$injector','$q','$parse',function($rootScope,$commangular,$injector,$q,$parse) {
 			
 			injector = $injector;
 			q = $q;
+			parse = $parse; 
 			angular.forEach(aspects,function(aspect){
 							
 				while((result = aspect.matcher.exec(commandNameString)) != null) {

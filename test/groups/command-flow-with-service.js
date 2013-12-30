@@ -73,7 +73,7 @@ describe("Command Flow link to service execution testing", function() {
 		provider.mapTo(eventName).asSequence()
 			.add('Command1')
 			.add(provider.asFlow()
-				.serviceLink('UserDomainModel','username','monkey').to('Command2'));
+				.link("UserDomainModel.username == 'monkey'",'UserDomainModel').to('Command2'));
 			
 
 		spyOn(injector, 'instantiate').andCallThrough();
@@ -125,7 +125,7 @@ describe("Command Flow link to service execution testing", function() {
 			.asSequence()
 				.add('Command1')
 				.add(provider.asFlow()
-					.serviceLink('UserDomainModel','username','notMonkey').to('Command2'));
+					.link("UserDomainModel.username == 'notMonkey'",'UserDomainModel').to('Command2'));
 			
 
 		spyOn(injector, 'instantiate').andCallThrough();

@@ -74,7 +74,7 @@ describe("Command Flow execution testing", function() {
 		provider.mapTo(eventName).asSequence()
 			.add('Command1')
 			.add(provider.asFlow()
-				.resultLink('result1',true).to('Command2'));
+				.link('result1 == true').to('Command2'));
 			
 
 		spyOn(injector, 'instantiate').andCallThrough();
@@ -125,7 +125,7 @@ describe("Command Flow execution testing", function() {
 		provider.mapTo(eventName).asSequence()
 			.add('Command1')
 			.add(provider.asFlow()
-				.resultLink('result1',true).to('Command2'));
+				.link('result1 == true').to('Command2'));
 			
 
 		spyOn(injector, 'instantiate').andCallThrough();

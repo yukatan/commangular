@@ -1,6 +1,6 @@
 {
   "name": "commangular",
-  "version": "0.7.1",
+  "version": "0.8.0",
   "main": "./dist/commangular.min.js",
   "description": "Command pattern implementation for AngularJS",
   "repository": {

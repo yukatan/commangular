@@ -98,8 +98,8 @@ describe("Command Flow With Numbers execution testing", function() {
 			.asSequence()
 				.add('Command1')
 				.add(provider.asFlow()
-					.resultLink('result1',2).to('Command2')
-					.resultLink('result1',3).to('Command3'));
+					.link('result1 == 2').to('Command2')
+					.link('result1 == 3').to('Command3'));
 				
 	
 		runs(function() {
@@ -148,8 +148,8 @@ describe("Command Flow With Numbers execution testing", function() {
 			.asSequence()
 				.add('Command1')
 				.add(provider.asFlow()
-					.resultLink('lastResult',2).to('Command2')
-					.resultLink('lastResult',3).to('Command3'));
+					.link('lastResult == 2').to('Command2')
+					.link('lastResult == 3').to('Command3'));
 	
 		runs(function() {
 

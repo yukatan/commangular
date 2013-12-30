@@ -87,7 +87,7 @@ describe("Flow To Sequence execution testing", function() {
 			.asSequence()
 				.add('Command1')
 				.add(provider.asFlow()
-						.resultLink('result1',true).to(
+						.link('result1 == true').to(
 							provider.asSequence()
 								.add('Command2')
 								.add('Command3')));
