@@ -422,6 +422,8 @@ The execution of Command1 returns a promise. Command2 won't wait for this promis
 
 ###<a name="building-command-flows"></a>Building command flows
 
+*If you are using version >= 0.8.0 read [here](#flow-break)*
+
 A command flow is a decision point inside the command group.You can have any number of flows inside a command group and nesting them how you perfer.
 
 ```javascript
@@ -452,7 +454,43 @@ $commangularProvider.mapTo('FlowsEvent')
       .resultLink('result1',true).to(sequence)
    // Link to parallel   
       .serviceLink('userModel','isAdmin',true).to(parallel)
-      .resultLink('result1',false).to(otherFlow)); 
+      .resultLink('result1',false).to(otherFlow));
+```
+
+####<a name="flow-break"></a> *Breaking change from v0.8.0*
+
+From version 0.8.0 the command flow creation has changed. Now it is more powerfull using the angular $parse service agains the command context. You can create flows now like in the example below.
+
+```javascript
+var sequence = $commangularProvider.asSequence().add('Seq1Command').add('Seq2Command');
+var parallel = $commangularProvider.asParallel().add('Par1Command').add('Par2Command');
+var otherFlow = $commangularProvider.asFlow().link('userModel.logged == true','userModel').to('UserLoggedCommand');
+
+$commangularProvider.mapTo('FlowsEvent')
+   .add('Command1') // returns "result1"
+   .add($commangularProvider.asFlow()
+   // Link to sequence
+      .link('result1 == true').to(sequence)
+   // Link to parallel   
+      .link("userModel.isAdmin == true",'userModel').to(parallel)
+      .link('result1 == false').to(otherFlow));
+```
+
+As you can see, there is only a "link" function to create flows. The first parameter is the expresion to be evaluated, it must return a result of type boolean. You can use any resultKey existing in the command context and 'lastResult' key. If you want to use some angular service in the expresion yo need to indicate what services are used in the second parameter of the function link in a comma separate style.
+
+```javascript
+
+link(expresion,services);
+
+//Examples
+
+//Using the result from the last command
+$commangularProvider.asFlow().link("lastResult == 5").to('EqualTo5Command');
+
+//Using two angular services "models"
+$commangularProvider.asFlow()
+  .link("UserModel.isAdmind == true && UserProfile.firstLogin == true",'UserModel,UserProfile')
+    .to('FirstAdminLoginCommand');
 ```
 
 ###<a name="nesting-commands"></a>Nesting commands
