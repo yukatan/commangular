@@ -340,6 +340,9 @@ label[for='toggle-all'] {
 	left: 0;
 }
 
+a:hover {
+	cursor: hand;
+}
 #filters li {
 	display: inline;
 }
