@@ -29,6 +29,7 @@ angular.module('todomvc').config(function($commangularProvider) {
 		.add('SaveStorageCommand');
 
 	//Close editing and save
+	//If the todo has an empty title, the todo will be removed.
 	$commangularProvider.mapTo('DoneEditing').asSequence()
 		.add('DoneEditingCommand')
 		.add($commangularProvider.asFlow()
