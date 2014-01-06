@@ -1,12 +1,8 @@
 describe("Injection from preceding command whit promise result test", function() {
 
 	var provider;
-	var dispatcher;
-	var scope;
-	var injector;
-	var eventName = 'TestEvent';
 	var resultInjected;
-	var timeout;
+	var $timeout;
 
 	beforeEach(function() {
 		
@@ -15,24 +11,24 @@ describe("Injection from preceding command whit promise result test", function()
 
 			return {
 
-				execute: function($log, $timeout, $q) {
+				execute: function($timeout, $q) {
 
 					var deferred = $q.defer()
 					$timeout(function() {
 						deferred.resolve(25);
 					}, 500);
-					$log.log('logging');
 					return deferred.promise;
 				}
 			};
 		},{resultKey:'result1'});
-		commangular.create('Command2', function() {
+
+		commangular.create('Command2', function($timeout) {
 
 			return {
 
-				execute: function(result1, $log) {
-
-					$log.log(result1);
+				execute: function(result1) {
+										
+					console.log('TRALALALA');
 					resultInjected = result1;
 				}
 			};
@@ -46,61 +42,24 @@ describe("Injection from preceding command whit promise result test", function()
 			provider = $commangularProvider;
 
 		});
-		inject(function($commangular, $rootScope, $injector, $timeout) {
+		inject(function(_$timeout_) {
 
-			dispatcher = $commangular;
-			scope = $rootScope;
-			injector = $injector;
-			timeout = $timeout
+			$timeout = _$timeout_;
 		});
-	});
-
-	it('provider should be defined', function() {
-
-		expect(provider).toBeDefined();
-	});
-
-	it('dispatcher should be defined', function() {
-
-		expect(dispatcher).toBeDefined();
-	});
-
-	it('injector should be defined', function() {
-
-		expect(injector).toBeDefined();
 	});
 
 	it('command should be executed and resultInjected has to be 25', function() {
 
-		var commandComplete = false;
-		provider.mapTo(eventName).asSequence().add('Command1').add('Command2');
-		spyOn(injector, 'instantiate').andCallThrough();
-		spyOn(injector, 'invoke').andCallThrough();
-		runs(function() {
+		provider.mapTo('TestEvent').asSequence().add('Command1').add('Command2');
+						
+		dispatch({event:'TestEvent'},function(exc) {
 
-			scope.$apply(function() {
-
-				dispatcher.dispatch(eventName).then(function(){
-					commandComplete = true;
-				});
-			});
-
+			/*expect(resultInjected).toBe(25);
+			expect(exc.resultKey('result1')).toBe(25);
+			expect(exc.canceled()).toBe(false);
+			expect(exc.commandExecuted('Command2')).toBe(true);*/
 		});
-
-		waitsFor(function() {
-			
-			timeout.flush();
-			return commandComplete;
-
-		}, 'The command should be executed', 1000)
-
-
-		runs(function() {
-
-			expect(injector.instantiate).toHaveBeenCalled();
-			expect(injector.invoke).toHaveBeenCalled();
-			expect(resultInjected).toBe(25)
-		})
+		$timeout.flush();
 	});
 
 

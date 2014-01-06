@@ -12,9 +12,8 @@ describe("Command execution testing", function() {
 
 			return {
 
-				execute: function($log) {
+				execute: function() {
 
-					$log.log('logging from commandObject');
 					return 45;
 				}
 			};
@@ -26,7 +25,7 @@ describe("Command execution testing", function() {
 		module('commangular', function($commangularProvider) {
 
 			provider = $commangularProvider;
-			provider.mapTo(eventName).asSequence().add('Command1');
+			
 
 		});
 		inject(function($rootScope) {
@@ -43,6 +42,7 @@ describe("Command execution testing", function() {
 
 	it('Context data has to contain the result key', function() {
 
+		provider.mapTo(eventName).asSequence().add('Command1');
 		var commandComplete = false;
 		runs(function() {
 

@@ -202,6 +202,7 @@
 
 			var self = this;
 			var context = this.context;
+			context.setCurrentCommand(this.command);
 			var result;					
 			var deferExecution = q.defer();
 			deferExecution.resolve();
@@ -232,16 +233,14 @@
 					return context.intercept('After',interceptors);
 				})
 				.then(function(){
-					if(context.currentCommand.hasOwnProperty('onResult'))
-						context.currentCommand.onResult(result);
+					context.exeOnResult(result);
 				},function(error) {
 					var deferred = q.defer();
 					if(context.canceled){
 						deferred.reject(error);
 						return deferred.promise;
 					}
-					if(context.currentCommand && context.currentCommand.hasOwnProperty('onError'))
-						context.currentCommand.onError(error);
+					context.exeOnError(error);
 					context.getContextData().lastError = error;
 					context.intercept('AfterThrowing',interceptors).then(function(){
 						deferred.reject(error)
@@ -404,25 +403,56 @@
 	function CommandContext(data) {
 
 		this.contextData = data || {};
-		this.instantiator = new CommandInstantiator();
 		this.contextData.commandModel = {};
 		this.currentDeferred;
 		this.currentCommand;
+		this.currentCommandInstance;
 		this.canceled = false;
 	}
 
 	CommandContext.prototype.instantiateDescriptor = function(descriptor) {
 
-		var command = this.instantiator.instantiate(descriptor, this);
-		return command;
+		switch (descriptor.commandType) {
+
+			case 'S':
+				return new CommandSequence(this, descriptor.descriptors);
+			case 'P':
+				return new CommandParallel(this, descriptor.descriptors);
+			case 'E':
+				return new Command(descriptor.command, this, descriptor.commandConfig,descriptor.interceptors);
+			case 'F':
+				return new CommandFlow(this, descriptor.descriptors);
+		}
 	};
 
 	CommandContext.prototype.instantiate = function(funct,isCommand) {
 
-		instance = injector.instantiate(funct,this.contextData);
-		if(isCommand) this.currentCommand = instance;
+		var instance = injector.instantiate(funct,this.contextData);
+		if(isCommand) this.currentCommandInstance = instance;
 		return instance;
-	}
+	};
+
+	CommandContext.prototype.hasCommandInstance = function() {
+
+		return this.currentCommandInstance != undefined;
+	};
+	CommandContext.prototype.setCurrentCommand = function(command) {
+
+		return this.currentCommand = command;
+	};
+
+
+	CommandContext.prototype.exeOnResult = function(result) {
+
+		if(this.currentCommandInstance && this.currentCommandInstance.hasOwnProperty('onResult'))
+			this.currentCommandInstance.onResult(result);
+	};
+
+	CommandContext.prototype.exeOnError = function(error) {
+
+		if(this.currentCommandInstance && this.currentCommandInstance.hasOwnProperty('onError'))
+			this.currentCommandInstance.onError(error);
+	};
 
 	CommandContext.prototype.processResults = function(result,config) {
 
@@ -445,9 +475,9 @@
 		return deferred.promise;
 	};
 
-	CommandContext.prototype.invoke = function(theFunction, self) {
-
-		return injector.invoke(theFunction,self,this.contextData);
+	CommandContext.prototype.invoke = function(func, self) {
+				
+		return injector.invoke(func,self,this.contextData);
 	};
 	
 	CommandContext.prototype.getContextData = function(resultKey) {
@@ -502,24 +532,6 @@
 		return deferred.promise;
 	};
 	//----------------------------------------------------------------------------------------------------------------------
-
-	function CommandInstantiator() {};
-
-	CommandInstantiator.prototype.instantiate = function(descriptor,context) {
-
-		switch (descriptor.commandType) {
-
-			case 'S':
-				return new CommandSequence(context, descriptor.descriptors);
-			case 'P':
-				return new CommandParallel(context, descriptor.descriptors);
-			case 'E':
-				return new Command(descriptor.command, context, descriptor.commandConfig,descriptor.interceptors);
-			case 'F':
-				return new CommandFlow(context, descriptor.descriptors);
-		}
-	};
-	//----------------------------------------------------------------------------------------------------------------------
 	function InterceptorProcessor(context,deferred) {
 
 		this.deferred = deferred;
@@ -569,8 +581,7 @@
 		.provider('$commangular', function() {
 						
 			return {
-				$get: ['commandExecutor',
-					function(commandExecutor) {
+				$get: ['commandExecutor',function(commandExecutor) {
 						
 						return {
 							dispatch: function(eventName, data) {
@@ -589,7 +600,7 @@
 					eventNameString = eventNameString.concat("%" + eventName + "%{" + eventName + "}\n");
 					var descriptor = new CommandDescriptor();
 					descriptors[eventName] = descriptor;
-					return descriptor
+					return descriptor;
 				},
 
 				asSequence : function() {
@@ -608,10 +619,6 @@
 				findCommand: function(eventName) {
 
 					return descriptors[eventName];
-				},
-				modelBinding : function(eventName,serviceName,resultKey) {
-
-					
 				}
 			};
 		});
@@ -622,8 +629,9 @@
 				return {
 					
 					execute: function(eventName, data) {
+						var self = this;
 						var deferred = q.defer();
-						var context = new CommandContext(data);
+						var context = self.createContext(data);
 						var command = context.instantiateDescriptor(descriptors[eventName]);
 						var interceptors = eventInterceptors[eventName].interceptors;
 						deferred.resolve();
@@ -631,15 +639,16 @@
 														
 							return context.intercept('Before',interceptors);
 						}).then(function() {
-
+							
 							return command.start();
 						}).then(function(){
 
 							return context.intercept('After',interceptors);	
 						}).then(function() {
 							
-							return context.contextData;
+							return self.returnData(context);
 						},function(error){
+							console.log(error && error.message);
 							var defer = q.defer();
 							context.intercept('AfterThrowing',interceptors).then(function(){
 								defer.reject(error);
@@ -648,6 +657,14 @@
 						});
 						
 					},
+					createContext: function(contextData) {
+						
+						return new CommandContext(contextData);
+					},
+					returnData : function(context) {
+
+						return context.contextData;
+					}
 				};
 			}
 		);

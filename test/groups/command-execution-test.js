@@ -1,11 +1,8 @@
 describe("Command execution testing", function() {
 
 	var provider;
-	var dispatcher;
-	var scope;
-	var injector;
-	var eventName = 'TestEvent';
-	
+	var $injector;
+		
 	beforeEach(function() {
 
 		commangular.reset();
@@ -28,11 +25,9 @@ describe("Command execution testing", function() {
 			provider = $commangularProvider;
 
 		});
-		inject(function($commangular, $rootScope, $injector) {
+		inject(function(_$injector_){
 
-			dispatcher = $commangular;
-			scope = $rootScope;
-			injector = $injector;
+			$injector = _$injector_;
 		});
 	});
 
@@ -41,81 +36,33 @@ describe("Command execution testing", function() {
 		expect(provider).toBeDefined();
 	});
 
-	it('dispatcher should be defined', function() {
-
-		expect(dispatcher).toBeDefined();
-	});
-
 	it('injector should be defined', function() {
 
-		expect(injector).toBeDefined();
+		expect($injector).toBeDefined();
 	});
 
 	it('command should be executed', function() {
 
-		var commandComplete = false;
-		provider.mapTo(eventName).asSequence().add('Command1');
-		spyOn(injector, 'instantiate').andCallThrough();
-		spyOn(injector, 'invoke').andCallThrough();
-		runs(function() {
+		provider.mapTo('TestEvent').asSequence().add('Command1');
+		spyOn($injector, 'instantiate').andCallThrough();
+		spyOn($injector, 'invoke').andCallThrough();
+		dispatch({event:'TestEvent'},function(){
 
-			scope.$apply(function() {
-
-				dispatcher.dispatch(eventName).then(function(){
-					commandComplete = true;
-				});
-			});
-
+			expect($injector.instantiate).toHaveBeenCalled();
+			expect($injector.invoke).toHaveBeenCalled();
 		});
-
-		waitsFor(function() {
-
-			return commandComplete;
-
-		}, 'The command should be executed', 1000)
-
-
-		runs(function() {
-			
-			expect(injector.instantiate).toHaveBeenCalled();
-			expect(injector.invoke).toHaveBeenCalled();
-		})
 	});
 
 	it('command.execute method should be called', function() {
 
 		var commandComplete = false;
-		var command = {
-
-			execute: function() {
-							
-			}
-		};
-
-		provider.mapTo(eventName).asSequence().add('Command1');
-		spyOn(injector, 'instantiate').andReturn(command);
+		var command = {execute: function(){}};
+		provider.mapTo('TestEvent').asSequence().add('Command1');
+		spyOn($injector, 'instantiate').andReturn(command);
 		spyOn(command, 'execute').andCallThrough();
-		runs(function() {
+		dispatch({event:'TestEvent'},function(){
 
-			scope.$apply(function() {
-
-				dispatcher.dispatch(eventName).then(function(){
-					commandComplete = true;
-				});
-			});
-
-		});
-
-		waitsFor(function() {
-
-			return commandComplete;
-
-		}, 'The command should be executed', 1000)
-
-
-		runs(function() {
-			
 			expect(command.execute).toHaveBeenCalled();
-		})
+		});
 	});
 });
