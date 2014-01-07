@@ -54,8 +54,8 @@ describe("Injection from preceding command whit promise result test", function()
 						
 		dispatch({event:'TestEvent'},function(exc) {
 
-			/*expect(resultInjected).toBe(25);
-			expect(exc.resultKey('result1')).toBe(25);
+			expect(resultInjected).toBe(25);
+			/*expect(exc.resultKey('result1')).toBe(25);
 			expect(exc.canceled()).toBe(false);
 			expect(exc.commandExecuted('Command2')).toBe(true);*/
 		});

@@ -1,7 +1,6 @@
 describe("On result handler test", function() {
 
 	var provider;
-	var scope;
 	var eventName = 'TestEvent';
 	var executeMethodExecuted = false;
 	var onResultMethodExecuted = false;
@@ -37,44 +36,18 @@ describe("On result handler test", function() {
 			provider = $commangularProvider;
 
 		});
-		inject(function($rootScope) {
-
-			scope = $rootScope;
-		});
-	});
-
-	it('provider should be defined', function() {
-
-		expect(provider).toBeDefined();
+		inject(); 
 	});
 
 	it('command should be executed', function() {
 
-		var commandComplete = false;
+		
 		provider.mapTo(eventName).asSequence().add('Command1');
-		runs(function() {
+		dispatch({event:eventName},function() {
 
-			scope.$apply(function() {
-
-				scope.dispatch(eventName).then(function(){
-					commandComplete = true;
-				});
-			});
-
-		});
-
-		waitsFor(function() {
-
-			return commandComplete;
-
-		}, 'The command should be executed', 1000)
-
-
-		runs(function() {
-			
 			expect(executeMethodExecuted).toBe(true);
 			expect(onResultMethodExecuted).toBe(true);
-		})
+		});
 	});
 
 	

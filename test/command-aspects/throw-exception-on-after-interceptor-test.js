@@ -1,7 +1,6 @@
 describe("Throw exception on after interception testing", function() {
 
 	var provider;
-	var scope;
 	var interceptorExecutedBefore = false;
 	var afterThrowingExecuted = false;
 	var commandExecutedBefore = false;
@@ -68,33 +67,12 @@ describe("Throw exception on after interception testing", function() {
 
 	it("should execute the interceptor before the command", function() {
 	
-		var complete = false;
 		provider.mapTo('BeforeTestEvent').asSequence().add('com.test1.Command1');
-
-		runs(function() {
-
-			scope.$apply(function(){
-
-				scope.dispatch('BeforeTestEvent').then(function(){
-
-					complete = true;
-				},function(){complete=true});
-			});
-		});
-
-		waitsFor(function() {
-
-			return complete;
-		});
-		
-		runs(function() {
+		dispatch({event:'BeforeTestEvent'},function(){
 
 			expect(interceptorExecutedBefore).toBe(false);
 			expect(commandExecutedBefore).toBe(true);
 			expect(afterThrowingExecuted).toBe(true);
-
 		});
-
 	});
-	
 });

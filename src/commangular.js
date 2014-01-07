@@ -107,6 +107,7 @@
 		this.command = null;
 		this.commandConfig;
 		this.interceptors;
+		this.commandName;
 	}
 
 	CommandDescriptor.prototype.asSequence = function() {
@@ -143,6 +144,7 @@
 		commandDescriptor.command = command.function;
 		commandDescriptor.commandConfig = command.config;
 		commandDescriptor.interceptors = command.interceptors;
+		commandDescriptor.commandName = command.commandName;
 		this.descriptors.push(commandDescriptor);
 		return this;
 	};
@@ -178,6 +180,7 @@
 		commandDescriptor.command = command.function;
 		commandDescriptor.commandConfig = command.config;
 		commandDescriptor.interceptors = command.interceptors;
+		commandDescriptor.commandName = command.commandName;
 		this.commandDescriptor = commandDescriptor;
 		return this.parent;
 	}; 
@@ -195,14 +198,11 @@
 
 		CommandBase.apply(this, [context]);
 		this.command = command;
-		this.commandConfig = config;
-		this.interceptors = interceptors;
-		
+						
 		this.execute = function() {
 
 			var self = this;
-			var context = this.context;
-			context.setCurrentCommand(this.command);
+			context.setCurrentCommand(command);
 			var result;					
 			var deferExecution = q.defer();
 			deferExecution.resolve();
@@ -216,7 +216,7 @@
 						if(interceptors['Around']) 
 							result = context.intercept('Around',interceptors,self.command);
 						else {
-							command = context.instantiate(self.command,true);
+							command = context.instantiate(command,true);
 							result = context.invoke(command.execute, command);
 						}
 						context.processResults(result,config).then(function(){
@@ -276,8 +276,8 @@
 
 		this.execute = function() {
 			var self = this;
-			var commandDescriptor = this.descriptors[currentIndex];
-			var command = this.context.instantiateDescriptor(commandDescriptor);
+			var commandDescriptor = descriptors[currentIndex];
+			var command = context.instantiateDescriptor(commandDescriptor);
 
 			if (command instanceof Command) {
 				command.execute().then(
@@ -299,7 +299,7 @@
 		};
 		this.nextCommand = function() {
 
-			if (++currentIndex == this.descriptors.length) {
+			if (++currentIndex == descriptors.length) {
 
 				this.deferred.resolve();
 				return;
@@ -318,11 +318,8 @@
 		this.execute = function() {
 
 			var self = this;
-			for (var x = 0; x < this.descriptors.length; x++) {
-
-				var commandDescriptor = this.descriptors[x];
-				var command = this.context.instantiateDescriptor(commandDescriptor);
-
+			angular.forEach(descriptors,function(descriptor) {
+				var command = context.instantiateDescriptor(descriptor);
 				if (command instanceof Command)
 					command.execute().then(
 						function() {
@@ -339,11 +336,11 @@
 						function(error) {
 							self.deferred.reject(error);
 						});
-			}
+			});
 		};
 		this.checkComplete = function() {
 
-			if (++totalComplete == this.descriptors.length)
+			if (++totalComplete == descriptors.length)
 				this.deferred.resolve();
 		};
 	}
@@ -358,7 +355,7 @@
 		this.execute = function() {
 
 			var self = this;
-			var descriptor = this.descriptors[currentIndex];
+			var descriptor = descriptors[currentIndex];
 			var locals = {};
 			if(descriptor.services) {
 				
@@ -366,12 +363,12 @@
 					locals[service] = injector.get(service);
 				});
 			}
-			var result = parse(descriptor.expresion)(this.context.contextData,locals);
+			var result = parse(descriptor.expresion)(context.contextData,locals);
 			if(typeof result != 'boolean')
 				throw new Error('Result from expresion :' + descriptor.expresion + ' is not boolean');
 			if(result){
 
-				var command = this.context.instantiateDescriptor(descriptor.commandDescriptor);
+				var command = context.instantiateDescriptor(descriptor.commandDescriptor);
 				if (command instanceof Command)
 					command.execute().then(function() {
 						self.next();
@@ -388,7 +385,7 @@
 
 		this.next = function() {
 
-			if (++currentIndex == this.descriptors.length) {
+			if (++currentIndex == descriptors.length) {
 
 				this.deferred.resolve();
 				return;
@@ -408,6 +405,16 @@
 		this.currentCommand;
 		this.currentCommandInstance;
 		this.canceled = false;
+
+		function processDescriptor(descriptor) {
+
+			
+		}
+
+		this.start = function() {
+
+			this.p
+		}
 	}
 
 	CommandContext.prototype.instantiateDescriptor = function(descriptor) {
@@ -431,16 +438,11 @@
 		if(isCommand) this.currentCommandInstance = instance;
 		return instance;
 	};
-
-	CommandContext.prototype.hasCommandInstance = function() {
-
-		return this.currentCommandInstance != undefined;
-	};
+	
 	CommandContext.prototype.setCurrentCommand = function(command) {
 
 		return this.currentCommand = command;
 	};
-
 
 	CommandContext.prototype.exeOnResult = function(result) {
 
@@ -624,7 +626,7 @@
 		});
 	//-----------------------------------------------------------------------------------------------------------------
 	angular.module('commangular')
-		.service('commandExecutor',function() {
+		.service('commandExecutor',['$exceptionHandler',function($exceptionHandler) {
 
 				return {
 					
@@ -648,7 +650,6 @@
 							
 							return self.returnData(context);
 						},function(error){
-							console.log(error && error.message);
 							var defer = q.defer();
 							context.intercept('AfterThrowing',interceptors).then(function(){
 								defer.reject(error);
@@ -667,7 +668,7 @@
 					}
 				};
 			}
-		);
+		]);
 	//------------------------------------------------------------------------------------------------------------------
 	angular.module('commangular')
 		.run(['$rootScope','$commangular','$injector','$q','$parse',function($rootScope,$commangular,$injector,$q,$parse) {

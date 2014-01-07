@@ -55,7 +55,6 @@ describe("Command execution testing", function() {
 
 	it('command.execute method should be called', function() {
 
-		var commandComplete = false;
 		var command = {execute: function(){}};
 		provider.mapTo('TestEvent').asSequence().add('Command1');
 		spyOn($injector, 'instantiate').andReturn(command);

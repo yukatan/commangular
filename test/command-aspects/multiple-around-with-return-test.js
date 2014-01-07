@@ -1,7 +1,6 @@
 describe("Multiple @Around with return execution testing", function() {
 
 	var provider;
-	var scope;
 	var timeout;
 	var interceptor1Executed = false;
 	var interceptor2Executed = false;
@@ -31,7 +30,6 @@ describe("Multiple @Around with return execution testing", function() {
 					return promise;
 				}
 			}
-			
 		},1);
 
 		commangular.aspect('@Around(/com\.test1\.Command1/)', function(processor,$timeout){
@@ -49,13 +47,9 @@ describe("Multiple @Around with return execution testing", function() {
 						interceptor2Executed = true;
 						return 25;
 					});
-
-					
 				}
 			}
-			
 		},2);
-				
 
 		commangular.create('com.test1.Command1',function($timeout){
 
@@ -63,8 +57,8 @@ describe("Multiple @Around with return execution testing", function() {
 
 				execute : function() {
 										
-						commandExecuted = true;
-						return 50;
+					commandExecuted = true;
+					return 50;
 				}
 			};
 		},{resultKey:'result1'});
@@ -75,13 +69,10 @@ describe("Multiple @Around with return execution testing", function() {
 
 				execute : function() {
 										
-						expect(result1).toBe(10);
+					expect(result1).toBe(10);
 				}
 			};
 		});
-
-		
-		
 	});
 
 	beforeEach(function() {
@@ -89,10 +80,7 @@ describe("Multiple @Around with return execution testing", function() {
 		module('commangular', function($commangularProvider) {
 			provider = $commangularProvider;
 		});
-		inject(function($rootScope,$timeout) {
-			scope = $rootScope;
-			timeout = $timeout;
-		});
+		inject();
 	});
 
 	it("provider should be defined", function() {
@@ -101,33 +89,13 @@ describe("Multiple @Around with return execution testing", function() {
 	});
 
 	it("should execute the interceptor before the command", function() {
-	
-		var complete = false;
-		provider.mapTo('AroundTestEvent').asSequence().add('com.test1.Command1').add('com.test1.Command2');
-
-		runs(function() {
-
-			scope.$apply(function(){
-
-				scope.dispatch('AroundTestEvent').then(function(){
-
-					complete = true;
-				});
-			});
-		});
-
-		waitsFor(function() {
-
-			//timeout.flush();
-			return complete;
-		});
 		
-		runs(function() {
+		provider.mapTo('AroundTestEvent').asSequence().add('com.test1.Command1').add('com.test1.Command2');
+		dispatch({event:'AroundTestEvent'},function(){
 
 			expect(interceptor1Executed).toBe(true);
 			expect(commandExecuted).toBe(true);
 			expect(interceptor2Executed).toBe(true);
 		});
 	});
-
 });

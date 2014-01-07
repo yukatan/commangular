@@ -1,7 +1,6 @@
 describe("Multiple @Before execution testing", function() {
 
 	var provider;
-	var scope;
 	var interceptor1Executed = false;
 	var interceptor2Executed = false;
 	var commandExecutedAfter = false;
@@ -71,9 +70,7 @@ describe("Multiple @Before execution testing", function() {
 		module('commangular', function($commangularProvider) {
 			provider = $commangularProvider;
 		});
-		inject(function($rootScope) {
-			scope = $rootScope;
-		});
+		inject();
 	});
 
 	it("provider should be defined", function() {
@@ -83,34 +80,12 @@ describe("Multiple @Before execution testing", function() {
 
 	it("should execute the interceptor before the command", function() {
 	
-		var complete = false;
 		provider.mapTo('BeforeTestEvent').asSequence().add('com.test1.Command1').add('com.test2.Command2');
-
-		runs(function() {
-
-			scope.$apply(function(){
-
-				scope.dispatch('BeforeTestEvent').then(function(){
-
-					complete = true;
-				});
-			});
-		});
-
-		waitsFor(function() {
-
-			return complete;
-		},500);
-		
-		runs(function() {
+		dispatch({event:'BeforeTestEvent'},function(){
 
 			expect(interceptor1Executed).toBe(true);
 			expect(interceptor2Executed).toBe(true);
 			expect(commandExecutedAfter).toBe(true);
-
 		});
-
 	});
-	
-	
 });

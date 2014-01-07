@@ -1,9 +1,7 @@
 describe("EventAspect execution testing", function() {
 
 	var provider;
-	var dispatcher;
-	var scope;
-
+	
 	var beforeInterceptorExecuted = false;
 	var commandExecuted = false;
 	var afterInterceptorExecuted = false;
@@ -80,75 +78,25 @@ describe("EventAspect execution testing", function() {
 			provider.mapTo('TestEvent').asSequence().add('Command1');
 			provider.mapTo('TestEvent2').asSequence().add('Command2');
 		});
-		inject(function($commangular,$rootScope) {
-
-			dispatcher = $commangular;
-			scope = $rootScope;
-		});
-	});
-
-	it("provider should be defined", function() {	var afterThrowingInterceptorExecuted = false;
-
-
-		expect(provider).toBeDefined();
+		inject();
 	});
 
 	it("should execute the interceptor before the command", function() {
 		
-		var complete = false;
-		
-		runs(function() {
-
-			scope.$apply(function () {
-
-					dispatcher.dispatch('TestEvent').then(function() {
-					complete = true;
-				});
-			});
-		});
-
-		waitsFor(function () {
-
-			return complete;
-		},'The interceptor should be executed and then the command',1000);
-
-		runs(function() {
+		dispatch({event:'TestEvent'},function() {
 
 			expect(commandExecuted).toBe(true);
 			expect(beforeInterceptorExecuted).toBe(true);
 			expect(afterInterceptorExecuted).toBe(true);
-		});
-
-
-
+		});	
 	});
 
 	it("should execute the interceptor before the command", function() {
-		
-		var complete = false;
-		
-		runs(function() {
-
-			scope.$apply(function () {
-
-					dispatcher.dispatch('TestEvent2').then(function() {},function(){
-					complete = true;
-				});
-			});
-		});
-
-		waitsFor(function () {
-
-			return complete;
-		},'The interceptor should be executed and then the command',1000);
-
-		runs(function() {
+						
+		dispatch({event:'TestEvent2'},function() {
 
 			expect(afterThrowingInterceptorExecuted).toBe(true);
-		});
-
-
-
+		});	
 	});
 
 });

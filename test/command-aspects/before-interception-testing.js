@@ -1,7 +1,6 @@
-describe("Aspect execution testing", function() {
+describe("Before interception testing", function() {
 
 	var provider;
-	var scope;
 	var interceptorExecutedBefore = false;
 	var commandExecutedAfter = false;
 
@@ -91,9 +90,7 @@ describe("Aspect execution testing", function() {
 		module('commangular', function($commangularProvider) {
 			provider = $commangularProvider;
 		});
-		inject(function($rootScope) {
-			scope = $rootScope;
-		});
+		inject();
 	});
 
 	it("provider should be defined", function() {
@@ -103,76 +100,32 @@ describe("Aspect execution testing", function() {
 
 	it("should execute the interceptor before the command", function() {
 	
-		var complete = false;
 		provider.mapTo('BeforeTestEvent').asSequence().add('com.test1.Command1');
-
-		runs(function() {
-
-			scope.$apply(function(){
-
-				scope.dispatch('BeforeTestEvent').then(function(){
-
-					complete = true;
-				});
-			});
-		});
-
-		waitsFor(function() {
-
-			return complete;
-		});
-		
-		runs(function() {
+		dispatch({event:'BeforeTestEvent'},function(){
 
 			expect(interceptorExecutedBefore).toBe(true);
 			expect(commandExecutedAfter).toBe(true);
-
 		});
-
 	});
 	
 	it("The interceptor should update the data passed to the command", function() {
 	
-		var complete = false;
 		provider.mapTo('BeforeTestEvent').asSequence().add('com.test2.Command2');
-
-		runs(function() {
-
-			scope.$apply(function(){
-
-				scope.dispatch('BeforeTestEvent',{username:'userName',password:'fuckingpassword'}).then(function(){
-
-					complete = true;
-				});
-			});
-		});
-
-		waitsFor(function() {
-
-			return complete;
-		});
-		
-		runs(function() {
+		dispatch({event:'BeforeTestEvent',data:{username:'userName',password:'fuckingpassword'}},function(){
 
 			expect(interceptorExecutedBefore).toBe(true);
 			expect(commandExecutedAfter).toBe(true);
-
 		});
-
 	});
 
 	it("The command execution has to be canceled", function() {
 	
 		var complete = false;
 		provider.mapTo('BeforeTestEvent').asSequence().add('com.test3.Command3');
-		
-		scope.$apply(function(){
+		dispatch({event:'BeforeTestEvent'},function(){
 
-			scope.dispatch('BeforeTestEvent').then(function(){
-
-				complete = true;
-			});
+			expect(interceptorExecutedBefore).toBe(true);
+			expect(commandExecutedAfter).toBe(true);
 		});
-
 	});
 });

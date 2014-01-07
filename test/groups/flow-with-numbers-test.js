@@ -1,23 +1,18 @@
 describe("Command Flow With Numbers execution testing", function() {
 
 	var provider;
-	var dispatcher;
-	var scope;
-	var injector;
 	var eventName = 'TestEvent';
 	var endValue = 0;
 	
 	beforeEach(function() {
-		
-		command2Executed = false;
+				
 		commangular.reset();
 		commangular.create('Command1', function() {
 
 			return {
 
-				execute: function($log) {
-
-					$log.log('logging');
+				execute: function() {
+					
 					return 2;
 				}
 			};
@@ -27,9 +22,8 @@ describe("Command Flow With Numbers execution testing", function() {
 
 			return {
 
-				execute: function($log) {
-
-					$log.log('logging');
+				execute: function() {
+					
 					endValue = 2;
 				}
 			};
@@ -39,9 +33,8 @@ describe("Command Flow With Numbers execution testing", function() {
 
 			return {
 
-				execute: function($log) {
-
-					$log.log('logging');
+				execute: function() {
+					
 					endValue = 3;
 				}
 			};
@@ -55,33 +48,12 @@ describe("Command Flow With Numbers execution testing", function() {
 			provider = $commangularProvider;
 
 		});
-		inject(function($commangular, $rootScope, $injector) {
-
-			dispatcher = $commangular;
-			scope = $rootScope;
-			injector = $injector;
-		});
-	});
-
-	it('provider should be defined', function() {
-
-		expect(provider).toBeDefined();
-	});
-
-	it('dispatcher should be defined', function() {
-
-		expect(dispatcher).toBeDefined();
-	});
-
-	it('injector should be defined', function() {
-
-		expect(injector).toBeDefined();
+		inject();
 	});
 
 	it('endValue should be 2', function() {
 		
-		var commandComplete = false;
-		
+				
 		commangular.create('Command1', function() {
 
 			return {
@@ -101,31 +73,10 @@ describe("Command Flow With Numbers execution testing", function() {
 					.link('result1 == 2').to('Command2')
 					.link('result1 == 3').to('Command3'));
 				
-	
-		runs(function() {
+		dispatch({event:eventName},function(){
 
-			scope.$apply(function() {
-
-				dispatcher.dispatch(eventName).then(function(){
-					
-					commandComplete = true;
-				});
-			});
-
-		});
-
-		waitsFor(function() {
-
-			return commandComplete;
-
-		}, 'The command should be executed', 1000)
-
-
-		runs(function() {
-						
 			expect(endValue).toBe(2);
-			
-		})
+		});
 	});
 
 	it('endValue should be 3', function() {
@@ -151,33 +102,9 @@ describe("Command Flow With Numbers execution testing", function() {
 					.link('lastResult == 2').to('Command2')
 					.link('lastResult == 3').to('Command3'));
 	
-		runs(function() {
+		dispatch({event:eventName},function(){
 
-			scope.$apply(function() {
-
-				dispatcher.dispatch(eventName).then(function(){
-					
-					commandComplete = true;
-				});
-			});
-
-		});
-
-		waitsFor(function() {
-
-			return commandComplete;
-
-		}, 'The command should be executed', 1000)
-
-
-		runs(function() {
-						
 			expect(endValue).toBe(3);
-			
-		})
+		});
 	});
-
-	
-
-
 });

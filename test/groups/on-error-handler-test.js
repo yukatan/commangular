@@ -1,7 +1,6 @@
 describe("On error handler test", function() {
 
 	var provider;
-	var scope;
 	var eventName = 'TestEvent';
 	var executeMethodExecuted = false;
 	var onErrorMethodExecuted = false;
@@ -37,44 +36,17 @@ describe("On error handler test", function() {
 			provider = $commangularProvider;
 
 		});
-		inject(function($rootScope) {
-
-			scope = $rootScope;
-		});
+		inject(); 
 	});
 
-	it('provider should be defined', function() {
+	it('OnError callback should be executed', function() {
 
-		expect(provider).toBeDefined();
-	});
-
-	it('command should be executed', function() {
-
-		var commandComplete = false;
 		provider.mapTo(eventName).asSequence().add('Command1');
-		runs(function() {
+		dispatch({event:eventName},function(){
 
-			scope.$apply(function() {
-
-				scope.dispatch(eventName).then(function(){},function(){
-					commandComplete = true;
-				});
-			});
-
-		});
-
-		waitsFor(function() {
-
-			return commandComplete;
-
-		}, 'The command should be executed', 1000)
-
-
-		runs(function() {
-			
 			expect(executeMethodExecuted).toBe(false);
 			expect(onErrorMethodExecuted).toBe(true);
-		})
+		});
 	});
 
 	

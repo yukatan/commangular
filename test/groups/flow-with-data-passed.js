@@ -1,9 +1,6 @@
 describe("Command Flow With Data passed test", function() {
 
 	var provider;
-	var dispatcher;
-	var scope;
-	var injector;
 	var eventName = 'TestEvent';
 	var endValue = 0;
 	
@@ -16,9 +13,8 @@ describe("Command Flow With Data passed test", function() {
 
 			return {
 
-				execute: function($log) {
-
-					$log.log('logging');
+				execute: function() {
+					
 					endValue = 1;
 				}
 			};
@@ -28,9 +24,8 @@ describe("Command Flow With Data passed test", function() {
 
 			return {
 
-				execute: function($log) {
-
-					$log.log('logging');
+				execute: function() {
+					
 					endValue = 2;
 				}
 			};
@@ -44,68 +39,23 @@ describe("Command Flow With Data passed test", function() {
 			provider = $commangularProvider;
 
 		});
-		inject(function($commangular, $rootScope, $injector) {
-
-			dispatcher = $commangular;
-			scope = $rootScope;
-			injector = $injector;
-		});
-	});
-
-	it('provider should be defined', function() {
-
-		expect(provider).toBeDefined();
-	});
-
-	it('dispatcher should be defined', function() {
-
-		expect(dispatcher).toBeDefined();
-	});
-
-	it('injector should be defined', function() {
-
-		expect(injector).toBeDefined();
+		inject();
 	});
 
 	it('endValue should be 1', function() {
-		
-		var commandComplete = false;
 		
 		provider.mapTo(eventName)
 			.asFlow()
 				.link('data1 == 2').to('Command1')
 				.link('data1 == 3').to('Command2');
-				
-	
-		runs(function() {
+		
+		dispatch({event:eventName,data:{data1:2}},function(){
 
-			scope.$apply(function() {
-
-				dispatcher.dispatch(eventName,{data1:2}).then(function(){
-					
-					commandComplete = true;
-				});
-			});
-
-		});
-
-		waitsFor(function() {
-
-			return commandComplete;
-
-		}, 'The command should be executed', 1000)
-
-
-		runs(function() {
-						
 			expect(endValue).toBe(1);
-			
-		})
+		});		
 	});
 
 	it('endValue should be 3', function() {
-		
-		var commandComplete = false;
 		
 		commangular.create('Command1', function() {
 
@@ -124,34 +74,9 @@ describe("Command Flow With Data passed test", function() {
 				.link('data1 == 2').to('Command1')
 				.link('data1 == 3').to('Command2');
 				
-	
-		runs(function() {
+		dispatch({event:eventName,data:{data1:3}},function(){
 
-			scope.$apply(function() {
-
-				dispatcher.dispatch(eventName,{data1:3}).then(function(){
-					
-					commandComplete = true;
-				});
-			});
-
-		});
-
-		waitsFor(function() {
-
-			return commandComplete;
-
-		}, 'The command should be executed', 1000)
-
-
-		runs(function() {
-						
 			expect(endValue).toBe(2);
-			
-		})
+		});		
 	});
-
-	
-
-
 });

@@ -1,7 +1,6 @@
 describe("@Around cancelation testing", function() {
 
 	var provider;
-	var scope;
 	var interceptorExecutedBefore = false;
 	var commandExecuted = false;
 
@@ -34,9 +33,6 @@ describe("@Around cancelation testing", function() {
 				}
 			};
 		});
-
-		
-		
 	});
 
 	beforeEach(function() {
@@ -44,9 +40,7 @@ describe("@Around cancelation testing", function() {
 		module('commangular', function($commangularProvider) {
 			provider = $commangularProvider;
 		});
-		inject(function($rootScope) {
-			scope = $rootScope;
-		});
+		inject();
 	});
 
 	it("provider should be defined", function() {
@@ -54,35 +48,14 @@ describe("@Around cancelation testing", function() {
 		expect(provider).toBeDefined();
 	});
 
-	it("should execute the interceptor before the command", function() {
+	it("should execute the interceptor around the command", function() {
 	
-		var complete = false;
 		provider.mapTo('AroundTestEvent').asSequence().add('com.test1.Command1');
 
-		runs(function() {
-
-			scope.$apply(function(){
-
-				scope.dispatch('AroundTestEvent').then(function(){
-
-					complete = true;
-				},function(){
-
-					complete = true;
-				});
-			});
-		});
-
-		waitsFor(function() {
-
-			return complete;
-		},1000);
-		
-		runs(function() {
+		dispatch({event:'AroundTestEvent'},function() {
 
 			expect(interceptorExecutedBefore).toBe(true);
 			expect(commandExecuted).toBe(false);
 		});
 	});
-
 });

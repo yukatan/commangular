@@ -1,7 +1,6 @@
 describe("Custom resolver test", function() {
 
 	var provider;
-	var scope;
 	var commandExecuted = false;
 
 	beforeEach(function() {
@@ -25,7 +24,7 @@ describe("Custom resolver test", function() {
 						return 50;
 				}
 			};
-		});
+		},{resultKey:'result'});
 		
 	
 	});
@@ -35,45 +34,16 @@ describe("Custom resolver test", function() {
 		module('commangular', function($commangularProvider) {
 			provider = $commangularProvider;
 		});
-		inject(function($rootScope) {
-			scope = $rootScope;
-		});
+		inject();
 	});
-
-	it("provider should be defined", function() {
-
-		expect(provider).toBeDefined();
-	});
-
-	it("should execute the interceptor before the command", function() {
+	//TODO: Add more expectations to test result returned
+	it("The resolver should be executed", function() {
 	
-		var complete = false;
 		provider.mapTo('CustomResolverEvent').asSequence().add('com.exec.Command1');
 
-		runs(function() {
+		dispatch({event:'CustomResolverEvent'},function() {
 
-			scope.$apply(function(){
-
-				scope.dispatch('CustomResolverEvent').then(function(){
-
-					complete = true;
-				});
-			});
-		});
-
-		waitsFor(function() {
-
-			return complete;
-		});
-		
-		runs(function() {
-			
 			expect(commandExecuted).toBe(true);
-
-		});
-
+		})
 	});
-	
-	
-	
 });

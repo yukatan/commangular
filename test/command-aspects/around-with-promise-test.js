@@ -17,11 +17,12 @@ describe("@Around with promise testing", function() {
 				execute:function() {
 
 					expect(commandExecuted).toBe(false)
-					processor.invoke().then(function(){
+					var promise = processor.invoke().then(function(){
 						expect(commandExecuted).toBe(true);
 						interceptorExecutedBefore = true;
 					});
 					expect(commandExecuted).toBe(false);
+					return promise;
 				}
 			}
 		});
@@ -52,8 +53,7 @@ describe("@Around with promise testing", function() {
 		module('commangular', function($commangularProvider) {
 			provider = $commangularProvider;
 		});
-		inject(function($rootScope,$timeout) {
-			scope = $rootScope;
+		inject(function($timeout) {
 			timeout = $timeout;
 		});
 	});
@@ -63,33 +63,14 @@ describe("@Around with promise testing", function() {
 		expect(provider).toBeDefined();
 	});
 
-	it("should execute the interceptor before the command", function() {
+	it("should execute the interceptor around the command and works with promises", function() {
 	
-		var complete = false;
 		provider.mapTo('AroundTestEvent').asSequence().add('com.test1.Command1');
-
-		runs(function() {
-
-			scope.$apply(function(){
-
-				scope.dispatch('AroundTestEvent').then(function(){
-
-					complete = true;
-				});
-			});
-		});
-
-		waitsFor(function() {
-
-			timeout.flush();
-			return complete;
-		});
-		
-		runs(function() {
+		dispatch({event:'AroundTestEvent'},function() {
 
 			expect(interceptorExecutedBefore).toBe(true);
 			expect(commandExecuted).toBe(true);
 		});
+		timeout.flush();
 	});
-
 });

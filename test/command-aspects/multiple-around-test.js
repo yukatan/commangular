@@ -1,7 +1,6 @@
 describe("Multiple @Around execution testing", function() {
 
 	var provider;
-	var scope;
 	var interceptor1Executed = false;
 	var interceptor2Executed = false;
 	var commandExecuted = false;
@@ -43,7 +42,6 @@ describe("Multiple @Around execution testing", function() {
 			}
 			
 		},2);
-				
 
 		commangular.create('com.test1.Command1',function(){
 
@@ -55,9 +53,6 @@ describe("Multiple @Around execution testing", function() {
 				}
 			};
 		});
-
-		
-		
 	});
 
 	beforeEach(function() {
@@ -65,9 +60,7 @@ describe("Multiple @Around execution testing", function() {
 		module('commangular', function($commangularProvider) {
 			provider = $commangularProvider;
 		});
-		inject(function($rootScope) {
-			scope = $rootScope;
-		});
+		inject();
 	});
 
 	it("provider should be defined", function() {
@@ -77,31 +70,12 @@ describe("Multiple @Around execution testing", function() {
 
 	it("should execute the interceptor before the command", function() {
 	
-		var complete = false;
 		provider.mapTo('AroundTestEvent').asSequence().add('com.test1.Command1');
-
-		runs(function() {
-
-			scope.$apply(function(){
-
-				scope.dispatch('AroundTestEvent').then(function(){
-
-					complete = true;
-				});
-			});
-		});
-
-		waitsFor(function() {
-
-			return complete;
-		});
-		
-		runs(function() {
+		dispatch({event:'AroundTestEvent'},function(){
 
 			expect(interceptor1Executed).toBe(true);
 			expect(commandExecuted).toBe(true);
 			expect(interceptor2Executed).toBe(true);
 		});
 	});
-
 });

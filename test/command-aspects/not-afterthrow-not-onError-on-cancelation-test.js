@@ -1,7 +1,6 @@
 describe("Aspect execution testing", function() {
 
 	var provider;
-	var scope;
 	var interceptorExecuted = false;
 	var afterThrowingExecuted = false;
 	var onErrorExecuted = false;
@@ -61,9 +60,7 @@ describe("Aspect execution testing", function() {
 		module('commangular', function($commangularProvider) {
 			provider = $commangularProvider;
 		});
-		inject(function($rootScope) {
-			scope = $rootScope;
-		});
+		inject();
 	});
 
 	it("provider should be defined", function() {
@@ -73,33 +70,12 @@ describe("Aspect execution testing", function() {
 
 	it("should execute the interceptor before the command", function() {
 	
-		var complete = false;
 		provider.mapTo('BeforeTestEvent').asSequence().add('com.test1.Command1');
-
-		runs(function() {
-
-			scope.$apply(function(){
-
-				scope.dispatch('BeforeTestEvent').then(function(){
-
-					complete = true;
-				},function(){complete=true});
-			});
-		});
-
-		waitsFor(function() {
-
-			return complete;
-		});
-		
-		runs(function() {
+		dispatch({event:'BeforeTestEvent'},function(){
 
 			expect(interceptorExecuted).toBe(true);
 			expect(commandExecuted).toBe(false);
 			expect(afterThrowingExecuted).toBe(false);
-
 		});
-
 	});
-	
 });

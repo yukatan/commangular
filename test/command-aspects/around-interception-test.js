@@ -23,7 +23,6 @@ describe("@Around execution testing", function() {
 			}
 			
 		});
-				
 
 		commangular.create('com.test1.Command1',function(){
 
@@ -35,8 +34,6 @@ describe("@Around execution testing", function() {
 				}
 			};
 		});
-
-		
 		
 	});
 
@@ -45,9 +42,7 @@ describe("@Around execution testing", function() {
 		module('commangular', function($commangularProvider) {
 			provider = $commangularProvider;
 		});
-		inject(function($rootScope) {
-			scope = $rootScope;
-		});
+		inject();
 	});
 
 	it("provider should be defined", function() {
@@ -55,32 +50,14 @@ describe("@Around execution testing", function() {
 		expect(provider).toBeDefined();
 	});
 
-	it("should execute the interceptor before the command", function() {
+	it("should execute the interceptor around the command", function() {
 	
-		var complete = false;
 		provider.mapTo('AroundTestEvent').asSequence().add('com.test1.Command1');
 
-		runs(function() {
-
-			scope.$apply(function(){
-
-				scope.dispatch('AroundTestEvent').then(function(){
-
-					complete = true;
-				});
-			});
-		});
-
-		waitsFor(function() {
-
-			return complete;
-		});
-		
-		runs(function() {
+		dispatch({event:'AroundTestEvent'},function() {
 
 			expect(interceptorExecutedBefore).toBe(true);
 			expect(commandExecuted).toBe(true);
 		});
 	});
-
 });

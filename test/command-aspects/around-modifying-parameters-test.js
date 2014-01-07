@@ -1,8 +1,7 @@
 describe("@Around with promise testing", function() {
 
 	var provider;
-	var scope;
-	var timeout;
+	var $timeout;
 	var interceptorExecutedBefore = false;
 	var commandExecuted = false;
 
@@ -19,11 +18,10 @@ describe("@Around with promise testing", function() {
 					expect(data).toBe('monkey');
 					processor.setData('data','updatedMonkey');
 					expect(commandExecuted).toBe(false)
-					processor.invoke().then(function(){
-						expect(commandExecuted).toBe(true);
-						interceptorExecutedBefore = true;
-					});
+					var promise = processor.invoke();
+					interceptorExecutedBefore = true;
 					expect(commandExecuted).toBe(false);
+					return promise;
 				}
 			}
 			
@@ -38,12 +36,10 @@ describe("@Around with promise testing", function() {
 				execute : function() {
 									
 					expect(data).toBe('updatedMonkey');
-					var deferred = $q.defer();
-					$timeout(function(){
+					return $timeout(function(){
 						commandExecuted = true;
-						deferred.resolve("Resolved");
-					},1000);
-					return deferred.promise;
+					},2000);
+					
 				}
 			};
 		});
@@ -57,9 +53,9 @@ describe("@Around with promise testing", function() {
 		module('commangular', function($commangularProvider) {
 			provider = $commangularProvider;
 		});
-		inject(function($rootScope,$timeout) {
-			scope = $rootScope;
-			timeout = $timeout;
+		inject(function(_$timeout_) {
+			
+			$timeout = _$timeout_;
 		});
 	});
 
@@ -68,33 +64,15 @@ describe("@Around with promise testing", function() {
 		expect(provider).toBeDefined();
 	});
 
-	it("should execute the interceptor before the command", function() {
+	it("should execute the interceptor around the command and change some data with the processor", function() {
 	
-		var complete = false;
 		provider.mapTo('AroundTestEvent').asSequence().add('com.test1.Command1');
-
-		runs(function() {
-
-			scope.$apply(function(){
-
-				scope.dispatch('AroundTestEvent',{data:'monkey'}).then(function(){
-
-					complete = true;
-				});
-			});
-		});
-
-		waitsFor(function() {
-
-			timeout.flush();
-			return complete;
-		});
-		
-		runs(function() {
+		dispatch({event:'AroundTestEvent',data:{data:'monkey'}},function() {
 
 			expect(interceptorExecutedBefore).toBe(true);
 			expect(commandExecuted).toBe(true);
 		});
+		$timeout.flush();
 	});
 
 });
