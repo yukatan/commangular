@@ -1,3 +1,5 @@
+"use strict";
+
 describe("Command Flow With Data passed test", function() {
 
 	var provider;
@@ -6,9 +8,7 @@ describe("Command Flow With Data passed test", function() {
 	
 	beforeEach(function() {
 		
-		command2Executed = false;
 		commangular.reset();
-		
 		commangular.create('Command1', function() {
 
 			return {

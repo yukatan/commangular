@@ -1,3 +1,5 @@
+"use strict";
+
 describe("Passing data to commands test", function() {
 
 	var provider;

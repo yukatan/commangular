@@ -1,7 +1,8 @@
+"use strict";
+
 describe("Command execution testing", function() {
 
 	var provider;
-	var scope;
 	var eventName = 'TestEvent';
 	
 	beforeEach(function() {
@@ -28,10 +29,7 @@ describe("Command execution testing", function() {
 			
 
 		});
-		inject(function($rootScope) {
-
-			scope = $rootScope;
-		});
+		inject();
 	});
 
 	it('provider should be defined', function() {
@@ -44,29 +42,12 @@ describe("Command execution testing", function() {
 
 		provider.mapTo(eventName).asSequence().add('Command1');
 		var commandComplete = false;
-		runs(function() {
+		
+		dispatch({event:eventName},function(exc) {
 
-			scope.$apply(function() {
-
-				scope.dispatch(eventName).then(function(result){
-					expect(result.resultKeyTest).toBe(45);
-					commandComplete = true;
-				});
-			});
-
+			expect(exc.resultKey('resultKeyTest')).toBe(45);
 		});
-
-		waitsFor(function() {
-
-			return commandComplete;
-
-		}, 'The command should be executed', 1000)
-
-
-		runs(function() {
-			
-			
-		})
+		
 	});
 	
 });

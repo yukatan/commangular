@@ -1,3 +1,5 @@
+"use strict";
+
 describe("Multiple After execution testing", function() {
 
 	var provider;

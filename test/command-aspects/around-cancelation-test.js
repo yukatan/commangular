@@ -1,3 +1,5 @@
+"use strict";
+
 describe("@Around cancelation testing", function() {
 
 	var provider;

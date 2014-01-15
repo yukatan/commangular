@@ -1,3 +1,5 @@
+"use strict";
+
 describe("Before event aspect execution testing", function() {
 
 	var provider;

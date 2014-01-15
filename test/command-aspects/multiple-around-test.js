@@ -1,3 +1,5 @@
+"use strict";
+
 describe("Multiple @Around execution testing", function() {
 
 	var provider;
@@ -68,7 +70,7 @@ describe("Multiple @Around execution testing", function() {
 		expect(provider).toBeDefined();
 	});
 
-	it("should execute the interceptor before the command", function() {
+	it("should execute intercepted around by two interceptors", function() {
 	
 		provider.mapTo('AroundTestEvent').asSequence().add('com.test1.Command1');
 		dispatch({event:'AroundTestEvent'},function(){

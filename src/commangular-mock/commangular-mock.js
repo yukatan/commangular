@@ -1,3 +1,4 @@
+"use strict";
 
 (function(window, angular, undefined) {
 
@@ -52,62 +53,74 @@
 	}
 
 	function ContextProxy(context,excInfo) {
+		
 		this.context = context;
 		this.contextData = context.contextData;
 		this.excInfo = excInfo;
 		this.currentDescriptor;
 		
 		this.invoke = function(func,self) {
-			if(context.currentCommandInstance && context.currentCommandInstance.execute === func){
-				excInfo.exeChain = excInfo.exeChain || [];
-				excInfo.exeChain.push({name:this.currentDescriptor.commandName});
-			}
+			
 			return context.invoke(func,self);
 		}
 
-		this.instantiateDescriptor = function(descriptor) {
+		this.processSequence = function(descriptor) {
 
-			this.currentDescriptor = descriptor;
-			return context.instantiateDescriptor.call(this,descriptor);
+			return context.processSequence.call(this,descriptor);
 		}
 
+		this.processParallel = function(descriptor) {
+
+			return context.processParallel.call(this,descriptor);
+		}
+
+		this.processFlow = function(descriptor) {
+
+			return context.processFlow.call(this,descriptor);
+		}
+
+		this.processCommand = function(descriptor) {
+
+			this.excInfo.exeChain = this.excInfo.exeChain || (this.excInfo.exeChain = []);
+			this.excInfo.exeChain.push({name:descriptor.command.commandName});
+			return context.processCommand.call(this,descriptor);
+		}
+
+		this.processDescriptor = function(descriptor) {
+
+			return context.processDescriptor.call(this,descriptor);
+		}
+		
 		this.instantiate = function(funct,isCommand) {
 
-			return context.instantiate(funct,isCommand);
+			return context.instantiate.call(this,funct,isCommand);
 		}
 
 		this.processResults = function(result,config) {
 
-			return context.processResults(result,config);
+			return context.processResults.call(this,result,config);
 		}
 		
 	
 		this.intercept = function(poincut,interceptors,command) {
 			
-			return context.intercept(poincut,interceptors,command);
+			return context.intercept.call(this,poincut,interceptors,command);
 		}
 
 		this.getContextData = function(resultKey) {
 
-			return context.getContextData(resultKey);
+			return context.getContextData.call(this,resultKey);
 		}
 
 		this.exeOnResult = function(result) {
 
-			context.exeOnResult(result);
+			context.exeOnResult.call(this,result);
 		}
 
 		this.exeOnError = function(error) {
 
-			context.exeOnError(error);
+			context.exeOnError.call(this,error);
 		}
-
-		this.setCurrentCommand = function(command) {
-
-			context.currentCommand = command;
-		}
-
-	
 	}
 
 		
@@ -116,13 +129,13 @@
 		commangularProvider = $commangularProvider;
 		$provide.decorator('commandExecutor',function($delegate){
 						
-			/*var createContext = $delegate.createContext;
+			var createContext = $delegate.createContext;
 
 			$delegate.createContext = function(data) {
 								
 				proxy = new ContextProxy(createContext(data),{initData:angular.copy(data),contextData:data});
 				return proxy;
-			}*/
+			}
 			return $delegate;
 		});
 	});
@@ -139,8 +152,7 @@
       	});
 
 		afterEach(function(){
-			
-			currentCommandInfo = null;
+						
 		});
 
 		window.dispatch = commangular.mock.dispatch = function(ec,callback) {
@@ -150,7 +162,6 @@
 
 			if(ec.command){
 				ec.event = randomEventName();
-				console.log(ec.event);
 				commangularProvider.mapTo(ec.event).asSequence().add(ec.command);
 			}
 			scope = currentSpect.$injector.get('$rootScope');
@@ -158,4 +169,4 @@
 		};  
 	}
 
-})(window,angular);
+})(window,window.angular);

@@ -1,8 +1,8 @@
+"use strict";
+
 describe("Command Sequence execution testing", function() {
 
 	var provider;
-	var scope;
-	var injector;
 	var eventName = 'TestEvent';
 	var testValue;
 
@@ -39,23 +39,15 @@ describe("Command Sequence execution testing", function() {
 			provider = $commangularProvider;
 
 		});
-		inject(function($rootScope, $injector) {
-
-			scope = $rootScope;
-			injector = $injector;
-		});
+		inject();
 	});
 
 	it('testValue should be 26', function() {
 
 		provider.mapTo(eventName).asSequence().add('Command1').add('Command2');
-		spyOn(injector, 'instantiate').andCallThrough();
-		spyOn(injector, 'invoke').andCallThrough();
-		
+				
 		dispatch({event:eventName},function() {
 
-			expect(injector.instantiate).toHaveBeenCalled();
-			expect(injector.invoke).toHaveBeenCalled();
 			expect(testValue).toBe(26);
 		});
 	});

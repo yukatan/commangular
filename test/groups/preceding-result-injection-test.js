@@ -1,3 +1,5 @@
+"use strict";
+
 describe("Injection from preceding command result test", function() {
 
 	var provider;
@@ -11,9 +13,8 @@ describe("Injection from preceding command result test", function() {
 
 			return {
 
-				execute: function($log) {
-
-					$log.log('logging');
+				execute: function() {
+					
 					return 25;
 
 				}
@@ -24,9 +25,8 @@ describe("Injection from preceding command result test", function() {
 
 			return {
 
-				execute: function(commandResult, $log) {
-
-					$log.log(commandResult);
+				execute: function(commandResult) {
+					
 					resultInjected = commandResult;
 
 
@@ -42,10 +42,7 @@ describe("Injection from preceding command result test", function() {
 			provider = $commangularProvider;
 
 		});
-		inject(function($commangular, $rootScope, $injector) {
-
-			injector = $injector;
-		});
+		inject();
 	});
 
 	it('command should be executed and resultInjected has to be 25', function() {

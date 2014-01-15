@@ -1,3 +1,5 @@
+"use strict";
+
 describe("Multiple @Before execution testing", function() {
 
 	var provider;

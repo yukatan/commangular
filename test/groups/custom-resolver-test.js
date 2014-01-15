@@ -1,3 +1,5 @@
+"use strict";
+
 describe("Custom resolver test", function() {
 
 	var provider;

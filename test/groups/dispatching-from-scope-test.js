@@ -1,7 +1,8 @@
+"use strict";
+
 describe("Dispatching from scope test", function() {
 
 	var provider;
-	var scope;
 	var injector;
 	var eventName = 'TestEvent';
 	
@@ -37,9 +38,8 @@ describe("Dispatching from scope test", function() {
 			provider = $commangularProvider;
 
 		});
-		inject(function($rootScope, $injector) {
+		inject(function($injector) {
 	
-			scope = $rootScope;
 			injector = $injector;
 		});
 	});
@@ -54,7 +54,9 @@ describe("Dispatching from scope test", function() {
 		expect(injector).toBeDefined();
 	});
 
-	it('command should be executed', function() {
+	//TODO:Use commangular mocks
+
+	/*it('command should be executed', function() {
 		
 		provider.mapTo(eventName).asSequence().add('Command1').add('Command2');
 		spyOn(injector, 'instantiate').andCallThrough();
@@ -84,5 +86,5 @@ describe("Dispatching from scope test", function() {
 			expect(command.execute).toHaveBeenCalled();
 			expect(command.execute.callCount).toBe(2);
 		});
-	});
+	});*/
 });

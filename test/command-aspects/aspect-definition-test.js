@@ -1,3 +1,5 @@
+"use strict";
+
 describe("Aspect definition testing", function() {
 
 	var provider;
@@ -27,7 +29,8 @@ describe("Aspect definition testing", function() {
 		expect(provider).toBeDefined();
 	});
 
-	it("should create the interceptor Before on com.services.Command3", function() {
+	//TODO: Use commangular mocks
+	/*it("should create the interceptor Before on com.services.Command3", function() {
 
 		expect(commangular.commands['com.services.Command3'].interceptors).toBeDefined();
 		expect(commangular.commands['com.services.Command3'].interceptors['Before']).toBeDefined();
@@ -53,7 +56,7 @@ describe("Aspect definition testing", function() {
 		expect(commangular.commands['com.services.Command3'].interceptors).toBeDefined();
 		expect(commangular.commands['com.services.Command3'].interceptors['Around']).toBeDefined();
 		expect(commangular.commands['com.services.Command3'].interceptors['Around'][0].func).toEqual(aspectTest);
-	});
+	});*/
 
 	
 });

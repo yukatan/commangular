@@ -1,3 +1,5 @@
+"use strict";
+
 describe("Command parallel and sequence nested execution testing", function() {
 
 	var provider;
@@ -8,10 +10,6 @@ describe("Command parallel and sequence nested execution testing", function() {
 	
 	beforeEach(function() {
 
-		executed = false;
-		executed2 = false;
-		executed3 = false;
-		executed4 = false;
 		commangular.reset();
 		commangular.create('Command1', function() {
 

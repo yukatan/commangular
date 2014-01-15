@@ -1,3 +1,5 @@
+"use strict";
+
 describe("Command Flow With Numbers execution testing", function() {
 
 	var provider;
@@ -58,9 +60,8 @@ describe("Command Flow With Numbers execution testing", function() {
 
 			return {
 
-				execute: function($log) {
+				execute: function() {
 
-					$log.log('logging');
 					return 2;
 				}
 			};
@@ -87,9 +88,8 @@ describe("Command Flow With Numbers execution testing", function() {
 
 			return {
 
-				execute: function($log) {
-
-					$log.log('logging');
+				execute: function() {
+					
 					return 3;
 				}
 			};

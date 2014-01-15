@@ -1,6 +1,9 @@
+"use strict";
+
 describe("Testing decorator", function() {
 	
 	var $timeout = null;
+	var provider;
 
 	beforeEach(function() {
 		

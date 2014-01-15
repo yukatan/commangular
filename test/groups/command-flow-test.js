@@ -1,7 +1,8 @@
+"use strict";
+
 describe("Command Flow execution testing", function() {
 
 	var provider;
-	var injector;
 	var eventName = 'TestEvent';
 	var command2Executed = false;
 	
@@ -13,9 +14,8 @@ describe("Command Flow execution testing", function() {
 
 			return {
 
-				execute: function($log) {
+				execute: function() {
 
-					$log.log('logging');
 					command2Executed = true;
 				}
 			};
@@ -29,20 +29,12 @@ describe("Command Flow execution testing", function() {
 			provider = $commangularProvider;
 
 		});
-		inject(function($injector) {
-
-			injector = $injector;
-		});
+		inject();
 	});
 
 	it('provider should be defined', function() {
 
 		expect(provider).toBeDefined();
-	});
-
-	it('injector should be defined', function() {
-
-		expect(injector).toBeDefined();
 	});
 
 	it('command 2 should be executed', function() {
@@ -52,9 +44,8 @@ describe("Command Flow execution testing", function() {
 
 			return {
 
-				execute: function($log) {
+				execute: function() {
 
-					$log.log('logging');
 					return true;
 				}
 			};
@@ -67,13 +58,8 @@ describe("Command Flow execution testing", function() {
 			.add(provider.asFlow()
 				.link('result1 == true').to('Command2'));
 			
-
-		spyOn(injector, 'instantiate').andCallThrough();
-		spyOn(injector, 'invoke').andCallThrough();
 		dispatch({event:eventName},function() {
-
-			expect(injector.instantiate).toHaveBeenCalled();
-			expect(injector.invoke).toHaveBeenCalled();
+			
 			expect(command2Executed).toBe(true);
 		});
 	});
@@ -85,9 +71,8 @@ describe("Command Flow execution testing", function() {
 
 			return {
 
-				execute: function($log) {
+				execute: function() {
 
-					$log.log('logging');
 					return false;
 				}
 			};
@@ -99,14 +84,9 @@ describe("Command Flow execution testing", function() {
 			.add('Command1')
 			.add(provider.asFlow()
 				.link('result1 == true').to('Command2'));
-			
-
-		spyOn(injector, 'instantiate').andCallThrough();
-		spyOn(injector, 'invoke').andCallThrough();
+		
 		dispatch({event:eventName},function() {
 
-			expect(injector.instantiate).toHaveBeenCalled();
-			expect(injector.invoke).toHaveBeenCalled();
 			expect(command2Executed).toBe(false);
 		});
 	});

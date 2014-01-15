@@ -1,3 +1,5 @@
+"use strict";
+
 describe("Before interception testing", function() {
 
 	var provider;

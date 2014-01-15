@@ -1,3 +1,5 @@
+"use strict";
+
 describe("Command execution testing", function() {
 
 	var provider;
@@ -11,7 +13,6 @@ describe("Command execution testing", function() {
 
 	beforeEach(function() {
 
-		executed = false;
 		commangular.reset();
 		commangular.create('Command1', function($log, $rootScope) {
 

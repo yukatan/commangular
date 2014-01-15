@@ -1,3 +1,5 @@
+"use strict";
+
 describe("On result handler test", function() {
 
 	var provider;
@@ -12,9 +14,8 @@ describe("On result handler test", function() {
 
 			return {
 
-				execute: function($log) {
+				execute: function() {
 
-					$log.log('logging');
 					executeMethodExecuted = true;
 					return 25;
 				},

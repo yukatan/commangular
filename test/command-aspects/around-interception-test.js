@@ -1,3 +1,5 @@
+"use strict";
+
 describe("@Around execution testing", function() {
 
 	var provider;

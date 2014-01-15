@@ -1,3 +1,5 @@
+"use strict";
+
 describe("Aspect execution testing", function() {
 
 	var provider;
@@ -39,7 +41,6 @@ describe("Aspect execution testing", function() {
 
 				execute : function() {
 
-					console.log('After throwing running');
 					afterThrowingInterceptorExecutedAfterCommand = true;
 				}
 			}
@@ -90,7 +91,6 @@ describe("Aspect execution testing", function() {
 
 				execute : function() {
 					
-					console.log('Command running');
 					throw new Error("This is an error");
 				}
 			};
@@ -102,7 +102,6 @@ describe("Aspect execution testing", function() {
 
 				execute : function() {
 					
-					console.log('Command running');
 					throw new Error("This is an error");
 				}
 			};

@@ -1,3 +1,5 @@
+"use strict";
+
 describe("Aspect execution testing", function() {
 
 	var provider;
@@ -68,7 +70,7 @@ describe("Aspect execution testing", function() {
 		expect(provider).toBeDefined();
 	});
 
-	it("should execute the interceptor before the command", function() {
+	it("should cancel execution and AfterThrowing should not be executed", function() {
 	
 		provider.mapTo('BeforeTestEvent').asSequence().add('com.test1.Command1');
 		dispatch({event:'BeforeTestEvent'},function(){

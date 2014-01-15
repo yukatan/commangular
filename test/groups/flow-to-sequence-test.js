@@ -1,3 +1,5 @@
+"use strict";
+
 describe("Flow To Sequence execution testing", function() {
 
 	var provider;
@@ -13,9 +15,8 @@ describe("Flow To Sequence execution testing", function() {
 
 			return {
 
-				execute: function($log) {
+				execute: function() {
 
-					$log.log('logging');
 					return true;
 				}
 			};
@@ -25,9 +26,8 @@ describe("Flow To Sequence execution testing", function() {
 
 			return {
 
-				execute: function($log) {
+				execute: function() {
 
-					$log.log('logging');
 					command2Executed = true;
 				}
 			};

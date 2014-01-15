@@ -1,3 +1,5 @@
+"use strict";
+
 describe("Aspect @After execution testing", function() {
 
 	var provider;

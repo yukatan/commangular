@@ -1,3 +1,5 @@
+"use strict";
+
 describe("Multiple @Before execution testing", function() {
 
 	var provider;
@@ -69,9 +71,7 @@ describe("Multiple @Before execution testing", function() {
 		module('commangular', function($commangularProvider) {
 			provider = $commangularProvider;
 		});
-		inject(function($rootScope) {
-			scope = $rootScope;
-		});
+		inject();
 	});
 
 	it("provider should be defined", function() {
@@ -79,7 +79,7 @@ describe("Multiple @Before execution testing", function() {
 		expect(provider).toBeDefined();
 	});
 
-	it("should execute the interceptor before the command", function() {
+	it("should execute the interceptor and cancel the command group", function() {
 	
 		provider.mapTo('BeforeTestEvent').asSequence().add('com.test1.Command1').add('com.test2.Command2');
 		dispatch({event:'BeforeTestEvent'},function(){

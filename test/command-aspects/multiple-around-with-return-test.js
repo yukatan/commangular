@@ -1,3 +1,5 @@
+"use strict";
+
 describe("Multiple @Around with return execution testing", function() {
 
 	var provider;

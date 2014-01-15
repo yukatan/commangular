@@ -1,3 +1,5 @@
+"use strict";
+
 describe("Throw exception on after interception testing", function() {
 
 	var provider;
@@ -55,9 +57,7 @@ describe("Throw exception on after interception testing", function() {
 		module('commangular', function($commangularProvider) {
 			provider = $commangularProvider;
 		});
-		inject(function($rootScope) {
-			scope = $rootScope;
-		});
+		inject();
 	});
 
 	it("provider should be defined", function() {
@@ -65,7 +65,7 @@ describe("Throw exception on after interception testing", function() {
 		expect(provider).toBeDefined();
 	});
 
-	it("should execute the interceptor before the command", function() {
+	it("should execute the command and AfterThrowing should be executed", function() {
 	
 		provider.mapTo('BeforeTestEvent').asSequence().add('com.test1.Command1');
 		dispatch({event:'BeforeTestEvent'},function(){

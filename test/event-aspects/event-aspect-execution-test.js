@@ -1,3 +1,5 @@
+"use strict";
+
 describe("EventAspect execution testing", function() {
 
 	var provider;

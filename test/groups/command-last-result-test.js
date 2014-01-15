@@ -1,3 +1,5 @@
+"use strict";
+
 describe("Injection using lastResult test", function() {
 
 	var provider;
@@ -13,9 +15,8 @@ describe("Injection using lastResult test", function() {
 
 			return {
 
-				execute: function($log) {
-
-					$log.log('logging');
+				execute: function() {
+					
 					return 25;
 				}
 			};
@@ -25,9 +26,8 @@ describe("Injection using lastResult test", function() {
 
 			return {
 
-				execute: function(lastResult,$log) {
-
-					$log.log(lastResult);
+				execute: function(lastResult) {
+					
 					resultInjected = lastResult;
 				}
 			};
@@ -36,13 +36,12 @@ describe("Injection using lastResult test", function() {
 
 			return {
 
-				execute: function($log, $timeout, $q) {
+				execute: function($timeout, $q) {
 
 					var deferred = $q.defer()
 					$timeout(function() {
 						deferred.resolve(75);
 					}, 500);
-					$log.log('logging');
 					return deferred.promise;
 				}
 			};
@@ -56,9 +55,8 @@ describe("Injection using lastResult test", function() {
 			provider = $commangularProvider;
 
 		});
-		inject(function($injector,$timeout) {
+		inject(function($timeout) {
 
-			injector = $injector;
 			timeout = $timeout;
 		});
 	});
@@ -66,13 +64,9 @@ describe("Injection using lastResult test", function() {
 	it('command should be executed and result injected has to be 25', function() {
 
 		provider.mapTo(eventName).asSequence().add('Command1').add('Command2');
-		spyOn(injector, 'instantiate').andCallThrough();
-		spyOn(injector, 'invoke').andCallThrough();
-		
+			
 		dispatch({event:eventName},function() {
-
-			expect(injector.instantiate).toHaveBeenCalled();
-			expect(injector.invoke).toHaveBeenCalled();
+			
 			expect(resultInjected).toBe(25)
 		});
 	});
@@ -80,13 +74,9 @@ describe("Injection using lastResult test", function() {
 	it('command should work with promise resolution as well', function() {
 
 		provider.mapTo(eventName).asSequence().add('Command3').add('Command2');
-		spyOn(injector, 'instantiate').andCallThrough();
-		spyOn(injector, 'invoke').andCallThrough();
-		
+	
 		dispatch({event:eventName},function() {
-
-			expect(injector.instantiate).toHaveBeenCalled();
-			expect(injector.invoke).toHaveBeenCalled();
+			
 			expect(resultInjected).toBe(75);
 		});
 		timeout.flush();

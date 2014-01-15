@@ -1,3 +1,5 @@
+"use strict";
+
 describe("On error handler test", function() {
 
 	var provider;

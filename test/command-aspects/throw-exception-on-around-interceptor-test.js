@@ -1,3 +1,5 @@
+"use strict";
+
 describe("Throw exception on around interceptor testing", function() {
 
 	var provider;
@@ -65,7 +67,7 @@ describe("Throw exception on around interceptor testing", function() {
 		expect(provider).toBeDefined();
 	});
 
-	it("should execute the interceptor before the command", function() {
+	it("should execute the interceptor and AfterThrowing should be executed", function() {
 	
 		provider.mapTo('BeforeTestEvent').asSequence().add('com.test1.Command1');
 		dispatch({event:'BeforeTestEvent'},function(){

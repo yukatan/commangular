@@ -1,3 +1,5 @@
+"use strict";
+
 describe("@Around with promise testing", function() {
 
 	var provider;
