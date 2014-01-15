@@ -30,7 +30,6 @@ describe("Throw exception on after interception testing", function() {
 
 				execute : function() {
 
-					console.log('Mandril!!')
 					afterThrowingExecuted = true;
 				}
 			}
