@@ -402,10 +402,9 @@
 
 	AroundProcessor.prototype.invoke = function() {
 			
-		var self = this;
-		self.context.contextData.processor = self.next;
-		var instance = self.context.instantiate(self.executed,this.next == null);
-		return this.$q.when(self.context.invoke(instance.execute,instance))
+		this.context.contextData.processor = this.next;
+		var instance = this.context.instantiate(this.executed,this.next == null);
+		return this.$q.when(this.context.invoke(instance.execute,instance))
 	}
 		
 	//----------------------------------------------------------------------------------------------------------------------
