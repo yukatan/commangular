@@ -695,7 +695,7 @@
 
 <span class=c1>//We are using a regular expresion to match the Event(Any event that ends with &#39;Event&#39;).</span>
 <span class=c1>//The same way as command we can cancel the execution using the processor.</span>
-<span class=nx>commangular</span><span class=p>.</span><span class=nx>eventAspect</span><span class=p>(</span><span class=s1>&#39;@Before(/.*Event/)&#39;</span><span class=p>,[</span><span class=s1>&#39;processor&#39;</span><span class=p>,</span><span class=kd>function</span><span class=p>(</span><span class=nx>processor</span><span class=p>,</span><span class=nx>datapassedtocommand</span><span class=p>)</span> <span class=p>{</span>
+<span class=nx>commangular</span><span class=p>.</span><span class=nx>eventAspect</span><span class=p>(</span><span class=s1>&#39;@Before(/.*Event/)&#39;</span><span class=p>,[</span><span class=s1>&#39;processor&#39;</span><span class=p>,</span><span class=s1>&#39;datapassedtocommand&#39;</span><span class=p>,</span><span class=kd>function</span><span class=p>(</span><span class=nx>processor</span><span class=p>,</span><span class=nx>datapassedtocommand</span><span class=p>)</span> <span class=p>{</span>
 
   <span class=k>return</span> <span class=p>{</span>
 
@@ -710,7 +710,7 @@
 <span class=p>});</span>
 
 <span class=c1>//You can use any resultKey from all the command execution in an @After aspect</span>
-<span class=nx>commangular</span><span class=p>.</span><span class=nx>eventAspect</span><span class=p>(</span><span class=s1>&#39;@After(/.*Event/)&#39;</span><span class=p>,[</span><span class=s1>&#39;processor&#39;</span><span class=p>,</span><span class=kd>function</span><span class=p>(</span><span class=nx>processor</span><span class=p>,</span><span class=nx>anyresultkey</span><span class=p>)</span> <span class=p>{</span>
+<span class=nx>commangular</span><span class=p>.</span><span class=nx>eventAspect</span><span class=p>(</span><span class=s1>&#39;@After(/.*Event/)&#39;</span><span class=p>,[</span><span class=s1>&#39;processor&#39;</span><span class=p>,</span><span class=s1>&#39;anyresultkey&#39;</span><span class=p>,</span><span class=kd>function</span><span class=p>(</span><span class=nx>processor</span><span class=p>,</span><span class=nx>anyresultkey</span><span class=p>)</span> <span class=p>{</span>
 
   <span class=k>return</span> <span class=p>{</span>
 
