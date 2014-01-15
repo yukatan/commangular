@@ -14,7 +14,7 @@ Remember to add commangular.js after angular.js. Commangular only depends on ang
 //Add as a module dependency
 angular.module('YourApp',['commangular'])
 ```
-*Create a command using de commangular namespace*
+*Create a command using the commangular namespace*
 
 ``` javascript 
 //hello-world-command.js

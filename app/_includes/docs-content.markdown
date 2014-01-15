@@ -1082,7 +1082,7 @@ $commangularProvider.mapTo('TestEvent').asSequence().add('Command1');
 
 //We are using a regular expresion to match the Event(Any event that ends with 'Event').
 //The same way as command we can cancel the execution using the processor.
-commangular.eventAspect('@Before(/.*Event/)',['processor',function(processor,datapassedtocommand) {
+commangular.eventAspect('@Before(/.*Event/)',['processor','datapassedtocommand',function(processor,datapassedtocommand) {
   
   return {
      
@@ -1097,7 +1097,7 @@ commangular.eventAspect('@Before(/.*Event/)',['processor',function(processor,dat
 });
 
 //You can use any resultKey from all the command execution in an @After aspect
-commangular.eventAspect('@After(/.*Event/)',['processor',function(processor,anyresultkey) {
+commangular.eventAspect('@After(/.*Event/)',['processor','anyresultkey',function(processor,anyresultkey) {
   
   return {
      
