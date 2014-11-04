@@ -258,7 +258,7 @@
 					return self.intercept('After',descriptor.command.interceptors);
 				})
 				.then(function(){
-					self.exeOnResult(result);
+					self.exeOnResult(self.contextData.lastResult);
 				},function(error) {
 					var deferred = $q.defer();
 					if(self.canceled){

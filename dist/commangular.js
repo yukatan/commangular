@@ -1,6 +1,6 @@
 /**
  * Command pattern implementation for AngularJS
- * @version v0.8.0 - 2014-01-09
+ * @version v0.8.0 - 2014-11-04
  * @link https://github.com/yukatan/commangular
  * @author Jesús Barquín Cheda <yukatan@gmail.com>
  * @license MIT License, http://www.opensource.org/licenses/MIT
@@ -265,7 +265,7 @@
 					return self.intercept('After',descriptor.command.interceptors);
 				})
 				.then(function(){
-					self.exeOnResult(result);
+					self.exeOnResult(self.contextData.lastResult);
 				},function(error) {
 					var deferred = $q.defer();
 					if(self.canceled){
@@ -409,10 +409,9 @@
 
 	AroundProcessor.prototype.invoke = function() {
 			
-		var self = this;
-		self.context.contextData.processor = self.next;
-		var instance = self.context.instantiate(self.executed,this.next == null);
-		return this.$q.when(self.context.invoke(instance.execute,instance))
+		this.context.contextData.processor = this.next;
+		var instance = this.context.instantiate(this.executed,this.next == null);
+		return this.$q.when(this.context.invoke(instance.execute,instance))
 	}
 		
 	//----------------------------------------------------------------------------------------------------------------------
@@ -422,14 +421,13 @@
 			return {
 				$get: ['commandExecutor',function(commandExecutor) {
 						
-						return {
-							dispatch: function(eventName, data) {
+					return {
+						dispatch: function(eventName, data) {
 
-								return commandExecutor.execute(eventName, data);
-							}
+							return commandExecutor.execute(eventName, data);
 						}
 					}
-				],
+				}],
 		
 				mapTo: function(eventName) {
 
@@ -487,7 +485,6 @@
 							
 							return self.returnData(context);
 						},function(error){
-							console.log(error && error.message);
 							var def = $q.defer();
 							context.intercept('AfterThrowing',interceptors).then(function(){
 								def.reject(error);
