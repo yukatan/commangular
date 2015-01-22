@@ -1,6 +1,6 @@
 /**
  * Command pattern implementation for AngularJS
- * @version v0.8.0 - 2015-01-22
+ * @version v0.8.1 - 2015-01-22
  * @link https://github.com/yukatan/commangular
  * @author Jesús Barquín Cheda <yukatan@gmail.com>
  * @license MIT License, http://www.opensource.org/licenses/MIT
@@ -19,6 +19,7 @@
 	var eventInterceptors= {};
 	var interceptorExtractor = /\/(.*)\//;
 	var aspectExtractor = /@([^(]*)\((.*)\)/;
+	var debugEnabled = false;	
 
 	function escapeRegExp(str) {
   		return str.replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, "\\$&");
@@ -92,6 +93,11 @@
 		aspects = eventAspects = [];
 		commands = eventInterceptors = {};
 		commandNameString = eventNameString = "";
+	}
+
+	commangular.debug = function(enableDebug){
+
+		debugEnabled = enableDebug;
 	}
 
 	//----------------------------------------------------------------------------------------------------------------------
@@ -485,6 +491,7 @@
 							
 							return self.returnData(context);
 						},function(error){
+							if(debugEnabled) $exceptionHandler(error);
 							var def = $q.defer();
 							context.intercept('AfterThrowing',interceptors).then(function(){
 								def.reject(error);

@@ -12,6 +12,7 @@
 	var eventInterceptors= {};
 	var interceptorExtractor = /\/(.*)\//;
 	var aspectExtractor = /@([^(]*)\((.*)\)/;
+	var debugEnabled = false;	
 
 	function escapeRegExp(str) {
   		return str.replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, "\\$&");
@@ -85,6 +86,11 @@
 		aspects = eventAspects = [];
 		commands = eventInterceptors = {};
 		commandNameString = eventNameString = "";
+	}
+
+	commangular.debug = function(enableDebug){
+
+		debugEnabled = enableDebug;
 	}
 
 	//----------------------------------------------------------------------------------------------------------------------
@@ -478,6 +484,7 @@
 							
 							return self.returnData(context);
 						},function(error){
+							if(debugEnabled) $exceptionHandler(error);
 							var def = $q.defer();
 							context.intercept('AfterThrowing',interceptors).then(function(){
 								def.reject(error);
