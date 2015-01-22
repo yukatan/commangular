@@ -60,6 +60,15 @@ module.exports = function(config) {
     // - PhantomJS
     // - IE (only Windows; has to be installed with `npm install karma-ie-launcher`)
     browsers: ['Chrome'],
+    
+    plugins : [
+	  
+	  'karma-chrome-launcher',
+	  'karma-firefox-launcher',
+	  'karma-jasmine'
+],
+
+	 
 
 
     // If browser does not capture in given timeout [ms], kill it
