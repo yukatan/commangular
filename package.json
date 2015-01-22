@@ -37,6 +37,7 @@
     "grunt-karma": "latest",
     "karma-jasmine": "latest",
     "karma-chrome-launcher": "latest",
+    "karma-firefox-launcher":"latest",
     "grunt-conventional-changelog": "0.0.12",
     "grunt-zip": "*"
   },
