@@ -59,11 +59,11 @@ describe("Provider Testing", function() {
 
 		var com1 = sequence.descriptors[0];
 		expect(com1).toBeDefined();
-		expect(com1.command.function).toEqual(command1);
+		expect(com1.command.commandFunction).toEqual(command1);
 
 		var com2 = parallel.descriptors[0];
 		expect(com2).toBeDefined();
-		expect(com2.command.function).toEqual(command2);
+		expect(com2.command.commandFunction).toEqual(command2);
 
 	});
 
@@ -75,7 +75,7 @@ describe("Provider Testing", function() {
 		var commandDescriptor = provider.findCommand(eventName);
 		expect(commandDescriptor).toBeDefined();
 		expect(commandDescriptor.command).toBeUndefined();
-		expect(commandDescriptor.descriptors[0].command.function).toEqual(command1);
+		expect(commandDescriptor.descriptors[0].command.commandFunction).toEqual(command1);
 
 
 	});
@@ -88,8 +88,8 @@ describe("Provider Testing", function() {
 		var commandDescriptor = provider.findCommand(eventName);
 		expect(commandDescriptor.ctype).toBe('S');
 		expect(commandDescriptor).toBeDefined();
-		expect(commandDescriptor.descriptors[0].command.function).toEqual(command1);
-		expect(commandDescriptor.descriptors[1].command.function).toEqual(command2);
+		expect(commandDescriptor.descriptors[0].command.commandFunction).toEqual(command1);
+		expect(commandDescriptor.descriptors[1].command.commandFunction).toEqual(command2);
 	});
 
 
@@ -101,8 +101,8 @@ describe("Provider Testing", function() {
 		var commandDescriptor = provider.findCommand(eventName);
 		expect(commandDescriptor.ctype).toBe('P');
 		expect(commandDescriptor).toBeDefined();
-		expect(commandDescriptor.descriptors[0].command.function).toEqual(command1);
-		expect(commandDescriptor.descriptors[1].command.function).toEqual(command2);
+		expect(commandDescriptor.descriptors[0].command.commandFunction).toEqual(command1);
+		expect(commandDescriptor.descriptors[1].command.commandFunction).toEqual(command2);
 	});
 
 	it("should allow nested commands", function() {
@@ -114,10 +114,10 @@ describe("Provider Testing", function() {
 		var commandDescriptor = provider.findCommand(eventName);
 		expect(commandDescriptor.ctype).toBe('P');
 		expect(commandDescriptor).toBeDefined();
-		expect(commandDescriptor.descriptors[0].command.function).toEqual(command1);
-		expect(commandDescriptor.descriptors[1].command.function).toEqual(command2);
+		expect(commandDescriptor.descriptors[0].command.commandFunction).toEqual(command1);
+		expect(commandDescriptor.descriptors[1].command.commandFunction).toEqual(command2);
 		expect(commandDescriptor.descriptors[2]).toEqual(sequence);
-		expect(commandDescriptor.descriptors[2].descriptors[0].command.function).toEqual(command1);
-		expect(commandDescriptor.descriptors[2].descriptors[1].command.function).toEqual(command2);
+		expect(commandDescriptor.descriptors[2].descriptors[0].command.commandFunction).toEqual(command1);
+		expect(commandDescriptor.descriptors[2].descriptors[1].command.commandFunction).toEqual(command2);
 	});
 });

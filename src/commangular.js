@@ -20,7 +20,7 @@
 	commangular.create = function(commandName, commandFunction, commandConfig) {
 				
 		commands[commandName] = {
-			function: commandFunction,
+			commandFunction: commandFunction,
 			config: commandConfig,
 			interceptors:{},
 			commandName:commandName
@@ -239,9 +239,9 @@
 					var deferred = $q.defer();
 					try{
 						if(descriptor.command.interceptors['Around']) 
-							result = self.intercept('Around',descriptor.command.interceptors,descriptor.command.function);
+							result = self.intercept('Around',descriptor.command.interceptors,descriptor.command.commandFunction);
 						else {
-							var command = self.instantiate(descriptor.command.function,true);
+							var command = self.instantiate(descriptor.command.commandFunction,true);
 							result = self.invoke(command.execute, command);
 						}
 						self.processResults(result,descriptor.command.config).then(function(){
