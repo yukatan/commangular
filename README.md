@@ -1,8 +1,6 @@
 #Commangular        
 
-![V0.8.0](https://travis-ci.org/yukatan/commangular.svg?branch=v0.8.0)
-
-
+[![Build Status](https://travis-ci.org/yukatan/commangular.svg?branch=master)](https://travis-ci.org/yukatan/commangular)
 Command framework for AngularJS.
 
 * Website  : [http://commangular.org](http://commangular.org)
