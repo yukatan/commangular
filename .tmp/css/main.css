@@ -1,0 +1,62 @@
+/*
+Syntax error: File to import not found or unreadable: ../_bower_components/font-awesome/scss/font-awesome.
+              Load paths:
+                /home/jefe/commangular/app/_scss
+                /home/jefe/.rvm/gems/ruby-2.1.2/gems/compass-0.12.2/frameworks/blueprint/stylesheets
+                /home/jefe/.rvm/gems/ruby-2.1.2/gems/compass-0.12.2/frameworks/compass/stylesheets
+                Compass::SpriteImporter
+        on line 15 of /home/jefe/commangular/app/_scss/main.scss
+
+Backtrace:
+/home/jefe/commangular/app/_scss/main.scss:15
+/home/jefe/.rvm/gems/ruby-2.1.2/gems/sass-3.2.12/lib/sass/tree/import_node.rb:67:in `rescue in import'
+/home/jefe/.rvm/gems/ruby-2.1.2/gems/sass-3.2.12/lib/sass/tree/import_node.rb:45:in `import'
+/home/jefe/.rvm/gems/ruby-2.1.2/gems/sass-3.2.12/lib/sass/tree/import_node.rb:28:in `imported_file'
+/home/jefe/.rvm/gems/ruby-2.1.2/gems/sass-3.2.12/lib/sass/tree/import_node.rb:37:in `css_import?'
+/home/jefe/.rvm/gems/ruby-2.1.2/gems/sass-3.2.12/lib/sass/tree/visitors/perform.rb:217:in `visit_import'
+/home/jefe/.rvm/gems/ruby-2.1.2/gems/sass-3.2.12/lib/sass/tree/visitors/base.rb:37:in `visit'
+/home/jefe/.rvm/gems/ruby-2.1.2/gems/sass-3.2.12/lib/sass/tree/visitors/perform.rb:100:in `visit'
+/home/jefe/.rvm/gems/ruby-2.1.2/gems/sass-3.2.12/lib/sass/tree/visitors/base.rb:53:in `block in visit_children'
+/home/jefe/.rvm/gems/ruby-2.1.2/gems/sass-3.2.12/lib/sass/tree/visitors/base.rb:53:in `map'
+/home/jefe/.rvm/gems/ruby-2.1.2/gems/sass-3.2.12/lib/sass/tree/visitors/base.rb:53:in `visit_children'
+/home/jefe/.rvm/gems/ruby-2.1.2/gems/sass-3.2.12/lib/sass/tree/visitors/perform.rb:109:in `block in visit_children'
+/home/jefe/.rvm/gems/ruby-2.1.2/gems/sass-3.2.12/lib/sass/tree/visitors/perform.rb:121:in `with_environment'
+/home/jefe/.rvm/gems/ruby-2.1.2/gems/sass-3.2.12/lib/sass/tree/visitors/perform.rb:108:in `visit_children'
+/home/jefe/.rvm/gems/ruby-2.1.2/gems/sass-3.2.12/lib/sass/tree/visitors/base.rb:37:in `block in visit'
+/home/jefe/.rvm/gems/ruby-2.1.2/gems/sass-3.2.12/lib/sass/tree/visitors/perform.rb:128:in `visit_root'
+/home/jefe/.rvm/gems/ruby-2.1.2/gems/sass-3.2.12/lib/sass/tree/visitors/base.rb:37:in `visit'
+/home/jefe/.rvm/gems/ruby-2.1.2/gems/sass-3.2.12/lib/sass/tree/visitors/perform.rb:100:in `visit'
+/home/jefe/.rvm/gems/ruby-2.1.2/gems/sass-3.2.12/lib/sass/tree/visitors/perform.rb:7:in `visit'
+/home/jefe/.rvm/gems/ruby-2.1.2/gems/sass-3.2.12/lib/sass/tree/root_node.rb:20:in `render'
+/home/jefe/.rvm/gems/ruby-2.1.2/gems/sass-3.2.12/lib/sass/engine.rb:315:in `_render'
+/home/jefe/.rvm/gems/ruby-2.1.2/gems/sass-3.2.12/lib/sass/engine.rb:262:in `render'
+/home/jefe/.rvm/gems/ruby-2.1.2/gems/compass-0.12.2/lib/compass/compiler.rb:140:in `block (2 levels) in compile'
+/home/jefe/.rvm/gems/ruby-2.1.2/gems/compass-0.12.2/lib/compass/compiler.rb:126:in `timed'
+/home/jefe/.rvm/gems/ruby-2.1.2/gems/compass-0.12.2/lib/compass/compiler.rb:139:in `block in compile'
+/home/jefe/.rvm/gems/ruby-2.1.2/gems/compass-0.12.2/lib/compass/logger.rb:45:in `red'
+/home/jefe/.rvm/gems/ruby-2.1.2/gems/compass-0.12.2/lib/compass/compiler.rb:138:in `compile'
+/home/jefe/.rvm/gems/ruby-2.1.2/gems/compass-0.12.2/lib/compass/compiler.rb:118:in `compile_if_required'
+/home/jefe/.rvm/gems/ruby-2.1.2/gems/compass-0.12.2/lib/compass/compiler.rb:103:in `block (2 levels) in run'
+/home/jefe/.rvm/gems/ruby-2.1.2/gems/compass-0.12.2/lib/compass/compiler.rb:101:in `each'
+/home/jefe/.rvm/gems/ruby-2.1.2/gems/compass-0.12.2/lib/compass/compiler.rb:101:in `block in run'
+/home/jefe/.rvm/gems/ruby-2.1.2/gems/compass-0.12.2/lib/compass/compiler.rb:126:in `timed'
+/home/jefe/.rvm/gems/ruby-2.1.2/gems/compass-0.12.2/lib/compass/compiler.rb:100:in `run'
+/home/jefe/.rvm/gems/ruby-2.1.2/gems/compass-0.12.2/lib/compass/commands/update_project.rb:45:in `perform'
+/home/jefe/.rvm/gems/ruby-2.1.2/gems/compass-0.12.2/lib/compass/commands/base.rb:18:in `execute'
+/home/jefe/.rvm/gems/ruby-2.1.2/gems/compass-0.12.2/lib/compass/commands/project_base.rb:19:in `execute'
+/home/jefe/.rvm/gems/ruby-2.1.2/gems/compass-0.12.2/lib/compass/exec/sub_command_ui.rb:43:in `perform!'
+/home/jefe/.rvm/gems/ruby-2.1.2/gems/compass-0.12.2/lib/compass/exec/sub_command_ui.rb:15:in `run!'
+/home/jefe/.rvm/gems/ruby-2.1.2/gems/compass-0.12.2/bin/compass:30:in `block in <top (required)>'
+/home/jefe/.rvm/gems/ruby-2.1.2/gems/compass-0.12.2/bin/compass:44:in `call'
+/home/jefe/.rvm/gems/ruby-2.1.2/gems/compass-0.12.2/bin/compass:44:in `<top (required)>'
+/home/jefe/.rvm/gems/ruby-2.1.2/bin/compass:23:in `load'
+/home/jefe/.rvm/gems/ruby-2.1.2/bin/compass:23:in `<main>'
+/home/jefe/.rvm/gems/ruby-2.1.2/bin/ruby_executable_hooks:15:in `eval'
+/home/jefe/.rvm/gems/ruby-2.1.2/bin/ruby_executable_hooks:15:in `<main>'
+*/
+
+body:before {
+  white-space: pre;
+  font-family: monospace;
+  content: "Syntax error: File to import not found or unreadable: ../_bower_components/font-awesome/scss/font-awesome.\A               Load paths:\A                 /home/jefe/commangular/app/_scss\A                 /home/jefe/.rvm/gems/ruby-2.1.2/gems/compass-0.12.2/frameworks/blueprint/stylesheets\A                 /home/jefe/.rvm/gems/ruby-2.1.2/gems/compass-0.12.2/frameworks/compass/stylesheets\A                 Compass::SpriteImporter\A         on line 15 of /home/jefe/commangular/app/_scss/main.scss";
+}

@@ -1,0 +1,31 @@
+@media -sass-debug-info {
+  filename {
+    font-family: file\:\/\/\/home\/jefe\/commangular\/app\/_scss\/header\.scss;
+  }
+
+  line {
+    font-family: \000033;
+  }
+}
+
+.header i {
+  font-size: 20px;
+  margin-right: 5px;
+}
+
+@media -sass-debug-info {
+  filename {
+    font-family: file\:\/\/\/home\/jefe\/commangular\/app\/_scss\/header\.scss;
+  }
+
+  line {
+    font-family: \000034;
+  }
+}
+
+.header .brand-image {
+  padding-right: 5px;
+  margin-bottom: -8px;
+  margin-top: -10px;
+  margin-left: -5px;
+}

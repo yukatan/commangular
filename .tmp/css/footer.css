@@ -1,0 +1,97 @@
+@media -sass-debug-info {
+  filename {
+    font-family: file\:\/\/\/home\/jefe\/commangular\/app\/_scss\/footer\.scss;
+  }
+
+  line {
+    font-family: \000031;
+  }
+}
+
+.footer {
+  background-color: #005a66;
+  width: 100%;
+  min-height: 150px;
+  margin-top: 150px;
+  padding-left: 20px;
+  padding-right: 20px;
+  padding-bottom: 20px;
+}
+
+@media -sass-debug-info {
+  filename {
+    font-family: file\:\/\/\/home\/jefe\/commangular\/app\/_scss\/footer\.scss;
+  }
+
+  line {
+    font-family: \0000310;
+  }
+}
+
+.footer .footer-sep {
+  background-color: #222222;
+  height: 30px;
+  width: 100%;
+}
+
+@media -sass-debug-info {
+  filename {
+    font-family: file\:\/\/\/home\/jefe\/commangular\/app\/_scss\/footer\.scss;
+  }
+
+  line {
+    font-family: \0000311;
+  }
+}
+
+.footer .footer-data {
+  color: #d4ece4;
+  padding-top: 25px;
+}
+
+@media -sass-debug-info {
+  filename {
+    font-family: file\:\/\/\/home\/jefe\/commangular\/app\/_scss\/footer\.scss;
+  }
+
+  line {
+    font-family: \0000312;
+  }
+}
+
+.footer .footer-data a {
+  color: #d4ece4;
+  border-bottom: dotted;
+  border-width: 1px;
+}
+
+@media -sass-debug-info {
+  filename {
+    font-family: file\:\/\/\/home\/jefe\/commangular\/app\/_scss\/footer\.scss;
+  }
+
+  line {
+    font-family: \0000313;
+  }
+}
+
+.footer .footer-data a:hover {
+  color: #fff;
+  border-bottom: solid;
+  border-width: 1px;
+  text-decoration: none;
+}
+
+@media -sass-debug-info {
+  filename {
+    font-family: file\:\/\/\/home\/jefe\/commangular\/app\/_scss\/footer\.scss;
+  }
+
+  line {
+    font-family: \0000314;
+  }
+}
+
+.footer .footer-data div {
+  padding-top: 5px;
+}

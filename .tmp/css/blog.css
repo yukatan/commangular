@@ -1,0 +1,13 @@
+@media -sass-debug-info {
+  filename {
+    font-family: file\:\/\/\/home\/jefe\/commangular\/app\/_scss\/blog\.scss;
+  }
+
+  line {
+    font-family: \000033;
+  }
+}
+
+.blog-index strong {
+  color: #005a66;
+}

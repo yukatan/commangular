@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html class="no-js">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>The Flight Dashboard Example.</title>
+    <meta name="description" content="">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link href='http://fonts.googleapis.com/css?family=Open+Sans:400italic,400,700' rel='stylesheet' type='text/css'>
+    <!-- Place favicon.ico and apple-touch-icon(s) in the root directory -->
+
+    <!-- build:css({app,.tmp}) /css/main.css -->
+    <link rel="stylesheet" href="/_bower_components/normalize-css/normalize.css">
+    <link rel="stylesheet" href="/css/syntax.css">
+    <link rel="stylesheet" href="/css/main.css">
+    <!-- endbuild -->
+
+    <!-- build:js(app) /js/head-scripts.js -->
+    <!-- Replace with a custom modernizer build for production -->
+    <script src="/_bower_components/modernizr/modernizr.js"></script>
+    <!-- endbuild -->
+
+  </head>
+  <body>
+    <!--[if lt IE 8]>
+        <p class="browsehappy">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> to improve your experience.</p>
+    <![endif]-->
+     
+        
+
+
+
+
+<nav class="navbar navbar-default navbar-inverse header" role="navigation">
+   <div class="navbar-header">
+    <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+      <span class="sr-only">Toggle navigation</span>
+      <span class="icon-bar"></span>
+      <span class="icon-bar"></span>
+      <span class="icon-bar"></span>
+    </button>
+     <a class="navbar-brand" href="/"><img src="/img/logo-small-web.png" class="brand-image"></img>Commangular</a>
+  </div>
+  <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+    <ul class="nav navbar-nav">
+      <li ><a href="/" onclick="_gaq.push(['_trackEvent', 'Outbound Link', 'Home Clicked']);"><i class="fa fa-home"></i>Home</a></li>
+       <li ><a href="/why" onclick="_gaq.push(['_trackEvent', 'Outbound Link', 'Why Clicked']);"><i class="fa fa-question"></i>Where and Why?</a></li>
+      <li ><a href="/get-started" onclick="_gaq.push(['_trackEvent', 'Outbound Link', 'Started Clicked']);"><i class="fa fa-gears"></i>Get Started</a></li>
+      <li ><a href="/docs" onclick="_gaq.push(['_trackEvent', 'Outbound Link', 'Docs Clicked']);"><i class="fa fa-book"></i>Documentation</a></li>
+      <li  class="active" ><a href="/blog" onclick="_gaq.push(['_trackEvent', 'Outbound Link', 'Blog Clicked']);"><i class="fa fa-bullhorn"></i>Blog</a></li>
+    </ul>
+  </div>
+</nav>
+
+<div class="subheader">
+	<div class="container text-center">
+		<h1><i class="fa fa-bullhorn"></i>Blog</h1>
+		<h3>IDEAS AND EXAMPLES ABOUT COMMANGULAR</h3>
+	</div>
+</div>
+<div class="social-bar">
+	<div class="container text-center">
+		<ul class="list-inline">
+			<li><iframe src="http://ghbtns.com/github-btn.html?user=yukatan&repo=commangular&type=watch&count=true"
+  				allowtransparency="true" frameborder="0" scrolling="0" width="82" height="20"></iframe></li>
+			<li><iframe src="http://ghbtns.com/github-btn.html?user=yukatan&repo=commangular&type=fork&count=true"
+  				allowtransparency="true" frameborder="0" scrolling="0" width="80" height="20"></iframe></li>
+  			<li><a href="https://twitter.com/commangular" class="twitter-follow-button" data-show-count="false">Follow @commangular</a>
+<script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+'://platform.twitter.com/widgets.js';fjs.parentNode.insertBefore(js,fjs);}}(document, 'script', 'twitter-wjs');</script></li>
+		</ul>
+	</div>
+</div>
+
+
+<div class="container">
+	<article class="markdown-content">
+	<h3>The Flight Dashboard Example.</h3>
+	<hr>
+	<p>This is the first post and the blog programming is still not ready but I saw and example on github showing promise chaining and I want to demostrate how it looks like implemented with commangular.</p>
+
+<p>You can see the sample <a href="https://github.com/ThomasBurleson/angularjs-FlightDashboard">here</a></p>
+
+<p>I&#39;m not going to write the FlightService because it is the same and I&#39;m going to show two examples, one with a FlightData model and one without it.</p>
+
+<!--more-->  
+
+<p><br></p>
+
+<h4>Without FlightData</h4>
+<div class="highlight"><pre><code class="javascript language-javascript" data-lang="javascript"> <span class="c1">//We have 3 commands doing the stuff. It can be separated in multiple js files to keep the code organized</span>
+<span class="nx">commangular</span><span class="p">.</span><span class="nx">command</span><span class="p">(</span><span class="s1">&#39;getUpcomingFlightCommand&#39;</span><span class="p">,</span><span class="kd">function</span><span class="p">(</span><span class="nx">user</span><span class="p">,</span><span class="nx">FlightService</span><span class="p">)</span> <span class="p">{</span>
+
+    <span class="k">return</span> <span class="p">{</span>
+        <span class="nx">execute</span> <span class="o">:</span><span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+
+            <span class="k">return</span> <span class="nx">FlightService</span><span class="p">.</span><span class="nx">getUpcomingFlight</span><span class="p">(</span><span class="nx">user</span><span class="p">);</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+<span class="p">},{</span><span class="nx">resultKey</span><span class="o">:</span><span class="s1">&#39;flight&#39;</span><span class="p">});</span>
+
+<span class="nx">commangular</span><span class="p">.</span><span class="nx">command</span><span class="p">(</span><span class="s1">&#39;getFlightDetailsCommand&#39;</span><span class="p">,</span><span class="kd">function</span><span class="p">(</span><span class="nx">flight</span><span class="p">,</span><span class="nx">FlightService</span><span class="p">)</span> <span class="p">{</span>
+
+    <span class="k">return</span> <span class="p">{</span>
+        <span class="nx">execute</span> <span class="o">:</span><span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+
+            <span class="k">return</span> <span class="nx">FlightService</span><span class="p">.</span><span class="nx">getFlightDetails</span><span class="p">(</span><span class="nx">flight</span><span class="p">.</span><span class="nx">id</span><span class="p">);</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+<span class="p">},{</span><span class="nx">resultKey</span><span class="o">:</span><span class="s1">&#39;planeStatus&#39;</span><span class="p">});</span>
+
+<span class="nx">commangular</span><span class="p">.</span><span class="nx">command</span><span class="p">(</span><span class="s1">&#39;getForecastCommand&#39;</span><span class="p">,</span><span class="kd">function</span><span class="p">(</span><span class="nx">flight</span><span class="p">,</span><span class="nx">WeatherService</span><span class="p">)</span> <span class="p">{</span>
+
+    <span class="k">return</span> <span class="p">{</span>
+        <span class="nx">execute</span> <span class="o">:</span><span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+
+            <span class="k">return</span> <span class="nx">WeatherService</span><span class="p">.</span><span class="nx">getForecast</span><span class="p">(</span><span class="nx">flight</span><span class="p">.</span><span class="nx">departure</span><span class="p">);</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+<span class="p">},{</span><span class="nx">resultKey</span><span class="o">:</span><span class="s1">&#39;forecast&#39;</span><span class="p">});</span>
+
+<span class="c1">//In a config block and with the provider</span>
+<span class="c1">//I create a sequence with a parallel inside and map it to &#39;LoadFlightEvent&#39;</span>
+<span class="nx">$commangularProvider</span><span class="p">.</span><span class="nx">mapTo</span><span class="p">(</span><span class="s1">&#39;LoadFlightEvent&#39;</span><span class="p">).</span><span class="nx">asSequence</span><span class="p">()</span>
+    <span class="p">.</span><span class="nx">add</span><span class="p">(</span><span class="s1">&#39;getUpcomingFlightCommand&#39;</span><span class="p">)</span>
+    <span class="p">.</span><span class="nx">add</span><span class="p">(</span><span class="nx">$commangularProvider</span><span class="p">.</span><span class="nx">asParallel</span><span class="p">()</span>
+        <span class="p">.</span><span class="nx">add</span><span class="p">(</span><span class="s1">&#39;getFlightdDetailsCommand&#39;</span><span class="p">)</span>
+        <span class="p">.</span><span class="nx">add</span><span class="p">(</span><span class="s1">&#39;getForecastCommand&#39;</span><span class="p">));</span>
+
+<span class="c1">//And the controler copy from the example and modified</span>
+
+<span class="kd">var</span> <span class="nx">FlightDashboard</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span> <span class="nx">$scope</span><span class="p">,</span><span class="nx">$log</span><span class="p">)</span> <span class="p">{</span>
+
+    <span class="nx">$scope</span><span class="p">.</span><span class="nx">dispatch</span><span class="p">(</span><span class="s1">&#39;LoadFlightEvent&#39;</span><span class="p">).</span><span class="nx">then</span><span class="p">(</span><span class="kd">function</span><span class="p">(</span><span class="nx">result</span><span class="p">){</span>
+
+        <span class="c1">//We can access here all the resultKeys from the command group execution</span>
+        <span class="nx">$scope</span><span class="p">.</span><span class="nx">flight</span>      <span class="o">=</span> <span class="nx">result</span><span class="p">.</span><span class="nx">flight</span><span class="p">;</span>                    
+        <span class="nx">$scope</span><span class="p">.</span><span class="nx">planeStatus</span> <span class="o">=</span> <span class="nx">result</span><span class="p">.</span><span class="nx">planeStatus</span><span class="p">;</span>              
+        <span class="nx">$scope</span><span class="p">.</span><span class="nx">forecast</span>    <span class="o">=</span> <span class="nx">result</span><span class="p">.</span><span class="nx">forecast</span><span class="p">;</span>  
+    <span class="p">},</span><span class="kd">function</span><span class="p">(</span><span class="nx">fault</span><span class="p">){</span>
+
+        <span class="nx">$log</span><span class="p">.</span><span class="nx">error</span><span class="p">(</span> <span class="nb">String</span><span class="p">(</span><span class="nx">fault</span><span class="p">)</span> <span class="p">);</span>
+    <span class="p">});</span>
+<span class="p">}</span>
+</code></pre></div>
+<p>This is ok.. but I think it can be improved using a model and some interception magic.</p>
+
+<p><br></p>
+
+<h4>With FlightData</h4>
+<div class="highlight"><pre><code class="javascript language-javascript" data-lang="javascript"> <span class="c1">//FlightData injection and onResult Handler. As you can see we don&#39;t use the &#39;resultKey&#39; because we have the model.</span>
+<span class="nx">commangular</span><span class="p">.</span><span class="nx">command</span><span class="p">(</span><span class="s1">&#39;getUpcomingFlightCommand&#39;</span><span class="p">,</span><span class="kd">function</span><span class="p">(</span><span class="nx">user</span><span class="p">,</span><span class="nx">FlightData</span><span class="p">,</span><span class="nx">FlightService</span><span class="p">)</span> <span class="p">{</span>
+
+    <span class="k">return</span> <span class="p">{</span>
+        <span class="nx">execute</span> <span class="o">:</span><span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+
+            <span class="k">return</span> <span class="nx">FlightService</span><span class="p">.</span><span class="nx">getUpcomingFlight</span><span class="p">(</span><span class="nx">user</span><span class="p">);</span>
+        <span class="p">},</span>
+        <span class="nx">onResult</span> <span class="o">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">flight</span><span class="p">)</span> <span class="p">{</span>
+
+            <span class="nx">FlightData</span><span class="p">.</span><span class="nx">flight</span> <span class="o">=</span> <span class="nx">flight</span><span class="p">;</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+<span class="p">});</span>
+
+<span class="nx">commangular</span><span class="p">.</span><span class="nx">command</span><span class="p">(</span><span class="s1">&#39;getFlightDetailsCommand&#39;</span><span class="p">,</span><span class="kd">function</span><span class="p">(</span><span class="nx">FlightData</span><span class="p">,</span><span class="nx">FlightService</span><span class="p">)</span> <span class="p">{</span>
+
+    <span class="k">return</span> <span class="p">{</span>
+        <span class="nx">execute</span> <span class="o">:</span><span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+
+            <span class="k">return</span> <span class="nx">FlightService</span><span class="p">.</span><span class="nx">getFlightDetails</span><span class="p">(</span><span class="nx">FlightData</span><span class="p">.</span><span class="nx">flight</span><span class="p">.</span><span class="nx">id</span><span class="p">);</span>
+        <span class="p">},</span>
+        <span class="nx">onResult</span><span class="o">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">flightStatus</span><span class="p">)</span> <span class="p">{</span>
+
+            <span class="nx">FlightData</span><span class="p">.</span><span class="nx">flightStatus</span> <span class="o">=</span> <span class="nx">flightStatus</span><span class="p">;</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+<span class="p">});</span>
+
+<span class="nx">commangular</span><span class="p">.</span><span class="nx">command</span><span class="p">(</span><span class="s1">&#39;getForecastCommand&#39;</span><span class="p">,</span><span class="kd">function</span><span class="p">(</span><span class="nx">FlightData</span><span class="p">,</span><span class="nx">WeatherService</span><span class="p">)</span> <span class="p">{</span>
+
+    <span class="k">return</span> <span class="p">{</span>
+        <span class="nx">execute</span> <span class="o">:</span><span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+
+            <span class="k">return</span> <span class="nx">WeatherService</span><span class="p">.</span><span class="nx">getForecast</span><span class="p">(</span><span class="nx">FlightData</span><span class="p">.</span><span class="nx">flight</span><span class="p">.</span><span class="nx">departure</span><span class="p">);</span>
+        <span class="p">},</span>
+        <span class="nx">onResult</span> <span class="o">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">forecast</span><span class="p">)</span> <span class="p">{</span>
+
+            <span class="nx">FlightData</span><span class="p">.</span><span class="nx">forecast</span> <span class="o">=</span> <span class="nx">forecast</span><span class="p">;</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+<span class="p">});</span>
+
+<span class="c1">//We are going to intercept all the command execution to control errors.</span>
+<span class="nx">commangular</span><span class="p">.</span><span class="nx">aspect</span><span class="p">(</span><span class="s1">&#39;@AfterThrowing(/(.)/)&#39;</span><span class="p">,</span><span class="kd">function</span><span class="p">(</span><span class="nx">lastError</span><span class="p">,</span><span class="nx">$log</span><span class="p">)</span> <span class="p">{</span>
+
+    <span class="k">return</span> <span class="p">{</span>
+        <span class="nx">execute</span> <span class="o">:</span><span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+
+            <span class="nx">$log</span><span class="p">.</span><span class="nx">error</span><span class="p">(</span> <span class="nb">String</span><span class="p">(</span><span class="nx">lastError</span><span class="p">));</span>
+    <span class="p">}</span>
+<span class="p">});</span>
+
+
+<span class="c1">//The same that before</span>
+<span class="nx">$commangularProvider</span><span class="p">.</span><span class="nx">mapTo</span><span class="p">(</span><span class="s1">&#39;LoadFlightEvent&#39;</span><span class="p">).</span><span class="nx">asSequence</span><span class="p">()</span>
+    <span class="p">.</span><span class="nx">add</span><span class="p">(</span><span class="s1">&#39;getUpcomingFlightCommand&#39;</span><span class="p">)</span>
+    <span class="p">.</span><span class="nx">add</span><span class="p">(</span><span class="nx">$commangularProvider</span><span class="p">.</span><span class="nx">asParallel</span><span class="p">()</span>
+        <span class="p">.</span><span class="nx">add</span><span class="p">(</span><span class="s1">&#39;getFlightdDetailsCommand&#39;</span><span class="p">)</span>
+        <span class="p">.</span><span class="nx">add</span><span class="p">(</span><span class="s1">&#39;getForecastCommand&#39;</span><span class="p">));</span>
+
+<span class="c1">//And the controler copy from the example and modified</span>
+
+<span class="kd">var</span> <span class="nx">FlightDashboard</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span><span class="nx">$scope</span><span class="p">,</span><span class="nx">FlighData</span><span class="p">)</span> <span class="p">{</span>
+
+    <span class="nx">$scope</span><span class="p">.</span><span class="nx">dispatch</span><span class="p">(</span><span class="s1">&#39;LoadFlightEvent&#39;</span><span class="p">).</span><span class="nx">then</span><span class="p">(</span><span class="kd">function</span><span class="p">(){</span>
+        <span class="c1">//We do it this here because we want the data when it is all load.</span>
+        <span class="nx">$scope</span><span class="p">.</span><span class="nx">flightData</span> <span class="o">=</span> <span class="nx">FlightData</span><span class="p">;</span>
+    <span class="p">})</span>
+<span class="p">}</span>
+</code></pre></div>
+<p>We end with organized and clean code and really easy to test and understand. Just looking at the config block you can see what happen. I have planned a chrome extension to do some introspection on config blocks. I think it will be a killer feature.</p>
+
+<p>You can use any commangular flavour you like :). I show the two options just to demostrate how commangular works.</p>
+
+	</article>
+	<div>
+		<a href="/blog" class="back-button"><i class="fa fa-angle-double-left"></i>  Back</a>
+	</div>
+<div id="disqus_thread">
+    <script type="text/javascript">
+       
+        var disqus_shortname = 'commangularweb'; 
+        (function() {
+            var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+            dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+            (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+        })();
+    </script>
+    <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+    <a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+</div>    	
+</div>
+
+<div class="footer">
+	<div class="footer-data text-center">
+		 <div>Commangular 0.8.1 | Created by <a href="https://twitter.com/FlashMandril" target="_blank">Jesús Barquín.</a></div>
+		 <div> Code licensed under <a href="http://opensource.org/licenses/mit-license.html" target="_blank">MIT License.</a>
+		 	Documentation licensed under <a href="http://creativecommons.org/licenses/by/3.0/">CC 3.0</a>
+		 </div>
+		 <div> This website is using 
+		 	<a href="http://fontawesome.io/" target="_blank">Font Awesome</a>, <a href="http://getbootstrap.com/" target="_blank">Twitter Bootstrap</a> and <a href="http://jekyllrb.com/" target="_blank">Jekyll</a>
+		 </div>
+		 <div>
+		 	<a href="https://github.com/yukatan/commangular" target="_blank">Github Repository</a>
+		 </div>
+	</div>	
+</div>
+
+
+
+        <script src="//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+
+<script>window.jQuery || document.write('<script src="/_bower_components/jquery/jquery.js"><\/script>')</script>
+<!-- build:js(app) /js/script.js -->
+<script src="/js/plugins.js"></script>
+<script src="/js/main.js"></script>
+<script src="/_bower_components/sass-bootstrap/js/affix.js"></script>
+<script src="/_bower_components/sass-bootstrap/js/alert.js"></script>
+<script src="/_bower_components/sass-bootstrap/js/button.js"></script>
+<script src="/_bower_components/sass-bootstrap/js/carousel.js"></script>
+<script src="/_bower_components/sass-bootstrap/js/collapse.js"></script>
+<script src="/_bower_components/sass-bootstrap/js/dropdown.js"></script>
+<script src="/_bower_components/sass-bootstrap/js/modal.js"></script>
+<script src="/_bower_components/sass-bootstrap/js/scrollspy.js"></script>
+<script src="/_bower_components/sass-bootstrap/js/tab.js"></script>
+<script src="/_bower_components/sass-bootstrap/js/tooltip.js"></script>
+<script src="/_bower_components/sass-bootstrap/js/popover.js"></script>
+<!-- endbuild -->
+
+        <script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-46287627-1']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+</script>
+    
+  </body>
+</html>

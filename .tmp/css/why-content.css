@@ -1,0 +1,59 @@
+@media -sass-debug-info {
+  filename {
+    font-family: file\:\/\/\/home\/jefe\/commangular\/app\/_scss\/why-content\.scss;
+  }
+
+  line {
+    font-family: \000031;
+  }
+}
+
+.mvc-image {
+  display: block;
+}
+
+@media (max-width: 700px) {
+@media -sass-debug-info {
+    filename {
+      font-family: file\:\/\/\/home\/jefe\/commangular\/app\/_scss\/why-content\.scss;
+    }
+
+    line {
+      font-family: \000031;
+    }
+}
+
+  .mvc-image {
+    display: none;
+  }
+}
+
+@media -sass-debug-info {
+  filename {
+    font-family: file\:\/\/\/home\/jefe\/commangular\/app\/_scss\/why-content\.scss;
+  }
+
+  line {
+    font-family: \000037;
+  }
+}
+
+.mvc-image-link {
+  display: none;
+}
+
+@media (max-width: 700px) {
+@media -sass-debug-info {
+    filename {
+      font-family: file\:\/\/\/home\/jefe\/commangular\/app\/_scss\/why-content\.scss;
+    }
+
+    line {
+      font-family: \000037;
+    }
+}
+
+  .mvc-image-link {
+    display: block;
+  }
+}
