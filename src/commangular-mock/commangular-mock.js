@@ -114,7 +114,7 @@
 
 		this.exeOnResult = function(result) {
 
-			context.exeOnResult.call(this,result);
+			return context.exeOnResult.call(this,result);
 		}
 
 		this.exeOnError = function(error) {

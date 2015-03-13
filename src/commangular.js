@@ -264,7 +264,8 @@
 					return self.intercept('After',descriptor.command.interceptors);
 				})
 				.then(function(){
-					self.exeOnResult(self.contextData.lastResult);
+					result = self.exeOnResult(self.contextData.lastResult);
+					self.processResults(result,descriptor.command.config);
 				},function(error) {
 					var deferred = $q.defer();
 					if(self.canceled){
@@ -332,11 +333,11 @@
 			if(isCommand) this.currentCommandInstance = instance;
 			return instance;
 		}
-
+		
 		this.exeOnResult = function(result) {
 
 			if(this.currentCommandInstance && this.currentCommandInstance.hasOwnProperty('onResult'))
-				this.currentCommandInstance.onResult(result);
+				return this.currentCommandInstance.onResult(result);
 		}
 
 		this.exeOnError = function(error) {
