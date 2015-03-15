@@ -7,7 +7,9 @@ describe("Aspect execution testing", function() {
 	var interceptorExecutedBefore = false;
 	var commandExecutedAfter = false;
 	var afterInterceptorExecutedAfterCommand = false;
+	var afterInterceptorExecutedAfterOnResult = false;
 	var afterThrowingInterceptorExecutedAfterCommand = false;
+	var onResultMethodExecuted = false;
 	
 	beforeEach(function() {
 
@@ -31,6 +33,17 @@ describe("Aspect execution testing", function() {
 
 					if(commandExecutedAfter)
 						afterInterceptorExecutedAfterCommand = true;
+				}
+			}
+		});
+		commangular.aspect('@After(/Command[1-9]/)', function(){
+
+			return {
+
+				execute : function() {
+
+					if(commandExecutedAfter && afterInterceptorExecutedAfterCommand)
+						afterInterceptorExecutedAfterOnResult = true;
 				}
 			}
 		});
@@ -81,6 +94,10 @@ describe("Aspect execution testing", function() {
 						commandExecutedAfter = true;
 					}
 					return "return From command1";
+				},
+				onResult: function(){
+
+					onResultMethodExecuted = true;
 				}
 			};
 		});
@@ -132,6 +149,17 @@ describe("Aspect execution testing", function() {
 		});		
 	});
 
+	it("should execute the interceptor afterexecution the command", function() {
+
+		provider.mapTo('AspectTestEvent').asSequence().add('Command1');
+		dispatch({event:'AspectTestEvent'},function() {
+
+			expect(commandExecutedAfter).toBe(true);
+			expect(interceptorExecutedBefore).toBe(true);
+			expect(afterInterceptorExecutedAfterCommand).toBe(true);
+		});				
+	});
+
 	it("should execute the interceptor after the command", function() {
 
 		provider.mapTo('AspectTestEvent').asSequence().add('Command1');
@@ -140,6 +168,8 @@ describe("Aspect execution testing", function() {
 			expect(commandExecutedAfter).toBe(true);
 			expect(interceptorExecutedBefore).toBe(true);
 			expect(afterInterceptorExecutedAfterCommand).toBe(true);
+			expect(onResultMethodExecuted).toBe(true);
+			expect(afterInterceptorExecutedAfterOnResult).toBe(true);
 		});				
 	});
 

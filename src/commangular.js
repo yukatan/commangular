@@ -53,7 +53,7 @@
 		var matcherString = interceptorExtractor.exec(result[2])[1];
 		var matcher = new RegExp("^%" + matcherString + "%\{(.*)\}$","mg");
 		var aspectOrder = order || (order = 0);
-		if(!/(\bBefore\b|\bAfterExecution\b|\bAfter\b|\bAfterThrowing\b)/.test(poincut))
+		if(!/(\bBefore\b|\bAfter\b|\bAfterThrowing\b)/.test(poincut))
 			throw new Error('aspect descriptor ' + aspectDescriptor + ' contains errors');
 		eventAspects.push({poincut:poincut,
 			matcher:matcher,
@@ -285,7 +285,10 @@
 				})
 				.then(function(){
 					result = self.exeOnResult(self.contextData.lastResult);
-					self.processResults(result,descriptor.command.config);
+					return self.processResults(result,descriptor.command.config);
+				})
+				.then(function(){
+					return self.intercept('After',descriptor.command.interceptors);
 				},function(error) {
 					var deferred = $q.defer();
 					if(self.canceled){
@@ -375,7 +378,7 @@
 				return defer.promise;
 			}
 			var promise = $q.when(result).then(function(data) {
-
+			
 				self.contextData.lastResult = data;
 				if (config && config.resultKey) {
 					self.contextData[config.resultKey] = data;

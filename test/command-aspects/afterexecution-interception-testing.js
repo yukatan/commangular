@@ -1,6 +1,6 @@
 "use strict";
 
-describe("Aspect @After execution testing", function() {
+describe("Aspect @AfterExecution execution testing", function() {
 
 	var provider;
 	var scope;
@@ -11,34 +11,49 @@ describe("Aspect @After execution testing", function() {
 
 		commangular.reset();
 		
-		commangular.aspect('@After(/com\.test1.*/)', function(){
+		commangular.aspect('@AfterExecution(/com\.test1.*/)', function(){
 
 			return {
 
-				execute : function (lastResult) {
-				
-					expect(lastResult).toBeDefined();
-					expect(lastResult).toBe("monkey2");
+				execute : function () {
+
 					interceptorExecutedAfter = true;
 				}
 			}
 			
 		});
 		
+		commangular.aspect('@AfterExecution(/com\.test2.*/)', function(lastResult){
+			
+			return {
+
+				execute : function() {
+
+					expect(lastResult).toBeDefined();
+					expect(lastResult).toBe('monkey');
+				}
+			}
+			
+		});
+
 		commangular.create('com.test1.Command1',function(){
 
 			return {
 
 				execute : function() {
 										
-					commandExecuted = true;
+						commandExecuted = true;
+				}
+			};
+		});
+
+		commangular.create('com.test2.Command2',function(){
+
+			return {
+
+				execute : function() {
+										
 					return "monkey";
-
-				},
-				onResult: function(lastResult){
-
-					expect(lastResult).toBe("monkey");
-					return "monkey2";
 				}
 			};
 		});
