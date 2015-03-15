@@ -1,6 +1,6 @@
 /**
  * Command pattern implementation for AngularJS
- * @version v0.8.1 - 2015-01-22
+ * @version v0.9.0 - 2015-03-15
  * @link https://github.com/yukatan/commangular
  * @author Jesús Barquín Cheda <yukatan@gmail.com>
  * @license MIT License, http://www.opensource.org/licenses/MIT
@@ -44,7 +44,7 @@
 		var matcherString = interceptorExtractor.exec(result[2])[1];
 		var matcher = new RegExp("^%" + matcherString + "%\{(.*)\}$","mg");
 		var aspectOrder = order || (order = 0);
-		if(!/(\bBefore\b|\bAfter\b|\bAfterThrowing\b|\bAround\b)/.test(poincut))
+		if(!/(\bBefore\b|\bAfterExecution\b|\bAfter\b|\bAfterThrowing\b|\bAround\b)/.test(poincut))
 			throw new Error('aspect descriptor ' + aspectDescriptor + ' contains errors');
 		aspects.push({poincut:poincut,
 			matcher:matcher,
@@ -84,7 +84,7 @@
 				}
 			}
 		}];	
-		var aspectDescriptor = "@After(/" + escapeRegExp(commandName) + "/)";
+		var aspectDescriptor = "@AfterExecution(/" + escapeRegExp(commandName) + "/)";
 		commangular.aspect(aspectDescriptor,aspectResolverFunction,-100);
 	}
 
@@ -98,6 +98,26 @@
 	commangular.debug = function(enableDebug){
 
 		debugEnabled = enableDebug;
+	}
+
+
+	commangular.build = function(){
+
+		(function processInterceptors(collection,stringList,targets) {
+
+				angular.forEach(collection,function(aspect){
+					var result;		
+					while((result = aspect.matcher.exec(stringList)) != null) {
+						
+						if(!targets[result[1]].interceptors[aspect.poincut])
+							targets[result[1]].interceptors[aspect.poincut] = [];
+						targets[result[1]].interceptors[aspect.poincut]
+								.push({func:aspect.aspectFunction,order:aspect.order});
+					}
+				});
+				return processInterceptors;
+			}(aspects,commandNameString,commands)(eventAspects,eventNameString,eventInterceptors));
+			
 	}
 
 	//----------------------------------------------------------------------------------------------------------------------
@@ -268,10 +288,14 @@
 					return deferred.promise;
 				})
 				.then(function(){
-					return self.intercept('After',descriptor.command.interceptors);
+					return self.intercept('AfterExecution',descriptor.command.interceptors);
 				})
 				.then(function(){
-					self.exeOnResult(self.contextData.lastResult);
+					result = self.exeOnResult(self.contextData.lastResult);
+					return self.processResults(result,descriptor.command.config);
+				})
+				.then(function(){
+					return self.intercept('After',descriptor.command.interceptors);
 				},function(error) {
 					var deferred = $q.defer();
 					if(self.canceled){
@@ -339,11 +363,11 @@
 			if(isCommand) this.currentCommandInstance = instance;
 			return instance;
 		}
-
+		
 		this.exeOnResult = function(result) {
 
 			if(this.currentCommandInstance && this.currentCommandInstance.hasOwnProperty('onResult'))
-				this.currentCommandInstance.onResult(result);
+				return this.currentCommandInstance.onResult(result);
 		}
 
 		this.exeOnError = function(error) {
@@ -361,7 +385,7 @@
 				return defer.promise;
 			}
 			var promise = $q.when(result).then(function(data) {
-
+			
 				self.contextData.lastResult = data;
 				if (config && config.resultKey) {
 					self.contextData[config.resultKey] = data;
@@ -513,24 +537,7 @@
 		]);
 	//------------------------------------------------------------------------------------------------------------------
 	angular.module('commangular')
-		.run(function() {
-			
-			(function processInterceptors(collection,stringList,targets) {
-
-				angular.forEach(collection,function(aspect){
-					var result;		
-					while((result = aspect.matcher.exec(stringList)) != null) {
-						
-						if(!targets[result[1]].interceptors[aspect.poincut])
-							targets[result[1]].interceptors[aspect.poincut] = [];
-						targets[result[1]].interceptors[aspect.poincut]
-								.push({func:aspect.aspectFunction,order:aspect.order});
-					}
-				});
-				return processInterceptors;
-			}(aspects,commandNameString,commands)(eventAspects,eventNameString,eventInterceptors));
-			commandNameString = eventNameString = "";
-		}); 
+		.run(commangular.build); 
 	//------------------------------------------------------------------------------------------------------------------ 
 	angular.module('commangular')
 		.config(['$provide',function($provide) {

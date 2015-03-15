@@ -1,7 +1,7 @@
 {
   "name": "commangular",
   "description": "Command pattern implementation for AngularJS",
-  "version": "0.8.1",
+  "version": "0.9.0",
   "filename": "commangular.min.js",
   "main": "./dist/commangular.min.js",
   "homepage": "https://github.com/yukatan/commangular",
@@ -37,7 +37,7 @@
     "grunt-karma": "latest",
     "karma-jasmine": "latest",
     "karma-chrome-launcher": "latest",
-    "karma-firefox-launcher":"latest",
+    "karma-firefox-launcher": "latest",
     "grunt-conventional-changelog": "0.0.12",
     "grunt-zip": "*"
   },
