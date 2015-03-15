@@ -9,7 +9,7 @@ describe("Aspect definition testing", function() {
 
 		commangular.reset();
 		commangular.aspect('@Before(/com\.services.*/)', aspectTest);
-		commangular.aspect('@After(/.*Command3.*/)', aspectTest);
+		commangular.aspect('@AfterExecution(/.*Command3.*/)', aspectTest);
 		commangular.aspect('@AfterThrowing(/com\.services.*/)', aspectTest);
 		commangular.aspect('@Around(/.*Command3.*/)', aspectTest);
 		commangular.create('com.services.Command3',function(){});

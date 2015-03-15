@@ -11,7 +11,7 @@ describe("Throw exception on after interception testing", function() {
 
 		commangular.reset();
 		
-		commangular.aspect('@After(/com\.test1.*/)', function(){
+		commangular.aspect('@AfterExecution(/com\.test1.*/)', function(){
 
 			return {
 

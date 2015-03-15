@@ -37,7 +37,7 @@
 		var matcherString = interceptorExtractor.exec(result[2])[1];
 		var matcher = new RegExp("^%" + matcherString + "%\{(.*)\}$","mg");
 		var aspectOrder = order || (order = 0);
-		if(!/(\bBefore\b|\bAfter\b|\bAfterThrowing\b|\bAround\b)/.test(poincut))
+		if(!/(\bBefore\b|\bAfterExecution\b|\bAfter\b|\bAfterThrowing\b|\bAround\b)/.test(poincut))
 			throw new Error('aspect descriptor ' + aspectDescriptor + ' contains errors');
 		aspects.push({poincut:poincut,
 			matcher:matcher,
@@ -53,7 +53,7 @@
 		var matcherString = interceptorExtractor.exec(result[2])[1];
 		var matcher = new RegExp("^%" + matcherString + "%\{(.*)\}$","mg");
 		var aspectOrder = order || (order = 0);
-		if(!/(\bBefore\b|\bAfter\b|\bAfterThrowing\b)/.test(poincut))
+		if(!/(\bBefore\b|\bAfterExecution\b|\bAfter\b|\bAfterThrowing\b)/.test(poincut))
 			throw new Error('aspect descriptor ' + aspectDescriptor + ' contains errors');
 		eventAspects.push({poincut:poincut,
 			matcher:matcher,
@@ -77,7 +77,7 @@
 				}
 			}
 		}];	
-		var aspectDescriptor = "@After(/" + escapeRegExp(commandName) + "/)";
+		var aspectDescriptor = "@AfterExecution(/" + escapeRegExp(commandName) + "/)";
 		commangular.aspect(aspectDescriptor,aspectResolverFunction,-100);
 	}
 
@@ -281,7 +281,7 @@
 					return deferred.promise;
 				})
 				.then(function(){
-					return self.intercept('After',descriptor.command.interceptors);
+					return self.intercept('AfterExecution',descriptor.command.interceptors);
 				})
 				.then(function(){
 					result = self.exeOnResult(self.contextData.lastResult);

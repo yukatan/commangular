@@ -1,6 +1,6 @@
 "use strict";
 
-describe("Multiple After execution testing", function() {
+describe("Multiple AfterExecution execution testing", function() {
 
 	var provider;
 	var interceptor1Executed = false;
@@ -11,7 +11,7 @@ describe("Multiple After execution testing", function() {
 
 		commangular.reset();
 		
-		commangular.aspect('@After(/com\.test1.*/)', function(){
+		commangular.aspect('@AfterExecution(/com\.test1.*/)', function(){
 
 			return {
 
@@ -24,7 +24,7 @@ describe("Multiple After execution testing", function() {
 			
 		},1);
 		
-		commangular.aspect('@After(/com\.test1.*/)', function(lastResult){
+		commangular.aspect('@AfterExecution(/com\.test1.*/)', function(lastResult){
 			
 			return {
 

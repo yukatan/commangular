@@ -1,6 +1,6 @@
 "use strict";
 
-describe("Aspect @After execution testing", function() {
+describe("Aspect @AfterExecution execution testing", function() {
 
 	var provider;
 	var scope;
@@ -11,7 +11,7 @@ describe("Aspect @After execution testing", function() {
 
 		commangular.reset();
 		
-		commangular.aspect('@After(/com\.test1.*/)', function(){
+		commangular.aspect('@AfterExecution(/com\.test1.*/)', function(){
 
 			return {
 
@@ -23,7 +23,7 @@ describe("Aspect @After execution testing", function() {
 			
 		});
 		
-		commangular.aspect('@After(/com\.test2.*/)', function(lastResult){
+		commangular.aspect('@AfterExecution(/com\.test2.*/)', function(lastResult){
 			
 			return {
 

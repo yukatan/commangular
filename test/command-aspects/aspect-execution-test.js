@@ -23,7 +23,7 @@ describe("Aspect execution testing", function() {
 			}
 			
 		});
-		commangular.aspect('@After(/Command[1-9]/)', function(){
+		commangular.aspect('@AfterExecution(/Command[1-9]/)', function(){
 
 			return {
 
