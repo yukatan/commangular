@@ -160,4 +160,15 @@ describe("Aspect execution testing", function() {
 			expect(afterThrowingInterceptorExecutedAfterCommand).toBe(true);
 		});				
 	});
+
+	it("should execute the interceptor after rebuild commangular interceptors", function() {
+
+		provider.mapTo('AspectTestEvent').asSequence().add('Command1');
+		commangular.build();
+		dispatch({event:'AspectTestEvent'},function() {
+
+			expect(commandExecutedAfter).toBe(true);
+			expect(interceptorExecutedBefore).toBe(true);
+		});		
+	});
 });

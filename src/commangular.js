@@ -93,6 +93,26 @@
 		debugEnabled = enableDebug;
 	}
 
+
+	commangular.build = function(){
+
+		(function processInterceptors(collection,stringList,targets) {
+
+				angular.forEach(collection,function(aspect){
+					var result;		
+					while((result = aspect.matcher.exec(stringList)) != null) {
+						
+						if(!targets[result[1]].interceptors[aspect.poincut])
+							targets[result[1]].interceptors[aspect.poincut] = [];
+						targets[result[1]].interceptors[aspect.poincut]
+								.push({func:aspect.aspectFunction,order:aspect.order});
+					}
+				});
+				return processInterceptors;
+			}(aspects,commandNameString,commands)(eventAspects,eventNameString,eventInterceptors));
+			
+	}
+
 	//----------------------------------------------------------------------------------------------------------------------
 
 	function CommandDescriptor(ctype,command) {
@@ -507,24 +527,7 @@
 		]);
 	//------------------------------------------------------------------------------------------------------------------
 	angular.module('commangular')
-		.run(function() {
-			
-			(function processInterceptors(collection,stringList,targets) {
-
-				angular.forEach(collection,function(aspect){
-					var result;		
-					while((result = aspect.matcher.exec(stringList)) != null) {
-						
-						if(!targets[result[1]].interceptors[aspect.poincut])
-							targets[result[1]].interceptors[aspect.poincut] = [];
-						targets[result[1]].interceptors[aspect.poincut]
-								.push({func:aspect.aspectFunction,order:aspect.order});
-					}
-				});
-				return processInterceptors;
-			}(aspects,commandNameString,commands)(eventAspects,eventNameString,eventInterceptors));
-			commandNameString = eventNameString = "";
-		}); 
+		.run(commangular.build); 
 	//------------------------------------------------------------------------------------------------------------------ 
 	angular.module('commangular')
 		.config(['$provide',function($provide) {
