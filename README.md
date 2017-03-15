@@ -1,4 +1,4 @@
-#Commangular        
+# Commangular        
 [![Build Status](https://travis-ci.org/yukatan/commangular.svg?branch=master)](https://travis-ci.org/yukatan/commangular)
 
 Command framework for AngularJS.
@@ -7,7 +7,7 @@ Command framework for AngularJS.
 * Quick Guide : [http://commangular.org/get-started/](http://commangular.org/get-started)
 * Documentation : [http://commangular.org/docs/](http://commangular.org/docs/)
 
-##Overview
+## Overview
 
 Commangular is a concept on top of angularJS that aims at simplifying the creation and organization of operations in a self-contained code units and chain them together with an easy and fluent API.That code units are called 'commands'
 
@@ -16,7 +16,7 @@ Commands can be easily tested, reused, and developed in isolation.
 It is inspired by [Parsley 3 Framework](https://github.com/spicefactory) and [Jens Halm](https://github.com/jenshalm) command concept. 
 
 
-###Main features :
+### Main features :
 
 * Chaining commands in command groups.
 * Command execution in sequence or parallel.
@@ -29,7 +29,7 @@ It is inspired by [Parsley 3 Framework](https://github.com/spicefactory) and [Je
 * Custom result resolvers(on the way).
 
 
-##Installation
+## Installation
 
 * Using bower : ``` bower install commangular ```
 * Download it and add commangular.js or commangular.min.js to your index.html.
@@ -38,7 +38,7 @@ Remember to add commangular.js after angular.js. Commangular only depends on ang
 
 
 
-##License
+## License
 
 The MIT License
 
