@@ -3,7 +3,7 @@
 
 Command framework for AngularJS.
 
-* Website  : [http://commangular.org](http://commangular.org)
+* Website  : [http://commangular.tk](http://commangular.org)
 * Quick Guide : [http://commangular.org/get-started/](http://commangular.org/get-started)
 * Documentation : [http://commangular.org/docs/](http://commangular.org/docs/)
 
